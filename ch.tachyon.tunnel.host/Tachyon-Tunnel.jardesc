@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="ch.tachyon.tunnel.host/Tachyon-Tunnel.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ch.tachyon.tunnel.host/Tachyon-Tunnel.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/ch.tachyon.tunnel.engine/src/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=ch.tachyon.tunnel.plugin/src"/>
+        <javaElement handleIdentifier="=ch.tachyon.tunnel.common/src"/>
+        <javaElement handleIdentifier="=ch.tachyon.tunnel.engine/src"/>
+        <javaElement handleIdentifier="=ch.tachyon.tunnel.host/src"/>
+    </selectedElements>
+</jardesc>

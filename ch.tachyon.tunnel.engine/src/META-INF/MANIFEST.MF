@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Title: Tachyon Tunnel
+Description: Audio Plugin Interface Core
+Copyright: (C) 2010 - 2013 PitchTech
+Version: 0.1
+Vendor: PitchTech (www.pitchtech.ch)
+Bundle-SymbolicName: ch.tachyon.tunnel
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

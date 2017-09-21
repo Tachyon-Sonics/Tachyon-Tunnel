@@ -1,0 +1,29 @@
+How to run the demo host
+========================
+
+1) Load and compile all the projects into Eclipse (other build tools are not officially supported). Java >= 5 required
+  ch.tachyon.tunnel.audio
+  ch.tachyon.tunnel.common
+  ch.tachyon.tunnel.demo.host
+  ch.tachyon.tunnel.demo.plugin
+  ch.tachyon.tunnel.engine
+  ch.tachyon.tunnel.host
+  ch.tachyon.tunnel.plugin
+  ch.tachyon.tunnel.resampler (optionnal - another demo)
+  ch.tachyon.tunnel.test (optionnal - support for unit tests)
+  
+2) Create a plugin bundle, so that you can load a plugin in the demo host
+  In Eclipse, go to the ch.tachyon.tunnel.demo.plugin project
+  On Demo-Plugin.jardesc, choose the "Create JAR" contextual menu
+  A file Demo-Plugins.jar is created. This is a demo plugin bundle
+  
+3) Start the demo host
+  In Eclipse, go to the ch.tachyon.tunnel.demo.host project
+  Run the class "SimpleHost" as a Java Application
+  
+4) Use the demo
+  Source audio file: any .wav, .aiff or .au file can be selected
+  Plugin Bundle: choose the Demo-Plugins.jar file created in step 2, in the ch.tachyon.tunnel.demo.plugin project
+  Audio Effect: choose one ;-)
+  Save As: specify a nonexistant .wav, .aiff or .au file to save the result to
+  Click "Transform...". The plugin parameters are opened in a dialog. Set them as you want and confirm with Ok
