@@ -14,5 +14,7 @@ public @interface OverTime {
     public String parameterName();
 
     public double minValue();
+    
+    public double minValueNight() default Double.NaN;
 
 }
