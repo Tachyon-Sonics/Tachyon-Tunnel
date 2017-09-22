@@ -30,7 +30,7 @@ public interface IRequiredBeforeAfter {
     /**
      * The number of required samples after the audio chunk to process. If negative, the
      * absolute value is used, and zero samples are used even if no samples are available.
-     * If positive, samples before the audio chunk will only be received if available.
+     * If positive, samples after the audio chunk will only be received if available.
      * <p>
      * If {@link ILatency} is also implemented, the number of additionnal samples will be the
      * maximum between {@link ILatency#getLatency(ch.tachyon.tunnel.common.IoDirection)} and
