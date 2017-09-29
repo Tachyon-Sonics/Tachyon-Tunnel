@@ -22,7 +22,6 @@ import ch.tachyon.tunnel.plugin.opt.doc.*;
 import ch.tachyon.tunnel.plugin.opt.spec.*;
 import ch.tachyon.tunnel.plugin.opt.thread.*;
 import ch.tachyon.tunnel.plugin.param.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * Base class for bridging a plugin ({@link IPlugin}) into an effect ({@link IEffect})
@@ -340,19 +339,19 @@ public abstract class PluginToHostWrapper<P extends IPlugin> implements IEffect 
         // If that is the case, it means the plugin was NOT wrapped into a multi-threaded version.
         // We hence need to supply dummy implementation (sufficient for single-threading to work)
         if (!(processingTarget instanceof ISerialSectionHandler) && baseTarget instanceof IHasSerialSections) {
-            MultiThreading mtAnno = baseTarget.getClass().getAnnotation(MultiThreading.class);
-            if (mtAnno == null && getClass().desiredAssertionStatus()) {
-                // Warn if IHasSerialSection is implemented directly
-                Class<?>[] intfs = baseTarget.getClass().getInterfaces();
-                boolean hasIt = false;
-                for (Class<?> intf : intfs) {
-                    if (intf.equals(IHasSerialSections.class))
-                        hasIt = true;
-                }
-                if (hasIt)
-                    Debug.warn("Plugin " + baseTarget.getClass() + " implements IHasSerialSection, but lacks the @MultiThreading annotation." +
-                    		"\nThe engine will supply dummy ISerialSection implementations to make it work. However, you way want to check if this makes sense.");
-            }
+//            MultiThreading mtAnno = baseTarget.getClass().getAnnotation(MultiThreading.class);
+//            if (mtAnno == null && getClass().desiredAssertionStatus()) {
+//                // Warn if IHasSerialSection is implemented directly
+//                Class<?>[] intfs = baseTarget.getClass().getInterfaces();
+//                boolean hasIt = false;
+//                for (Class<?> intf : intfs) {
+//                    if (intf.equals(IHasSerialSections.class))
+//                        hasIt = true;
+//                }
+//                if (hasIt)
+//                    Debug.warn("Plugin " + baseTarget.getClass() + " implements IHasSerialSection, but lacks the @MultiThreading annotation." +
+//                    		"\nThe engine will supply dummy ISerialSection implementations to make it work. However, you way want to check if this makes sense.");
+//            }
             final IMtContext mtContext = new DummyMtContext();
             // Create dummy serial sections
             ((IHasSerialSections) baseTarget).createSerialSections(new ISerialSectionFactory() {
