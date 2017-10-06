@@ -167,10 +167,12 @@ public class PluginTester extends TestCase {
             nbInput += size;
             plugin.process(new float[size], size, new ISingleChanAudioSink() {
 
+                @Override
                 public void writeSamples(float[] samples) {
                     nbOutput.addAndGet(samples.length);
                 }
 
+                @Override
                 public void close() {
                 }
             });
@@ -179,10 +181,12 @@ public class PluginTester extends TestCase {
             nbInput += minSize / 2;
             plugin.process(new float[minSize], minSize / 2, new ISingleChanAudioSink() {
 
+                @Override
                 public void writeSamples(float[] samples) {
                     nbOutput.addAndGet(samples.length);
                 }
 
+                @Override
                 public void close() {
                 }
             });
@@ -217,6 +221,7 @@ public class PluginTester extends TestCase {
             nbInput += size;
             plugin.process(new float[nbChannels][size], size, new IMultiChanAudioSink() {
 
+                @Override
                 public void writeSamples(float[][] samples) {
                     int count = samples[0].length;
                     for (int k = 1; k < samples.length; k++)
@@ -224,6 +229,7 @@ public class PluginTester extends TestCase {
                     nbOutput.addAndGet(count);
                 }
 
+                @Override
                 public void close() {
                 }
             });
@@ -232,6 +238,7 @@ public class PluginTester extends TestCase {
             nbInput += minSize / 2;
             plugin.process(new float[nbChannels][minSize], minSize / 2, new IMultiChanAudioSink() {
 
+                @Override
                 public void writeSamples(float[][] samples) {
                     int count = samples[0].length;
                     for (int k = 1; k < samples.length; k++)
@@ -239,6 +246,7 @@ public class PluginTester extends TestCase {
                     nbOutput.addAndGet(count);
                 }
 
+                @Override
                 public void close() {
                 }
             });
