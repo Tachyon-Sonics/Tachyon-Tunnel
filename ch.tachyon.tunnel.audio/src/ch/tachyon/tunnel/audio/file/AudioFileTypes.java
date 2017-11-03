@@ -42,7 +42,7 @@ public class AudioFileTypes {
 
     private final static ThreadLocal<AudioFileTypes> instances = new ThreadLocal<AudioFileTypes>();
     private final static Monitor readLock = new Monitor("JavaSound Reader SPI Lock"); // Some providers are not thread safe
-    private final static Monitor writeLock = new Monitor("JavaSound Writer SPI Lock"); // Some providers are not thread safe
+    private final static Monitor writeLock = new Monitor("JavaSound Writer SPI Lock"); // Some providers are not thread safe // TODO refine
 
     // File extension -> Collection of class names
     private Map<String, Collection<String>> ext2fileReader = new HashMap<String, Collection<String>>();
@@ -349,7 +349,7 @@ public class AudioFileTypes {
      */
     AudioInputStream getAudioInputStream(String fileName, InputStream fileInput) throws IOException,
             UnsupportedAudioFileException {
-        synchronized (readLock) {
+//        synchronized (readLock) {
             // Try with the reader corresponding to the extension
             AudioFileReader reader = getAudioFileReader(fileName);
             if (reader != null) {
@@ -366,7 +366,7 @@ public class AudioFileTypes {
             Debug.warn("Using JavaSound''s AudioSystem to open file {0}", fileName);
             // Failed. Fallback to JavaSound (try all readers)
             return AudioSystem.getAudioInputStream(fileInput);
-        }
+//        }
     }
 
     /**
@@ -377,7 +377,7 @@ public class AudioFileTypes {
      * and the format is anything else than AU. Use {@link #write(AudioInputStream, Type, File)} instead.
      */
     static int write(AudioInputStream stream, AudioFileFormat.Type fileType, OutputStream out) throws IOException {
-        synchronized (writeLock) {
+//        synchronized (writeLock) {
             if (fileType.equals(AudioFileFormat.Type.WAVE)) {
                 // Force the use of tritonus
                 WaveAudioFileWriter writer = new WaveAudioFileWriter();
@@ -393,7 +393,7 @@ public class AudioFileTypes {
             } else {
                 return AudioSystem.write(stream, fileType, out);
             }
-        }
+//        }
     }
     
     /**
@@ -404,7 +404,7 @@ public class AudioFileTypes {
      * length by seeking backwards and patching the header in case the given stream is of unspecified length.
      */
     static int write(AudioInputStream stream, AudioFileFormat.Type fileType, File outputFile) throws IOException {
-        synchronized (writeLock) {
+//        synchronized (writeLock) {
             if (fileType.equals(AudioFileFormat.Type.WAVE)) {
                 // Force the use of tritonus
                 WaveAudioFileWriter writer = new WaveAudioFileWriter();
@@ -420,7 +420,7 @@ public class AudioFileTypes {
             } else {
                 return AudioSystem.write(stream, fileType, outputFile);
             }
-        }
+//        }
     }
 
     /**
@@ -456,7 +456,7 @@ public class AudioFileTypes {
     }
 
     public AudioFileFormat getAudioFileFormat(String fileName, InputStream fileInput) throws IOException, UnsupportedAudioFileException {
-        synchronized (readLock) {
+//        synchronized (readLock) {
             // Try with the reader corresponding to the extension
             AudioFileReader reader = getAudioFileReader(fileName);
             if (reader != null) {
@@ -469,7 +469,7 @@ public class AudioFileTypes {
 
             // Failed. Fallback to JavaSound (try all readers)
             return AudioSystem.getAudioFileFormat(fileInput);
-        }
+//        }
     }
 
 }
