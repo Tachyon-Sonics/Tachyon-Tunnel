@@ -128,6 +128,21 @@ public class AudioFileIO {
     }
     
     /**
+     * Create an {@link InputStream} that read from the given {@link IMultiChanAudioSource} in the specified audio file format
+     * @param audioSource the audio source to read from
+     * @param saveFormat the audio file format
+     * @param progress an optional progress monitor
+     * @return a stream with the audio source encoded in the given audio file format
+     */
+    public static AudioInputStream createInputStream(IMultiChanAudioSource audioSource, AudioFileFormat saveFormat, IProgressMonitor progress) {
+        if (saveFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED && !saveFormat.getType().equals(Type.AU))
+            throw new IllegalArgumentException("Writing to a stream with unspecified length is not allowed");
+        AudioSourceInputStream source = AudioSourceInputStream.createAudioSourceInputStream(audioSource, saveFormat.getFormat(), progress, saveFormat.getFrameLength());
+        AudioInputStream input = new AudioInputStream(source, saveFormat.getFormat(), saveFormat.getFrameLength());
+        return input;
+    }
+    
+    /**
      * Close an object that might wrap a {@link Closeable}. For instance, some implementations of {@link IMultiChanAudioSource} wrap
      * an {@link InputStream}. Invoking this method on such an implementation will close the underlying input stream. Else it has no effect.
      * <p>
