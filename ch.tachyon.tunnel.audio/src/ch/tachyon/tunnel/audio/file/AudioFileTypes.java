@@ -3,7 +3,8 @@ package ch.tachyon.tunnel.audio.file;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
+import java.util.concurrent.atomic.*;
+import java.util.concurrent.locks.*;
 import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat.Encoding;
@@ -41,13 +42,13 @@ public class AudioFileTypes {
     private static final String SERVICE_RESOURCE = "META-INF/services/org.corebounce.audio.file.FileReader";
 
     private final static ThreadLocal<AudioFileTypes> instances = new ThreadLocal<AudioFileTypes>();
-    private final static Monitor readLock = new Monitor("JavaSound Reader SPI Lock"); // Some providers are not thread safe
-    private final static Monitor writeLock = new Monitor("JavaSound Writer SPI Lock"); // Some providers are not thread safe // TODO refine
+    private final static Lock readLock = new ReentrantLock(true); // Some providers are not thread safe
 
     // File extension -> Collection of class names
     private Map<String, Collection<String>> ext2fileReader = new HashMap<String, Collection<String>>();
     private Map<String, String> ext2Type = new LinkedHashMap<String, String>();
     private Map<String, Type> ext2writeType = new LinkedHashMap<String, Type>();
+    private Set<String> threadUnsafeProviders = new HashSet<>(); // Class name
 
 
     private AudioFileTypes() {
@@ -83,6 +84,8 @@ public class AudioFileTypes {
                 };
                 try {
                     IOUtils.loadUtf8Properties(metaInf.openStream(), propParser);
+                    boolean threadSafe = true;
+                    Collection<String> foundClassNames = new ArrayList<>();
                     for (Object key0 : props.keySet()) {
                         String key = (String) key0;
                         if (key.startsWith("loader.")) {
@@ -97,6 +100,7 @@ public class AudioFileTypes {
                                         ext2fileReader.put(ext, classNames);
                                     }
                                     classNames.add(className);
+                                    foundClassNames.add(className);
                                 } catch (Throwable ex) {
                                     Debug.warn("Cannot load JavaSound FileReader {0} for extension {1}", className, ext);
                                     Debug.warn(ex);
@@ -107,8 +111,12 @@ public class AudioFileTypes {
                             String type = (String) props.get(key);
                             if (type != null && !type.trim().equals("") && !ext.substring(1).trim().equals(""))
                                 ext2Type.put(ext, type);
+                        } else if (key.equals("thread.safe")) {
+                            threadSafe = !"false".equalsIgnoreCase((String) props.get(key));
                         }
                     }
+                    if (!threadSafe)
+                        threadUnsafeProviders.addAll(foundClassNames);
                 } catch (IOException ex) {
                     Debug.warn(ex);
                 } catch (Exception ex) {
@@ -313,7 +321,7 @@ public class AudioFileTypes {
 
     // Opening file
 
-    protected AudioFileReader getAudioFileReader(String fileName) throws IOException {
+    protected AudioFileReader getAudioFileReader(String fileName, AtomicBoolean threadSafe) throws IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         int lastDot = fileName.lastIndexOf('.');
         if (lastDot >= 0) {
@@ -324,6 +332,7 @@ public class AudioFileTypes {
                     try {
                         Class<?> clazz = Class.forName(fileReaderClassName, true, classLoader);
                         AudioFileReader reader = (AudioFileReader) clazz.newInstance();
+                        threadSafe.set(!threadUnsafeProviders.contains(fileReaderClassName));
                         return reader;
                     } catch (Exception ex) {
                         Debug.error(ex);
@@ -349,24 +358,28 @@ public class AudioFileTypes {
      */
     AudioInputStream getAudioInputStream(String fileName, InputStream fileInput) throws IOException,
             UnsupportedAudioFileException {
-//        synchronized (readLock) {
-            // Try with the reader corresponding to the extension
-            AudioFileReader reader = getAudioFileReader(fileName);
-            if (reader != null) {
-                try {
-                    return reader.getAudioInputStream(fileInput);
-                } catch (IOException ex) {
-                    Debug.warn(ex);
-                } catch (UnsupportedAudioFileException ex) {
-                    // Maybe the extension is wrong
-                    Debug.warn(ex);
-                }
+        AtomicBoolean threadSafe = new AtomicBoolean();
+        // Try with the reader corresponding to the extension
+        AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
+        if (reader != null) {
+            try {
+                if (!threadSafe.get())
+                    readLock.lock();
+                return reader.getAudioInputStream(fileInput);
+            } catch (IOException ex) {
+                Debug.warn(ex);
+            } catch (UnsupportedAudioFileException ex) {
+                // Maybe the extension is wrong
+                Debug.warn(ex);
+            } finally {
+                if (!threadSafe.get())
+                    readLock.unlock();
             }
+        }
 
-            Debug.warn("Using JavaSound''s AudioSystem to open file {0}", fileName);
-            // Failed. Fallback to JavaSound (try all readers)
-            return AudioSystem.getAudioInputStream(fileInput);
-//        }
+        Debug.warn("Using JavaSound''s AudioSystem to open file {0}", fileName);
+        // Failed. Fallback to JavaSound (try all readers)
+        return AudioSystem.getAudioInputStream(fileInput);
     }
 
     /**
@@ -377,23 +390,21 @@ public class AudioFileTypes {
      * and the format is anything else than AU. Use {@link #write(AudioInputStream, Type, File)} instead.
      */
     static int write(AudioInputStream stream, AudioFileFormat.Type fileType, OutputStream out) throws IOException {
-//        synchronized (writeLock) {
-            if (fileType.equals(AudioFileFormat.Type.WAVE)) {
-                // Force the use of tritonus
-                WaveAudioFileWriter writer = new WaveAudioFileWriter();
-                return writer.write(stream, fileType, out);
-            } else if (fileType.equals(AudioFileFormat.Type.AIFF) || fileType.equals(AudioFileFormat.Type.AIFC)) {
-                // Force the use of tritonus
-            	AiffAudioFileWriter writer = new AiffAudioFileWriter();
-            	return writer.write(stream, fileType, out);
-            } else if (fileType.equals(AudioFileFormat.Type.AU)) {
-            	// Force the use of tritonus
-            	AuAudioFileWriter writer = new AuAudioFileWriter();
-            	return writer.write(stream, fileType, out);
-            } else {
-                return AudioSystem.write(stream, fileType, out);
-            }
-//        }
+        if (fileType.equals(AudioFileFormat.Type.WAVE)) {
+            // Force the use of tritonus
+            WaveAudioFileWriter writer = new WaveAudioFileWriter();
+            return writer.write(stream, fileType, out);
+        } else if (fileType.equals(AudioFileFormat.Type.AIFF) || fileType.equals(AudioFileFormat.Type.AIFC)) {
+            // Force the use of tritonus
+        	AiffAudioFileWriter writer = new AiffAudioFileWriter();
+        	return writer.write(stream, fileType, out);
+        } else if (fileType.equals(AudioFileFormat.Type.AU)) {
+        	// Force the use of tritonus
+        	AuAudioFileWriter writer = new AuAudioFileWriter();
+        	return writer.write(stream, fileType, out);
+        } else {
+            return AudioSystem.write(stream, fileType, out);
+        }
     }
     
     /**
@@ -404,23 +415,21 @@ public class AudioFileTypes {
      * length by seeking backwards and patching the header in case the given stream is of unspecified length.
      */
     static int write(AudioInputStream stream, AudioFileFormat.Type fileType, File outputFile) throws IOException {
-//        synchronized (writeLock) {
-            if (fileType.equals(AudioFileFormat.Type.WAVE)) {
-                // Force the use of tritonus
-                WaveAudioFileWriter writer = new WaveAudioFileWriter();
-                return writer.write(stream, fileType, outputFile);
-            } else if (fileType.equals(AudioFileFormat.Type.AIFF) || fileType.equals(AudioFileFormat.Type.AIFC)) {
-                // Force the use of tritonus
-                AiffAudioFileWriter writer = new AiffAudioFileWriter();
-                return writer.write(stream, fileType, outputFile);
-            } else if (fileType.equals(AudioFileFormat.Type.AU)) {
-                // Force the use of tritonus
-                AuAudioFileWriter writer = new AuAudioFileWriter();
-                return writer.write(stream, fileType, outputFile);
-            } else {
-                return AudioSystem.write(stream, fileType, outputFile);
-            }
-//        }
+        if (fileType.equals(AudioFileFormat.Type.WAVE)) {
+            // Force the use of tritonus
+            WaveAudioFileWriter writer = new WaveAudioFileWriter();
+            return writer.write(stream, fileType, outputFile);
+        } else if (fileType.equals(AudioFileFormat.Type.AIFF) || fileType.equals(AudioFileFormat.Type.AIFC)) {
+            // Force the use of tritonus
+            AiffAudioFileWriter writer = new AiffAudioFileWriter();
+            return writer.write(stream, fileType, outputFile);
+        } else if (fileType.equals(AudioFileFormat.Type.AU)) {
+            // Force the use of tritonus
+            AuAudioFileWriter writer = new AuAudioFileWriter();
+            return writer.write(stream, fileType, outputFile);
+        } else {
+            return AudioSystem.write(stream, fileType, outputFile);
+        }
     }
 
     /**
@@ -456,20 +465,24 @@ public class AudioFileTypes {
     }
 
     public AudioFileFormat getAudioFileFormat(String fileName, InputStream fileInput) throws IOException, UnsupportedAudioFileException {
-//        synchronized (readLock) {
-            // Try with the reader corresponding to the extension
-            AudioFileReader reader = getAudioFileReader(fileName);
-            if (reader != null) {
-                try {
-                    return reader.getAudioFileFormat(fileInput);
-                } catch (IOException ex) {
-                    Debug.warn(ex);
-                }
+        AtomicBoolean threadSafe = new AtomicBoolean();
+        // Try with the reader corresponding to the extension
+        AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
+        if (reader != null) {
+            try {
+                if (!threadSafe.get())
+                    readLock.lock();
+                return reader.getAudioFileFormat(fileInput);
+            } catch (IOException ex) {
+                Debug.warn(ex);
+            } finally {
+                if (!threadSafe.get())
+                    readLock.unlock();
             }
+        }
 
-            // Failed. Fallback to JavaSound (try all readers)
-            return AudioSystem.getAudioFileFormat(fileInput);
-//        }
+        // Failed. Fallback to JavaSound (try all readers)
+        return AudioSystem.getAudioFileFormat(fileInput);
     }
 
 }
