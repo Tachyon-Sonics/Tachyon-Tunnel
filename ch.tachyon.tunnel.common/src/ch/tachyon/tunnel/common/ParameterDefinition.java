@@ -2,7 +2,7 @@ package ch.tachyon.tunnel.common;
 
 import java.util.*;
 
-public class ParameterDefinition<P, T> { // TODO unit test for correctness, also unit test names in presets
+public class ParameterDefinition<P, T> { // WAIT unit test for correctness, also unit test names in presets
 
     private final Class<P> pluginClass;
     private final Class<T> type;
