@@ -74,6 +74,9 @@ public class ClockedAsynchronousQueue<E> {
             E result = buffers.getAndSet(index, null);
             if (result != null)
                 return result;
+            /*
+             * WAIT dispose can fully occur here. NO guarantee that active will be seen as false though
+             */
             // Buffer not produced yet - Register us as parked consumer
             boolean success = parkedConsumers.compareAndSet(index, null, Thread.currentThread());
             assert success;
@@ -112,7 +115,7 @@ public class ClockedAsynchronousQueue<E> {
     
     private void park() throws InterruptedException {
         if (active)
-            LockSupport.park();
+            LockSupport.parkNanos(10_000_000_000l);
         else
             throw new InterruptedException();
     }
