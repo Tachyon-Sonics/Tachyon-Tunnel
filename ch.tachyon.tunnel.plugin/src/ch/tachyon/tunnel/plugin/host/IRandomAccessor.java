@@ -52,6 +52,8 @@ public interface IRandomAccessor {
      * process.
      * <p>
      * Writing data before or after the region to process is allowed but the host may ignore it.
+     * More precisely, the host may either ignore it, or use it to mix and/or cross-fade with any existing audio,
+     * for instance if the region to process is a subset of the audio file being edited.
      */
     public void write(long position, float[][] samples, int length);
 
