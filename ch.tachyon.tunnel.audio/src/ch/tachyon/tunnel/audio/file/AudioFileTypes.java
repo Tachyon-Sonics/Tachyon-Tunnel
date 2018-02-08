@@ -439,11 +439,22 @@ public class AudioFileTypes {
      * is available, this method will decode the entire file to compute the frame length. Be aware that this can be very time consuming.
      */
     public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength) throws IOException, UnsupportedAudioFileException {
-        InputStream fileInput = new RandomFileInputStream(file);
+        return getAudioFileFormat(file, forceComputeLength, null);
+    }
+    
+    /**
+     * Get the audio file format of the given file
+     * @param forceComputeLength Some audio format does not provide an exact frame length (mp3, m4a, etc), and hence if this flag is <tt>false</tt>,
+     * {@link AudioFileFormat#getFrameLength()} will return {@link AudioSystem#NOT_SPECIFIED}. If this flag is <tt>true</tt> and no exact length
+     * is available, this method will decode the entire file to compute the frame length. Be aware that this can be very time consuming.
+     * @param progress an optionnal progress monitor. Mostly usefull when the file has to be scanned to compute its length. Can be <tt>null</tt>
+     */
+    public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
+        InputStream fileInput = new RandomFileInputStream(file, progress);
         AudioFileFormat result = getAudioFileFormat(file.getName(), fileInput);
         fileInput.close();
         if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED) {
-            Pair<AudioFormat, Integer> info = getFormatAndFrameLength(file);
+            Pair<AudioFormat, Integer> info = getFormatAndFrameLength(file, progress);
             AudioFormat format = info.getFirst();
             int nbFrames = info.getSecond();
             result = new AudioFileFormat(result.getType(), format, nbFrames, result.properties());
@@ -451,9 +462,9 @@ public class AudioFileTypes {
         return result;
     }
 
-    private Pair<AudioFormat, Integer> getFormatAndFrameLength(File file) throws IOException, UnsupportedAudioFileException {
+    private Pair<AudioFormat, Integer> getFormatAndFrameLength(File file, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
         final int bufferSize = 16384;
-        IMultiChanAudioSource source = AudioFileIO.createAudioSource(file);
+        IMultiChanAudioSource source = AudioFileIO.createAudioSource(file, progress);
         int nbFrames = 0;
         float[][] buffer = new float[source.getAudioFormat().getChannels()][bufferSize];
         int read = source.readSamples(buffer);
