@@ -70,6 +70,10 @@ public class Utils {
     public static boolean isBelowJava16() {
         return javaMajorVersion <= 1 && javaMinorVersion < 6;
     }
+    
+    public static boolean isBelowJava17() {
+        return javaMajorVersion <= 1 && javaMinorVersion < 7;
+    }
 
     public static boolean isBelowJava18() {
         return javaMajorVersion <= 1 && javaMinorVersion < 8;
