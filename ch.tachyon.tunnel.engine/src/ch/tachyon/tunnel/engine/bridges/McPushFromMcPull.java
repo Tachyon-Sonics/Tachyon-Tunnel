@@ -55,7 +55,7 @@ public class McPushFromMcPull extends PluginToHostWrapper<IMultiChanPullEffect> 
             outputLength = info.negociateFixedChunkLength(outputLength);
         if (outputLength < 0)
             outputLength = DEFAULT_MAX_LENGTH;
-        queueCapacity = maxInputLength + outputLength;
+        queueCapacity = maxInputLength + Math.max(outputLength, maxInputLength);
         // Init latency compensation param
         headOutToSkip = super.getLatency(IoDirection.OUTPUT);
         tailInToPad = super.getLatency(IoDirection.INPUT);
