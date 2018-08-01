@@ -15,5 +15,6 @@
         <javaElement handleIdentifier="=ch.tachyon.tunnel.common/src"/>
         <javaElement handleIdentifier="=ch.tachyon.tunnel.engine/src"/>
         <javaElement handleIdentifier="=ch.tachyon.tunnel.host/src"/>
+        <javaElement handleIdentifier="=ch.tachyon.tunnel.audio/src"/>
     </selectedElements>
 </jardesc>
