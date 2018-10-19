@@ -107,11 +107,11 @@ public class Resample implements IPullEffect, IStartStop, ILatency, IAudioSource
         return ratio < 1.0;
     }
 
-    public int getLatency(IoDirection ioDirection) {
+    public double getLatency(IoDirection ioDirection) {
         if (ioDirection == IoDirection.INPUT)
             return resampler.getLatency();
         else
-            return (int) (resampler.getLatency() / ratio + 0.5); // !! Resampler ratio is 1.0 / this.ratio
+            return resampler.getLatency() / ratio; // !! Resampler ratio is 1.0 / this.ratio
     }
 
     public int process(ISingleChanAudioSource source, float[] output) {

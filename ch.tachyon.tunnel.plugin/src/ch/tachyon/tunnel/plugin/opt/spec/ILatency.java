@@ -25,6 +25,6 @@ public interface ILatency {
      * The two values may not be the same for a plugin that changes the audio speed. A <code>null</code> should
      * be interpreted like {@link IoDirection#OUTPUT}.
      */
-    public int getLatency(IoDirection ioDirection); // WAIT remove arg and add new interface ISpeedChanger
+    public double getLatency(IoDirection ioDirection); // WAIT remove arg and add new interface ISpeedChanger
 
 }

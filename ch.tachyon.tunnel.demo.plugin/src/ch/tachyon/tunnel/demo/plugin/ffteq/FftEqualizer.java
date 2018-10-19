@@ -266,7 +266,7 @@ public class FftEqualizer implements ISimpleEffect, IStartStop, IBeginProcessing
     /**
      * Implemented to report some latency to the tachyon tunnel engine so that it can compensate it
      */
-    public int getLatency(IoDirection ioDirection) {
+    public double getLatency(IoDirection ioDirection) {
         if (engine == null)
             return 0;
         return engine.getLatency();

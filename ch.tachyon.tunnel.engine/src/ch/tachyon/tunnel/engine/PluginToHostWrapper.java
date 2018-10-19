@@ -396,7 +396,7 @@ public abstract class PluginToHostWrapper<P extends IPlugin> implements IEffect 
     protected int getLatency(IoDirection ioDirection) {
         checkStarted(true);
         if (baseTarget instanceof ILatency)
-            return ((ILatency) baseTarget).getLatency(ioDirection);
+            return (int) ( ((ILatency) baseTarget).getLatency(ioDirection) + 0.5); // TODO review
         return 0;
     }
 
