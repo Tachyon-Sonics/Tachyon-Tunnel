@@ -9,6 +9,7 @@ import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.demo.plugin.resample.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
+import ch.tachyon.tunnel.tools.*;
 
 /**
  * Utility to resample (change the playback speed, affecting both pitch and tempo) an audio file.
@@ -33,6 +34,11 @@ public class Resampler {
     private final static int RESAMPLE_QUALITY = 3;
 
 
+    /**
+     * Main method, implemented using the low-level methods.
+     * <p>
+     * See {@link #main2(String[])} for a simpler way using the high-level, but more limited {@link SimpleProcessor} class.
+     */
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
         if (args.length != 3) {
             System.out.println("Usage: java -jar Resampler.jar <input file> <ratio> <output file>");
@@ -157,6 +163,61 @@ public class Resampler {
          * That's all. The plugin is automatically released when the last audio chunk is read from the source file.
          * The input streams are also automatically closed.
          */
+    }
+    
+    /**
+     * Simpler version, using {@link SimpleProcessor}.
+     * <p>
+     * The simpler {@link SimpleProcessor} class, unlike {@link StreamProcessor}, does not allow you to:
+     * <ul>
+     * <li>Specify you own audio source by implementing {@link IMultiChanAudioSource} directly
+     * <li>Capture and/or modify the audio source by wrapping {@link IMultiChanAudioSource}
+     * <li>Chain multiple effects
+     * </ul>
+     */
+    public static void main2(String[] args) throws IOException, UnsupportedAudioFileException {
+        if (args.length != 3) {
+            System.out.println("Usage: java -jar Resampler.jar <input file> <ratio> <output file>");
+            System.exit(1);
+        }
+
+        /*
+         * Read arguments from the command line. There must be 3 arguments:
+         * - input file
+         * - resample ratio, as a floating point number
+         * - output file
+         */
+        File inputFile = new File(args[0]);
+        double ratio = Double.parseDouble(args[1]);
+        File outputFile = new File(args[2]);
+        
+        /*
+         * Load the resampler plugin. Note that SimpleProcessor only works with the IPullEffect interface.
+         * However it does not matter if the plugin does not implement this interface, as the tachyon tunnel
+         * engine will do the bridge automatically. In fact, the engine will also automatically duplicate
+         * the plugin in order to process the two channels of a stereo file, as the plugin itself only handles
+         * mono audio streams. This also works for more than two channels.
+         */
+        IPullEffect plugin = SimpleProcessor.getPlugin(Resample.class);
+        
+        /*
+         * Set the plugin's parameters. This must be done before the plugin is used
+         * using SimpleProcessor.process().
+         *
+         * This is the only place we can use the plugin directly, and this is limited to public static final fields.
+         * A plugin (class Resample in that example) should never be used directly in an other ways.
+         *
+         * Note that we might get IllegalArgumentException if the specified value is out of the range defined
+         * by the plugin. Parameters can also be specifed by their name, as a String.
+         */
+        plugin.setParameterValue(Resample.RATIO, ratio); // Resample.RATIO could be replaced by "ratio" (the actual internal name of the parameter)
+        plugin.setParameterValue(Resample.QUALITY, RESAMPLE_QUALITY); // Resample.QUALITY could be replaced by "accuracy" (the actual internal name of the parameter)
+        
+        /*
+         * Transform the given audio input file using the plugin, writing the result to the given output file.
+         * There are also overloaded version of the process() method using InputStream and OutputStream
+         */
+        SimpleProcessor.process(inputFile, plugin, outputFile);
     }
 
 }

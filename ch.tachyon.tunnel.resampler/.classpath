@@ -16,5 +16,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/ch.tachyon.tunnel.audio"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ch.tachyon.tunnel.tools"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
