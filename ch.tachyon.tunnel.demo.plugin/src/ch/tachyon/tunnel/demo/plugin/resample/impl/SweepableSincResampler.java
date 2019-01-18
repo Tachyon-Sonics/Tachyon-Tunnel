@@ -19,11 +19,11 @@ public class SweepableSincResampler implements ISweepableResampler {
      * aliasing should be minimal. This argument is ignored if the resampling ration is 1.
      */
     public SweepableSincResampler(IAudioSource source, double ratio, int nbSamplesPerZeroCross, int nbZeroCross,
-            float kaiserAttenuationDb, float antiAliasing, int bufferSize) {
+            float antiAliasing, int bufferSize) {
         if (nbZeroCross < 1)
             throw new IllegalArgumentException();
         this.source = new SweepableSincLiConvolvedAudioSource(source, nbSamplesPerZeroCross, nbZeroCross,
-                kaiserAttenuationDb, bufferSize, antiAliasing, ratio);
+                bufferSize, antiAliasing, ratio);
         this.latency = nbZeroCross;
     }
 

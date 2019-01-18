@@ -22,7 +22,7 @@ public class SincResampler implements IResampler {
      * 'count' parameter.
      */
     public SincResampler(IAudioSource source, double ratio, int nbSamplesPerZeroCross, int nbZeroCross,
-            float kaiserAttenuationDb, float antiAliasing, int bufferSize) {
+            float antiAliasing, int bufferSize) {
         if (nbZeroCross < 1)
             throw new IllegalArgumentException();
         float amplitudeCorrection = (float) Math.min(ratio, 1.0);
@@ -31,7 +31,7 @@ public class SincResampler implements IResampler {
         float sincStretch = 1.0f / amplitudeCorrection;
         double srcStep = 1.0 / ratio;
         this.source = new SincLiConvolvedAudioSource(source, nbSamplesPerZeroCross, nbZeroCross,
-                kaiserAttenuationDb, sincStretch, bufferSize, srcStep, amplitudeCorrection);
+                sincStretch, bufferSize, srcStep, amplitudeCorrection);
         this.latency = nbZeroCross;
     }
 

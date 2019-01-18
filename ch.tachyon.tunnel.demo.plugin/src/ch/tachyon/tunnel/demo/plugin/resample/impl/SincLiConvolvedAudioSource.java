@@ -33,17 +33,15 @@ public class SincLiConvolvedAudioSource implements IAudioSource, IResetable {
      * between every sample before convolving
      * @param nbSamplesPerZeroCross numbre of sample between zero crossing for the sinc function
      * @param nbZeroCross number of zero cross (on one side) for the sinc function
-     * @param kaiserAttenuationDb in dB, positive. Parameter for the kaiser window applied to the sinc function
      * @param stretch the amount by which the sinc function must be stretched.
      * @param bufferSize the number of sample to read from the source at once
      * @param srcStep the rate at which the source must be read. 1=same as result, 0.5=half speed, etc
      * @param amplitudeCorrection amount by which output samples are multiplied
      */
     public SincLiConvolvedAudioSource(IAudioSource source, int nbSamplesPerZeroCross, int nbZeroCross,
-            float kaiserAttenuationDb, float stretch, int bufferSize, double srcStep,
-            float amplitudeCorrection) {
+            float stretch, int bufferSize, double srcStep, float amplitudeCorrection) {
         this.source = source;
-        this.sincBuffer = new SincLiBuffer(nbSamplesPerZeroCross, nbZeroCross, kaiserAttenuationDb, stretch);
+        this.sincBuffer = new SincLiBuffer(nbSamplesPerZeroCross, nbZeroCross, stretch);
         this.nbZeroCross = nbZeroCross;
         this.bufferSize = bufferSize;
         this.historySize = nbZeroCross * 2 + 1;

@@ -16,25 +16,25 @@ public class SincLiBuffer extends LinearInterpolatedBuffer {
 
 
     /**
-     * Create a new buffer with a sinc function windowed by a kaiser window
+     * Create a new buffer with a sinc function windowed by a Hann window
      */
-    public SincLiBuffer(int nbSamplesPerZeroCross, int nbZeroCross, float kaiserAttenuationDb, float stretch) {
+    public SincLiBuffer(int nbSamplesPerZeroCross, int nbZeroCross, float stretch) {
         // We pad with (nbSamplesPerZeroCross / 2) + 2 additional zeroes (to avoid range checking)
         super(nbSamplesPerZeroCross * nbZeroCross + (nbSamplesPerZeroCross / 2) + 2);
         this.scaleFactor = (float) nbSamplesPerZeroCross / (float) Math.PI;
-        fillData(nbSamplesPerZeroCross, nbZeroCross, kaiserAttenuationDb, stretch);
+        fillData(nbSamplesPerZeroCross, nbZeroCross, stretch);
     }
 
-    private void fillData(int samplesPerZeroCross, int nbZeroCross, float kaiserAttenuationDb, float stretch) {
-        float[] kaiserWindow = new float[samplesPerZeroCross * nbZeroCross * 2];
-        Windows.fillKaiserWindow(kaiserWindow, Windows.getKaiserBeta(kaiserAttenuationDb));
+    private void fillData(int samplesPerZeroCross, int nbZeroCross, float stretch) {
+        float[] window = new float[samplesPerZeroCross * nbZeroCross * 2];
+        Windows.fillHannWindow(window);
         double nrj2 = 0.0f;
         // Create windowed sinc
         for (int i = 0; i < super.getSize(); i++) {
             float angle = (float) i / (float) samplesPerZeroCross;
             float windowCoeff = 0.0f;
-            if (i <= kaiserWindow.length / 2)
-                windowCoeff = kaiserWindow[kaiserWindow.length / 2 - i];
+            if (i <= window.length / 2)
+                windowCoeff = window[window.length / 2 - i];
             float value = sinc(angle / stretch) * windowCoeff;
             nrj2 += value * value;
             super.set(i, value);
@@ -97,7 +97,7 @@ public class SincLiBuffer extends LinearInterpolatedBuffer {
     }
 
     public static void main(String[] args) {
-        SincLiBuffer buffer = new SincLiBuffer(10, 7, 80.0f, 1.0f);
+        SincLiBuffer buffer = new SincLiBuffer(10, 7, 1.0f);
         float max = (float) Math.PI * 7.5f;
         float step = (float) Math.PI / 20.0f;
         for (float a = -max; a < max; a+= step) {

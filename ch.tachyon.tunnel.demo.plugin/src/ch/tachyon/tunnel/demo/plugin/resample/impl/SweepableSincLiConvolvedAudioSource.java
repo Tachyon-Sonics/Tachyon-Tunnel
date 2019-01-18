@@ -9,7 +9,7 @@ public class SweepableSincLiConvolvedAudioSource implements IAudioSource, IReset
 
     private final IAudioSource source;
     private final SincLiBuffer sincBuffer;
-    private final KaiserLiBuffer kaiserBuffer;
+    private final WindowLiBuffer kaiserBuffer;
     private final int nbZeroCross;
     private final float antiAliasing;
     private float stretch;
@@ -33,14 +33,13 @@ public class SweepableSincLiConvolvedAudioSource implements IAudioSource, IReset
      * between every sample before convolving
      * @param nbSamplesPerZeroCross numbre of sample between zero crossing for the sinc function
      * @param nbZeroCross number of zero cross (on one side) for the sinc function
-     * @param kaiserAttenuationDb in dB, positive. Parameter for the kaiser window applied to the sinc function
      * @param bufferSize the number of sample to read from the source at once
      */
     public SweepableSincLiConvolvedAudioSource(IAudioSource source, int nbSamplesPerZeroCross, int nbZeroCross,
-            float kaiserAttenuationDb, int bufferSize, float antiAliasing, double ratio) {
+            int bufferSize, float antiAliasing, double ratio) {
         this.source = source;
         this.sincBuffer = new SincLiBuffer(nbSamplesPerZeroCross, nbZeroCross);
-        this.kaiserBuffer = new KaiserLiBuffer(nbSamplesPerZeroCross, nbZeroCross, kaiserAttenuationDb);
+        this.kaiserBuffer = new WindowLiBuffer(nbSamplesPerZeroCross, nbZeroCross);
         this.nbZeroCross = nbZeroCross;
         this.antiAliasing = antiAliasing;
         this.bufferSize = bufferSize;

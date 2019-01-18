@@ -13,19 +13,15 @@ public class ResamplerFactory {
 
     private final static int SINC_UPSAMPLE_FACTOR_LOW = 64; // 2^(nbits/2) --> 12 bits
     private final static int SINC_NB_ZERO_CROSS_LOW = 4;
-    private final static float SINC_KAISER_FACTOR_LOW = 50.0f;
 
     private final static int SINC_UPSAMPLE_FACTOR_MED = 256; // 2^(nbits/2) --> 16 bits
     private final static int SINC_NB_ZERO_CROSS_MED = 13;
-    private final static float SINC_KAISER_FACTOR_MED = 80.0f;
 
     private final static int SINC_UPSAMPLE_FACTOR_HIGH = 1024; // 2^(nbits/2) --> 20 bits
     private final static int SINC_NB_ZERO_CROSS_HIGH = 40;
-    private final static float SINC_KAISER_FACTOR_HIGH = 120.0f;
 
     private final static int SINC_UPSAMPLE_FACTOR_ULTRA = 4096; // 2^(nbits/2) --> 24 bits
     private final static int SINC_NB_ZERO_CROSS_ULTRA = 80;
-    private final static float SINC_KAISER_FACTOR_ULTRA = 144.0f;
 
     public final static int MIN_QUALITY = 0;
     public final static int MEDIUM_QUALITY = 2;
@@ -99,31 +95,31 @@ public class ResamplerFactory {
         case 2:
             if (sweepable)
                 return new SweepableSincResampler(source, ratio, SINC_UPSAMPLE_FACTOR_LOW,
-                        SINC_NB_ZERO_CROSS_LOW, SINC_KAISER_FACTOR_LOW, 1.0f, bufferSize);
+                        SINC_NB_ZERO_CROSS_LOW, 1.0f, bufferSize);
             else
                 return new SincResampler(source, ratio, SINC_UPSAMPLE_FACTOR_LOW,
-                        SINC_NB_ZERO_CROSS_LOW, SINC_KAISER_FACTOR_LOW, 1.0f, bufferSize);
+                        SINC_NB_ZERO_CROSS_LOW, 1.0f, bufferSize);
         case 3:
             if (sweepable)
                 return new SweepableSincResampler(source, ratio, SINC_UPSAMPLE_FACTOR_MED,
-                        SINC_NB_ZERO_CROSS_MED, SINC_KAISER_FACTOR_MED, 1.0f, bufferSize);
+                        SINC_NB_ZERO_CROSS_MED, 1.0f, bufferSize);
             else
                 return new SincResampler(source, ratio, SINC_UPSAMPLE_FACTOR_MED,
-                        SINC_NB_ZERO_CROSS_MED, SINC_KAISER_FACTOR_MED, 1.0f, bufferSize);
+                        SINC_NB_ZERO_CROSS_MED, 1.0f, bufferSize);
         case 4:
             if (sweepable)
                 return new SweepableSincResampler(source, ratio, SINC_UPSAMPLE_FACTOR_HIGH,
-                        SINC_NB_ZERO_CROSS_HIGH, SINC_KAISER_FACTOR_HIGH, 1.0f, bufferSize);
+                        SINC_NB_ZERO_CROSS_HIGH, 1.0f, bufferSize);
             else
                 return new SincResampler(source, ratio, SINC_UPSAMPLE_FACTOR_HIGH,
-                        SINC_NB_ZERO_CROSS_HIGH, SINC_KAISER_FACTOR_HIGH, 1.0f, bufferSize);
+                        SINC_NB_ZERO_CROSS_HIGH, 1.0f, bufferSize);
         case 5:
             if (sweepable)
                 return new SweepableSincResampler(source, ratio, SINC_UPSAMPLE_FACTOR_ULTRA,
-                        SINC_NB_ZERO_CROSS_ULTRA, SINC_KAISER_FACTOR_ULTRA, 1.0f, bufferSize);
+                        SINC_NB_ZERO_CROSS_ULTRA, 1.0f, bufferSize);
             else
                 return new SincResampler(source, ratio, SINC_UPSAMPLE_FACTOR_ULTRA,
-                        SINC_NB_ZERO_CROSS_ULTRA, SINC_KAISER_FACTOR_ULTRA, 1.0f, bufferSize);
+                        SINC_NB_ZERO_CROSS_ULTRA, 1.0f, bufferSize);
         }
         throw new IllegalArgumentException("quality must be between 0 and 5");
     }
