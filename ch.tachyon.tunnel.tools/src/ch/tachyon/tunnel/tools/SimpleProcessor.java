@@ -208,7 +208,6 @@ public class SimpleProcessor {
      * @param progress an optional {@link IProgressMonitor} implementation. The method {@link IProgressMonitor#setProgress(double, double)}
      * will be invoked regularly so the progress can be monitored. Use <tt>null</tt> if no progress monitoring is necessary. The given object
      * should not make any assumption on the frequency at which {@link IProgressMonitor#setProgress(double, double)} will be invoked.
-     * @return
      * @throws OperationAbortedException if the given progress is not null, and {@link IProgressMonitor#setProgress(double, double)} threw
      * an {@link OperationAbortedException} while transforming the file
      * @throws IOException
