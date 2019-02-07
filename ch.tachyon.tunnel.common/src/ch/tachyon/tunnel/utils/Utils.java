@@ -79,4 +79,8 @@ public class Utils {
         return javaMajorVersion <= 1 && javaMinorVersion < 8;
     }
 
+    public static boolean isBelowJava19() {
+        return javaMajorVersion <= 1 && javaMinorVersion < 9;
+    }
+
 }

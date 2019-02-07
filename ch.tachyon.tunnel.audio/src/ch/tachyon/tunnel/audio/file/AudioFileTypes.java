@@ -360,24 +360,26 @@ public class AudioFileTypes {
             UnsupportedAudioFileException {
         AtomicBoolean threadSafe = new AtomicBoolean();
         // Try with the reader corresponding to the extension
-        AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
-        if (reader != null) {
-            try {
-                if (!threadSafe.get())
-                    readLock.lock();
-                return reader.getAudioInputStream(fileInput);
-            } catch (IOException ex) {
-                Debug.warn(ex);
-            } catch (UnsupportedAudioFileException ex) {
-                // Maybe the extension is wrong
-                Debug.warn(ex);
-            } finally {
-                if (!threadSafe.get())
-                    readLock.unlock();
+        if (fileName != null) {
+            AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
+            if (reader != null) {
+                try {
+                    if (!threadSafe.get())
+                        readLock.lock();
+                    return reader.getAudioInputStream(fileInput);
+                } catch (IOException ex) {
+                    Debug.warn(ex);
+                } catch (UnsupportedAudioFileException ex) {
+                    // Maybe the extension is wrong
+                    Debug.warn(ex);
+                } finally {
+                    if (!threadSafe.get())
+                        readLock.unlock();
+                }
             }
         }
 
-        Debug.warn("Using JavaSound''s AudioSystem to open file {0}", fileName);
+//        Debug.warn("Using JavaSound''s AudioSystem to open file {0}", fileName);
         // Failed. Fallback to JavaSound (try all readers)
         return AudioSystem.getAudioInputStream(fileInput);
     }
@@ -477,18 +479,20 @@ public class AudioFileTypes {
 
     public AudioFileFormat getAudioFileFormat(String fileName, InputStream fileInput) throws IOException, UnsupportedAudioFileException {
         AtomicBoolean threadSafe = new AtomicBoolean();
-        // Try with the reader corresponding to the extension
-        AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
-        if (reader != null) {
-            try {
-                if (!threadSafe.get())
-                    readLock.lock();
-                return reader.getAudioFileFormat(fileInput);
-            } catch (IOException ex) {
-                Debug.warn(ex);
-            } finally {
-                if (!threadSafe.get())
-                    readLock.unlock();
+        if (fileName != null) {
+            // Try with the reader corresponding to the extension
+            AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
+            if (reader != null) {
+                try {
+                    if (!threadSafe.get())
+                        readLock.lock();
+                    return reader.getAudioFileFormat(fileInput);
+                } catch (IOException ex) {
+                    Debug.warn(ex);
+                } finally {
+                    if (!threadSafe.get())
+                        readLock.unlock();
+                }
             }
         }
 

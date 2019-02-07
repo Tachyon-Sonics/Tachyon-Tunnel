@@ -103,7 +103,7 @@ public class SimpleProcessor {
             return dflt;
         return value;
     }
-
+    
     /**
      * Process audio from the given input file using the given audio effect, and save the result in the given output file using the given
      * file format type.
@@ -132,6 +132,8 @@ public class SimpleProcessor {
             throw new UnsupportedOperationException("Cannot infer the output audio file type from the file name: " + output.getAbsolutePath());
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
         AudioFileIO.saveAudioFile(transformedSource, output, format, progress);
+        if (progress != null)
+        	progress.setProgress(100.0, 100.0); // Ensure progress is closed
     }
 
     public static void process(File input, IPullEffect effect, OutputStream output, AudioFileFormat.Type outputFileType) throws IOException, UnsupportedAudioFileException {
@@ -140,6 +142,11 @@ public class SimpleProcessor {
 
     public static void process(File input, IPullEffect effect, OutputStream output, AudioFileFormat.Type outputFileType, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(input, true);
+        if (outputFileType == null) {
+        	outputFileType = inputFormat.getType();
+        	if (!Arrays.asList(new Type[] { Type.WAVE, Type.AIFF, Type.AIFC, Type.AU}).contains(outputFileType))
+        		outputFileType = Type.WAVE;
+        }
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
         effect.load(processor);
@@ -164,12 +171,32 @@ public class SimpleProcessor {
 
     public static void process(String inputFileName, InputStream input, IPullEffect effect, OutputStream output, AudioFileFormat.Type outputFileType, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
+        if (outputFileType == null) {
+        	if (inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED) {
+        		outputFileType = Type.AU;
+        	} else if (Arrays.asList(new Type[] { Type.WAVE, Type.AIFF, Type.AIFC, Type.AU}).contains(inputFormat.getType())) {
+        		outputFileType = inputFormat.getType();
+        	} else {
+        		outputFileType = Type.WAVE;
+        	}
+        }
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
         effect.load(processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
         AudioFileIO.saveAudioFile(transformedSource, output, format, progress);
+    }
+
+    public static void process(String inputFileName, InputStream input, IPullEffect effect, File outputFile, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
+    	AudioFileFormat.Type outputFileType = fromFileName(outputFile.getName());
+    	AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
+        IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
+        StreamProcessor processor = new StreamProcessor(inputFormat);
+        effect.load(processor);
+        IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
+        AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
+        AudioFileIO.saveAudioFile(transformedSource, outputFile, format, progress);
     }
 
     /**
@@ -223,6 +250,48 @@ public class SimpleProcessor {
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileFormat, inputFormat, processor);
         return AudioFileIO.createInputStream(transformedSource, format, progress);
+    }
+
+    public static void process(InputFileOrStream input, IPullEffect effect, OutputFileOrStream output) throws IOException, UnsupportedAudioFileException {
+    	process(input, effect, output, null);
+    }
+    
+    private static Type fromFileName(String fileName) {
+    	Type[] types = new Type[] {Type.WAVE, Type.AIFF, Type.AIFC, Type.AU};
+    	for (Type type : types) {
+    		if (fileName.endsWith("." + type.getExtension()))
+    			return type;
+    	}
+    	if (fileName.endsWith(".aiff"))
+    		return Type.AIFF;
+    	return Type.WAVE;
+    }
+    
+    /**
+     * Transform the given file or stream using the given effect, saving the result to the given file or stream
+     * <p>
+     * If the output is a file, its extension determines the file format (.wav, .aiff, etc)
+     * <p>
+     * If the output is a stream:
+     * <li>If the input is a file, the output file format will be the same as the input if it is supported (WAVE, AIFF/C or AU); or WAVE else
+     * <li>If the input is a stream, the output file format will be the same as the input if it is supported (WAVE, AIFF/C or AU) <i>and</i> if the
+     * length can be known immediately. If the format is unsupported but the length is known, WAVE is used, else AU is used.
+     * The length can generally be known immediately from a stream of WAVE or AIFF/C format, but not from compressed streams such as mp3.
+     */
+    public static void process(InputFileOrStream input, IPullEffect effect, OutputFileOrStream output, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
+    	if (input.isFile()) {
+    		if (output.isFile()) {
+    			process(input.getFile(), effect, output.getFile(), progress);
+    		} else {
+    			process(input.getFile(), effect, output.getStream(), null, progress);
+    		}
+    	} else {
+    		if (output.isFile()) {
+    			process(null, input.getStream(), effect, output.getFile(), progress);
+    		} else {
+    			process(null, input.getStream(), effect, output.getStream(), null, progress);
+    		}
+    	}
     }
 
 }
