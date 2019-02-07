@@ -10,14 +10,25 @@ public class OutputFileOrStream {
 	private final OutputStream stream;
 
 	
+	/**
+	 * Create an {@link OutputFileOrStream} using the given file name.
+	 * The special value "<tt>-</tt>" (without the quote) will create a new instance
+	 * using the standard output {@link System#out}.
+	 */
 	public OutputFileOrStream(String fileName) {
 		if (fileName.equals("-")) {
 			this.file = null;
-			this.stream = new BufferedOutputStream(System.out);
+			this.stream = wrap(System.out);
 		} else {
 			this.file = new File(fileName);
 			this.stream = null;
 		}
+	}
+	
+	private static OutputStream wrap(OutputStream stream) {
+		if (stream instanceof BufferedOutputStream)
+			return stream;
+		return new BufferedOutputStream(stream);
 	}
 	
 	public OutputFileOrStream(File file) {
@@ -27,7 +38,7 @@ public class OutputFileOrStream {
 	
 	public OutputFileOrStream(OutputStream stream) {
 		this.file = null;
-		this.stream = new BufferedOutputStream(stream);
+		this.stream = wrap(stream);
 	}
 
 	public File getFile() {

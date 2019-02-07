@@ -10,14 +10,25 @@ public class InputFileOrStream {
 	private final InputStream stream;
 
 	
+	/**
+	 * Create an {@link InputFileOrStream} using the given file name.
+	 * The special value "<tt>-</tt>" (without the quote) will create a new instance
+	 * using the standard input {@link System#in}.
+	 */
 	public InputFileOrStream(String fileName) {
 		if (fileName.equals("-")) {
 			this.file = null;
-			this.stream = new BufferedInputStream(System.in);
+			this.stream = wrap(System.in);
 		} else {
 			this.file = new File(fileName);
 			this.stream = null;
 		}
+	}
+	
+	private static InputStream wrap(InputStream stream) {
+		if (stream instanceof BufferedInputStream)
+			return stream;
+		return new BufferedInputStream(stream);
 	}
 	
 	public InputFileOrStream(File file) {
@@ -27,7 +38,7 @@ public class InputFileOrStream {
 	
 	public InputFileOrStream(InputStream stream) {
 		this.file = null;
-		this.stream = new BufferedInputStream(stream);
+		this.stream = wrap(stream);
 	}
 
 	public File getFile() {
