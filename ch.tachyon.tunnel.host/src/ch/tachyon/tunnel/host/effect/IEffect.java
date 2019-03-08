@@ -203,7 +203,8 @@ public interface IEffect {
      * or number of calls to <code>process()</code>, especially when multicore processing is used. The exact instants at which
      * the value is updated are, however, not defined, and the host should not rely on it. The returned value is only meant as
      * a way to monitor the progress (for instance to display a progress bar). Note that you may certainly also need to use
-     * {@link #getAdditionalInputFrames()}!
+     * {@link #getAdditionalInputFrames()} because the total number of frames that will be processed is the size of the audio
+     * stream being processed, plus {@link #getAdditionalInputFrames()}.
      * <p>
      * It is safe to invoke this method concurrently by another thread than the one that calls the <code>process()</code> method.
      * This method is very fast (it consists in an atomic read operation) and can be invoked multiple times during processing.

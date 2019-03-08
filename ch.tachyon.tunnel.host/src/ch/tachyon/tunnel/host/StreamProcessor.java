@@ -27,6 +27,7 @@ import ch.tachyon.tunnel.plugin.*;
  *     // and {@link IMultiChanAudioSource#readSamples(float[][])} to produce/synthezize/read your audio
  * };
  *     // or use AudioFileIO.createAudioSource() from the ch.tachyon.tunnel.audio package to create a source from an audio file or input stream
+ *     
  * StreamProcessor processor = new StreamProcessor(44100.0f); // Replace with another sample rate if relevant
  * IEffect plugin = {@link #getPlugin(Class) processor.getPlugin(<i>plugin_class</i>)}; // Load a plugin
  * {@link IEffect#setParameterValue(ParameterDefinition, Object) plugin.setParameterValue(<i>plugin_class.parameter</i>, <i>value</i>)}; // Set zero or more parameters
@@ -41,6 +42,8 @@ import ch.tachyon.tunnel.plugin.*;
  *     // It is in the 'nextBlock' array and contains 'read' sample frames
  * } while (read == 1024); // Only the last chunk will have less than the requested number of audio sample frames, and this is hence the condition for stopping
  * </pre>
+ * 
+ * See {@link #setCallbackInfo(long, Runnable)} and {@link #getProgressPercent()} for a way of monitoring the current progress.
  */
 public class StreamProcessor implements IProcessingInfo {
     
@@ -48,12 +51,19 @@ public class StreamProcessor implements IProcessingInfo {
     protected final static int PREFERRED_CHUNK_LENGTH = 2048;
     protected final static int MAX_CHUNK_LENGTH = 16384;
     
-    protected final float sampleRate;
-    protected final int nbChannels;
-    protected final long length;
-    protected double lengthChange = 1.0;
-    protected int chunkLength = PREFERRED_CHUNK_LENGTH;
-    protected BitSet channels;
+    private final float sampleRate;
+    private final int nbChannels;
+    private final long length;
+    private double lengthChange = 1.0;
+    private int chunkLength = PREFERRED_CHUNK_LENGTH;
+    private BitSet channels;
+    
+    // Progress monitoring
+    private boolean terminated;
+    private long inputLength;
+    private Runnable callback;
+    private IMultiChanAudioSource mainSource;
+    private List<IPullEffect> effects = new ArrayList<>();
     
     
     /**
@@ -84,6 +94,25 @@ public class StreamProcessor implements IProcessingInfo {
     }
     
     /**
+     * Specify a callback that must be invoked at regular intervals while processing the stream.
+     * <p>
+     * There is no guarantee on how frequently the callback will be invoked, as this depends on the buffer sizes
+     * of the used effects as well as internal buffer sizes. In general this is invoked at least each time
+     * audio is read from the {@link IMultiChanAudioSource} returned by {@link #filter(IMultiChanAudioSource, IPullEffect)}.
+     * <p>
+     * A typical use of the the callback is to invoke {@link #getProgressPercent()} in order to monitor the current progress.
+     * Note though that the callback might be called very frequently.
+     * @param audioStreamLengthInFrames (optional) the length of the audio that will be processed, in frames. Unless correctly specified,
+     * {@link #getProgressPercent()} will not work. Note: a 'frame' consists of a sample value in all channels, e.g. in stereo
+     * one frame = two samples. Use -1 if not used or not known.
+     * @param callback the callback to invoke, as the {@link Runnable#run()} method.
+     */
+    public void setCallbackInfo(long audioStreamLengthInFrames, Runnable callback) {
+        this.inputLength = audioStreamLengthInFrames;
+        this.callback = callback;
+    }
+
+    /**
      * Load a plugin for processing audio
      * @param pluginClass the plugin class. Any class implementing {@link IPlugin} can be used
      * @return the plugin. You can set its parameters using {@link IEffect#setParameterValue(ParameterDefinition, Object)}
@@ -105,14 +134,90 @@ public class StreamProcessor implements IProcessingInfo {
      * @param effect the audio plugin. Use {@link #getPlugin(Class)} to load a plugin
      * @return a new audio source, corresponding to the given source transformed by the given plugin
      */
-    public IMultiChanAudioSource filter(final IMultiChanAudioSource source, final IPullEffect effect) {
+    public IMultiChanAudioSource filter(IMultiChanAudioSource source, final IPullEffect effect) {
         if (nbChannels != source.getAudioFormat().getChannels())
             throw new IllegalArgumentException("The numnber of channel in the source (" + source.getAudioFormat().getChannels() + ") does not match the number of channels of this StreamProcessor (" + nbChannels + ")");
         if (sampleRate != source.getAudioFormat().getSampleRate())
             throw new IllegalArgumentException("The sample rate of the source (" + source.getAudioFormat().getSampleRate() + ") does not match the sample rate of the StreamProcessor (" + sampleRate + ")");
         effect.startProcessing(this);
         this.lengthChange *= effect.getTimeChange();
+        if (mainSource == null) {
+            source = new MainSourceWrapper(source); // Wrap to help monitoring progress
+            mainSource = source;
+        }
+        terminated = false;
+        effects.add(effect);
         return new FilterSource(effect, source);
+    }
+    
+    /**
+     * Get the current processing progress in percent.
+     * <p>
+     * The result in generally more reliable than using a progress in AudioFileIO.createAudioSource().
+     * However, this method will not work (and return {@link Double#NaN}) if the length of the input file
+     * is not known.
+     * <p>
+     * This can be invoked by a callback specified by {@link #setCallbackInfo(long, Runnable)}
+     */
+    public double getProgressPercent() {
+        if (terminated)
+            return 100.0;
+        long toProcess = inputLength;
+        if (toProcess == AudioSystem.NOT_SPECIFIED)
+            return Double.NaN;
+        if (effects.isEmpty())
+            throw new IllegalStateException();
+        for (IPullEffect effect : effects)
+            toProcess += effect.getAdditionalInputFrames();
+        
+        long processed = 0;
+        for (IPullEffect effect : effects)
+            processed += effect.getProcessedFrames();
+        processed /= effects.size();
+        
+        return (double) processed * 100.0 / (double) toProcess;
+    }
+    
+    /**
+     * Wrapper around {@link IMultiChanAudioSource} that invokes the callback on every reads.
+     * This improves the accuracy of {@link StreamProcessor#getProgressPercent()} by invoking
+     * the callback more often.
+     * <p>
+     * For accurate progress monitoring, it is indeed necessary to invoke the callback at least when:
+     * <ul>
+     * <li>Audio is read from the first (untransformed) source
+     * <li>Audio is read from the last (fully transformed) source
+     * </ul>
+     * The reason is that an effect might
+     * <ul>
+     * <li>Read a lot of sample frames before producing the first ones
+     * <li>Write a lot of sample frames after the last one has been read
+     * </ul>
+     */
+    class MainSourceWrapper implements IMultiChanAudioSource, Closeable {
+        
+        private final IMultiChanAudioSource target;
+        
+        
+        public MainSourceWrapper(IMultiChanAudioSource target) {
+            this.target = target;
+        }
+
+        public AudioFormat getAudioFormat() {
+            return target.getAudioFormat();
+        }
+
+        public int readSamples(float[][] data) {
+            int result = target.readSamples(data);
+            if (callback != null)
+                callback.run();
+            return result;
+        }
+
+        public void close() {
+            target.close();
+        }
+        
     }
 
     class FilterSource implements IMultiChanAudioSource, Closeable {
@@ -154,14 +259,23 @@ public class StreamProcessor implements IProcessingInfo {
                     close();
                     break; // This was the last block. We cannot read more
                 }
+                if (callback != null)
+                    callback.run();
             }
             return result;
         }
 
         public void close() {
+            closeImpl(true);
+        }
+
+        private void closeImpl(boolean normalTermination) {
             if (!disposed) {
                 effect.stopProcessing();
                 effect.unload();
+                terminated = true;
+                if (callback != null)
+                    callback.run();
                 disposed = true;
             }
         }
@@ -172,7 +286,7 @@ public class StreamProcessor implements IProcessingInfo {
 
         @Override
         protected void finalize() throws Throwable {
-            close();
+            closeImpl(false);
         }
     }
 
