@@ -78,7 +78,7 @@ public class MtContext implements IMtContext {
     }
 
     public void setNbThreads(int nbThreads) {
-        if (!pools.isEmpty())
+        if (!pools.isEmpty() && nbThreads != this.nbThreads)
             throw new IllegalStateException("Cannot change the number of threads while a pool is in use");
         this.nbThreads = nbThreads;
     }

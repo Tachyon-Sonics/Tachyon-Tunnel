@@ -3,7 +3,7 @@ package ch.tachyon.tunnel.test;
 import java.lang.ref.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
-
+import junit.extensions.*;
 import junit.framework.*;
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.*;
@@ -19,7 +19,7 @@ import ch.tachyon.tunnel.plugin.opt.spec.*;
  * <p>
  * To test all effects in a bundle, use {@link PluginBundleTester}.
  */
-public class PluginTester extends TestCase {
+public class PluginTester {
 
     private final static float MIN_RATIO_TIME_CHANGE = 0.99f;
     private final static float MAX_RATIO_TIME_CHANGE = 1.01f;
@@ -27,7 +27,7 @@ public class PluginTester extends TestCase {
 
     private final Random rnd = new Random();
     
-    private List<WeakReference<Class<?>>> classRefs;
+    private List<WeakReference<Class<?>>> classRefs; // TODO adapt
     private IPluginBundle bundle;
     private String effectName;
 
@@ -38,13 +38,70 @@ public class PluginTester extends TestCase {
     }
 
     public PluginTester(List<WeakReference<Class<?>>> classRefs, IPluginBundle bundle, String effectName) {
-        super(effectName);
+//        super(effectName);
         this.classRefs = classRefs;
         this.bundle = bundle;
         this.effectName = effectName;
     }
+    
+    public TestSuite suite() {
+        TestSuite suite = new TestSuite(effectName);
+        {
+            TestSuite serialSuite = new ActiveTestSuite("Single threaded");
+            suite.addTest(serialSuite);
+            {
+                TestSuite scSuite = new TestSuite("Single channel");
+                serialSuite.addTest(scSuite);
+                LazyScPlugin plugin = new LazyScPlugin(bundle, effectName, false);
+                scSuite.addTest(new PluginScProcessingTest(plugin, 2048, 2048, true, 10));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 10, 10, true, 1000));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 10000, 10000, true, 3));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 10, 5000, true, 10));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 2048, 2048, false, 10));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 2048, 2048, true, 8));
+            }
+            for (int chans = 1; chans <= 3; chans++) {
+                TestSuite mcSuite = new TestSuite("" + chans + " channels");
+                serialSuite.addTest(mcSuite);
+                LazyMcPlugin plugin = new LazyMcPlugin(bundle, effectName, chans, false);
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 2048, 2048, true, 10));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 10, 10, true, 1000));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 10000, 10000, true, 3));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 10, 5000, true, 10));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 2048, 2048, false, 10));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 2048, 2048, true, 8));
+            }
+        }
+        {
+            TestSuite parallelSuite = new ActiveTestSuite("Multi threaded");
+            suite.addTest(parallelSuite);
+            {
+                TestSuite scSuite = new TestSuite("Single channel");
+                parallelSuite.addTest(scSuite);
+                LazyScPlugin plugin = new LazyScPlugin(bundle, effectName, true);
+                scSuite.addTest(new PluginScProcessingTest(plugin, 2048, 2048, true, 10));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 10, 10, true, 1000));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 10000, 10000, true, 3));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 10, 5000, true, 10));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 2048, 2048, false, 10));
+                scSuite.addTest(new PluginScProcessingTest(plugin, 2048, 2048, true, 8));
+            }
+            for (int chans = 1; chans <= 3; chans++) {
+                TestSuite mcSuite = new TestSuite("" + chans + "channels");
+                parallelSuite.addTest(mcSuite);
+                LazyMcPlugin plugin = new LazyMcPlugin(bundle, effectName, chans, true);
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 2048, 2048, true, 10));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 10, 10, true, 1000));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 10000, 10000, true, 3));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 10, 5000, true, 10));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 2048, 2048, false, 10));
+                mcSuite.addTest(new PluginMcProcessingTest(plugin, 2048, 2048, true, 8));
+            }
+        }
+        return suite;
+    }
 
-    @Override
+//    @Override
     protected void runTest() throws ClassNotFoundException {
         { // Single threaded
             bundle.getMtContext().setNbThreads(1);

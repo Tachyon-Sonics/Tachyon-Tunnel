@@ -57,7 +57,7 @@ public class PluginBundleTester {
         suite.addTest(new NoNewThreadTest(threadIds));
         for (String effectName : effectNames) {
             PluginTester tester = new PluginTester(classRefs, bundle, effectName);
-            suite.addTest(tester);
+            suite.addTest(tester.suite());
         }
         suite.addTest(new ReleaseBundleTest(bundle, threadIds));
         suite.addTest(new MemoryLeakTest(classRefs));
