@@ -37,6 +37,7 @@ public class MemoryLeakTest extends TestCase {
                 if (count % 3 == 0)
                     ThreadUtils.sleep(1000);
                 count++;
+                System.out.println("GC attempt " + count + " of 90");
                 if (count >= 90) {
                     StringBuilder classList = new StringBuilder();
                     for (WeakReference<Class<?>> classRef0 : classRefs) {

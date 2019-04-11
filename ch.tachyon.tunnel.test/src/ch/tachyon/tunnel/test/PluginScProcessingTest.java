@@ -54,7 +54,8 @@ public class PluginScProcessingTest extends TestCase {
         ISingleChanPushEffect plugin = this.plugin.getPlugin();
         if (plugin != null) {
             runEffect(plugin);
-        } 
+        }
+        this.plugin.release();
     }
     
     private void runEffect(ISingleChanPushEffect plugin) {

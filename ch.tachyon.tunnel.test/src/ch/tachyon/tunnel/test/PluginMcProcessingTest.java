@@ -65,6 +65,7 @@ public class PluginMcProcessingTest extends TestCase {
             if (nbChannels >= minNbChan && nbChannels <= maxNbChan)
                 runMcEffect(plugin);
         }
+        this.plugin.release();
     }
     
     private void runMcEffect(IPushEffect plugin) {
