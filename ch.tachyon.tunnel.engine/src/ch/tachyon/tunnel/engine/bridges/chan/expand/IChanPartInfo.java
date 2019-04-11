@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.engine.bridges.chan;
+package ch.tachyon.tunnel.engine.bridges.chan.expand;
 
 
 public interface IChanPartInfo {

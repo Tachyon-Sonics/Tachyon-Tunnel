@@ -1,7 +1,7 @@
 package ch.tachyon.tunnel.engine;
 
 import java.util.*;
-import ch.tachyon.tunnel.engine.bridges.chan.*;
+import ch.tachyon.tunnel.engine.bridges.chan.expand.*;
 import ch.tachyon.tunnel.plugin.*;
 import ch.tachyon.tunnel.plugin.opt.spec.*;
 import ch.tachyon.tunnel.plugin.opt.thread.*;

@@ -3,9 +3,9 @@ package ch.tachyon.tunnel.engine;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
 import ch.tachyon.tunnel.engine.bridges.*;
-import ch.tachyon.tunnel.engine.bridges.chan.*;
+import ch.tachyon.tunnel.engine.bridges.chan.expand.*;
+import ch.tachyon.tunnel.engine.bridges.chan.reduce.*;
 import ch.tachyon.tunnel.engine.bridges.mthread.*;
 import ch.tachyon.tunnel.engine.utils.*;
 import ch.tachyon.tunnel.host.IProcessingInfo;
@@ -14,6 +14,7 @@ import ch.tachyon.tunnel.plugin.*;
 import ch.tachyon.tunnel.plugin.IPullEffect;
 import ch.tachyon.tunnel.plugin.IPushEffect;
 import ch.tachyon.tunnel.plugin.ISimpleEffect;
+import ch.tachyon.tunnel.plugin.opt.spec.*;
 import ch.tachyon.tunnel.plugin.opt.thread.*;
 import ch.tachyon.tunnel.utils.*;
 
@@ -62,9 +63,9 @@ public class PluginsImpl {
     private static final String PLUGINS_RESOURCE = "META-INF/services/ch.tachyon.tunnel.Plugins";
 
     private final static int PRIORITY_STRAIGHT = 0; // Same interface
-    private final static int PRIORITY_EASY = 1; // Easy conversion
-    private final static int PRIORITY_HARD = 2; // Hard conversion
-//    private final static int PRIORITY_OPTIONAL = 3; // Hard conversion, only if requested by host
+    private final static int PRIORITY_EASY = 2; // Easy conversion
+    private final static int PRIORITY_HARD = 4; // Hard conversion
+//    private final static int PRIORITY_OPTIONAL = 6; // Hard conversion, only if requested by host
 
 
     /**
@@ -86,8 +87,13 @@ public class PluginsImpl {
      * Single chan to multi chan converters. This is done after the plugin interface is bridged to the host interface.
      * Key is multi chan interface, value is single chan interface and converter (as a pair)
      */
-    private final static Map<Class<? extends IEffect>, Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>> singleToMultiConverters = 
-            new HashMap<Class<? extends IEffect>, Pair<Class<? extends IEffect>,Class<? extends McFromScBase<?,?>>>>();
+    private final static Map<Class<? extends IEffect>, Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>> singleToMultiConverters = new HashMap<>();
+    
+    /**
+     * Multi chan to single chan converters. This is done after the plugin interface is bridged to the host interface.
+     * Key is single chan interface, value is multi chan interface and converter (as a pair)
+     */
+    private final static Map<Class<? extends IEffect>, Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?, ?>>>> multiToSingleConverters = new HashMap<>();
     
     /**
      * Set of host interfaces that correspond to multi chan interfaces
@@ -154,21 +160,29 @@ public class PluginsImpl {
         multiChanInterfaces.add(ch.tachyon.tunnel.host.effect.IPullEffect.class);
         multiChanInterfaces.add(ch.tachyon.tunnel.host.effect.IPushEffect.class);
         
-        // Mono to stereo converters
+        // Mono to stereo (multi-chan) converters
         addSingleToMultiConverter(ISingleChanEffect.class, ch.tachyon.tunnel.host.effect.ISimpleEffect.class, McEffectFromScEffect.class);
         addSingleToMultiConverter(ISingleChanPushEffect.class, ch.tachyon.tunnel.host.effect.IPushEffect.class, McPushFromScPush.class);
         addSingleToMultiConverter(ISingleChanPullEffect.class, ch.tachyon.tunnel.host.effect.IPullEffect.class, McPullFromScPull.class);
+        
+        // Stereo (multi-chan) to mono converters
+        addMultiToSIngleConverter(ch.tachyon.tunnel.host.effect.ISimpleEffect.class, ISingleChanEffect.class, ScEffectFromMcEffect.class);
+        addMultiToSIngleConverter(ch.tachyon.tunnel.host.effect.IPushEffect.class, ISingleChanPushEffect.class, ScPushFromMcPush.class);
+        addMultiToSIngleConverter(ch.tachyon.tunnel.host.effect.IPullEffect.class, ISingleChanPullEffect.class, ScPullFromMcPull.class);
     }
 
-    private static <P extends IPlugin, H extends IEffect> void addBridge(Class<P> pluginInterface,
-            Class<H> hostInterface, Class<? extends H> bridgeType, int priority) {
-        bridges.put(new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(
-                pluginInterface, hostInterface), bridgeType);
+    private static <P extends IPlugin, H extends IEffect> void addBridge(Class<P> pluginInterface, Class<H> hostInterface, Class<? extends H> bridgeType,
+            int priority) {
+        bridges.put(new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(pluginInterface, hostInterface), bridgeType);
         bridgePriorities.put(bridgeType, priority);
     }
     
     private static <S extends IEffect, M extends IEffect, C extends McFromScBase<M, S>> void addSingleToMultiConverter(Class<S> singleInterface, Class<M> multiInterface, Class<C> converter) {
         singleToMultiConverters.put(multiInterface, new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>(singleInterface, converter));
+    }
+    
+    private static <M extends IEffect, S extends IEffect, C extends ScFromMcBase<S, M>> void addMultiToSIngleConverter(Class<M> multiInterface, Class<S> singleInterface, Class<C> converter) {
+        multiToSingleConverters.put(singleInterface, new Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?,?>>>(multiInterface, converter));
     }
 
     /**
@@ -270,13 +284,16 @@ public class PluginsImpl {
     static class ConversionInfo {
         Class<? extends IPlugin> pluginInterface;
         Class<? extends IEffect> targetInterface;
-        Class<? extends McFromScBase<?, ?>> chanConverterType;
+        Class<? extends McFromScBase<?, ?>> chanExpanderType;
+        Class<? extends ScFromMcBase<?, ?>> chanReducerType;
         boolean isWorthMultiThreading;
         
-        public ConversionInfo(Class<? extends IPlugin> pluginInterface, Class<? extends IEffect> targetInterface, Class<? extends McFromScBase<?, ?>> converterType, boolean isWorthMultiThreading) {
+        public ConversionInfo(Class<? extends IPlugin> pluginInterface, Class<? extends IEffect> targetInterface,
+                Class<? extends McFromScBase<?, ?>> expanderType, Class<? extends ScFromMcBase<?, ?>> reducerType, boolean isWorthMultiThreading) {
             this.pluginInterface = pluginInterface;
             this.targetInterface = targetInterface;
-            this.chanConverterType = converterType;
+            this.chanExpanderType = expanderType;
+            this.chanReducerType = reducerType;
             this.isWorthMultiThreading = isWorthMultiThreading;
         }
     }
@@ -288,15 +305,25 @@ public class PluginsImpl {
     private static IEffect createEffect(List<Class<? extends IEffect>> hostInterfaces, final Class<? extends IPlugin> effectType,
             Class<? extends IPlugin> effectInterface, MtContext mtContext)
                     throws InstantiationException, IllegalAccessException {
-        // Create extended list of host interfaces, adding single chan to multi chan conversion
-        List<Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>> targetInterfaces = new ArrayList<Pair<Class<? extends IEffect>,Class<? extends McFromScBase<?,?>>>>();
+        // Create extended list of host interfaces, 
+        // adding single chan to multi chan conversion
+        List<Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>> targetMcInterfaces = new ArrayList<>();
         for (Class<? extends IEffect> hostInterface : hostInterfaces) {
-            targetInterfaces.add(new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?,?>>>(hostInterface, null));
+            targetMcInterfaces.add(new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?,?>>>(hostInterface, null)); // No conversion
             if (singleToMultiConverters.containsKey(hostInterface)) { // Multi chan can be converted
                 Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair = singleToMultiConverters.get(hostInterface);
-                targetInterfaces.add(pair); // Add corresponding single chan, and converter type
+                targetMcInterfaces.add(pair); // Add corresponding single chan, and converter type
             }
         }
+        // and multi chan to single chan conversion
+        List<Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?, ?>>>> targetScInterfaces = new ArrayList<>();
+        for (Class<? extends IEffect> hostInterface : hostInterfaces) {
+            if (multiToSingleConverters.containsKey(hostInterface)) { // Single chan can be converted
+                Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?, ?>>> pair = multiToSingleConverters.get(hostInterface);
+                targetScInterfaces.add(pair); // Add corresponding multi chan, and converter type
+            }
+        }
+        
         // Load associated properties
         Properties properties = loadProperties(effectType);
         
@@ -311,7 +338,7 @@ public class PluginsImpl {
                  */
                 boolean hostPushOk = false;
                 boolean hostPullOk = false;
-                for (Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair : targetInterfaces) {
+                for (Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair : targetMcInterfaces) {
                     Class<?> hostInterface = pair.getFirst();
                     if (hostInterface.equals(ch.tachyon.tunnel.host.effect.ISingleChanPushEffect.class))
                         hostPushOk = true;
@@ -331,7 +358,7 @@ public class PluginsImpl {
                  */
                 boolean hostPushOk = false;
                 boolean hostPullOk = false;
-                for (Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair : targetInterfaces) {
+                for (Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair : targetMcInterfaces) {
                     Class<?> hostInterface = pair.getFirst();
                     if (hostInterface.equals(ch.tachyon.tunnel.host.effect.IPushEffect.class))
                         hostPushOk = true;
@@ -352,12 +379,12 @@ public class PluginsImpl {
         Pair<Class<? extends IPlugin>,Class<? extends IEffect>> bestConversion = null;
         ConversionInfo bestInfo = null;
         int bestPriority = Integer.MAX_VALUE;
-        for (Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair : targetInterfaces) {
+        for (Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair : targetMcInterfaces) {
             Class<? extends IEffect> hostInterface = pair.getFirst();
             boolean isParallelizingChans = (pair.getSecond() != null);
             boolean isWorthMultithreading = !isParallelizingChans || mtContext.getNbThreads() > 2;
             Class<? extends IPlugin> pluginInterface = (isWorthMultithreading && isMultiThreadable ? mtEffectInterface : effectInterface);
-            ConversionInfo conversionInfo = new ConversionInfo(pluginInterface, hostInterface, pair.getSecond(), isWorthMultithreading);
+            ConversionInfo conversionInfo = new ConversionInfo(pluginInterface, hostInterface, pair.getSecond(), null, isWorthMultithreading);
             Pair<Class<? extends IPlugin>,Class<? extends IEffect>> conversion = new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(pluginInterface, hostInterface);
             if (bridges.containsKey(conversion)) {
                 // This effect can be bridged to the target type
@@ -369,6 +396,30 @@ public class PluginsImpl {
                     bestConversion = conversion;
                     bestInfo = conversionInfo;
                     bestPriority = priority;
+                }
+            }
+        }
+        // Check for multi chan to single chan conversion
+        boolean monoOk = true;
+        Channels channelsAnno = AnnotationUtils.getAnnotation(effectType, Channels.class, properties);
+        if (channelsAnno != null && channelsAnno.min() > 1)
+            monoOk = false; // This effect does not work with a single channel
+        if (monoOk) {
+            for (Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?, ?>>> pair : targetScInterfaces) {
+                Class<? extends IEffect> hostInterface = pair.getFirst();
+                ConversionInfo conversionInfo = new ConversionInfo(effectInterface, hostInterface, null, pair.getSecond(), false);
+                Pair<Class<? extends IPlugin>,Class<? extends IEffect>> conversion = new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(effectInterface, hostInterface);
+                if (bridges.containsKey(conversion)) {
+                    // This effect can be bridged to the target type
+                    @SuppressWarnings("unchecked")
+                    Class<IEffect> converterType = (Class<IEffect>) bridges.get(conversion);
+                    int priority = bridgePriorities.get(converterType) + 1; // Add 1 because using stereo interface for mono processing is not recommanded
+                    // Check if the conversion is better than what we currently have
+                    if (priority < bestPriority) {
+                        bestConversion = conversion;
+                        bestInfo = conversionInfo;
+                        bestPriority = priority;
+                    }
                 }
             }
         }
@@ -387,14 +438,14 @@ public class PluginsImpl {
         IEffect converted = bridged;
         
         // Convert channels if necessary
-        if (bestInfo.chanConverterType != null) {
+        if (bestInfo.chanExpanderType != null) {
             @SuppressWarnings("unchecked")
-            McFromScBase<IEffect, IEffect> chanConverter = (McFromScBase<IEffect, IEffect>) bestInfo.chanConverterType.newInstance();
+            McFromScBase<IEffect, IEffect> chanExpander = (McFromScBase<IEffect, IEffect>) bestInfo.chanExpanderType.newInstance();
             final Class<? extends IPlugin> effectInterface0 = bestInfo.pluginInterface;
             final Properties properties0 = properties;
             final MultiThreading mtAnno0 = mtAnno;
             final MtContext mtContext0 = mtContext;
-            chanConverter.init(bridged, new IScEffectFactory<IEffect>() {
+            chanExpander.init(bridged, new IScEffectFactory<IEffect>() {
                 
                 public IEffect create(IEffect mainEffect, IProcessingInfo info) {
                     try {
@@ -408,7 +459,12 @@ public class PluginsImpl {
                     }
                 }
             });
-            converted = chanConverter;
+            converted = chanExpander;
+        } else if (bestInfo.chanReducerType != null) {
+            @SuppressWarnings("unchecked")
+            ScFromMcBase<IEffect, IEffect> chanReducer = (ScFromMcBase<IEffect, IEffect>) bestInfo.chanReducerType.newInstance();
+            chanReducer.init(bridged);
+            converted = chanReducer;
         }
         // Return the converted effect
         return converted;

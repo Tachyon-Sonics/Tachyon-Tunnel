@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.engine.bridges.chan;
+package ch.tachyon.tunnel.engine.bridges.chan.expand;
 
 import ch.tachyon.tunnel.engine.utils.concurrent.*;
 import ch.tachyon.tunnel.host.*;

@@ -9,9 +9,7 @@ public class AnnotationUtils {
         E result = clazz.getAnnotation(annoType);
         if (result == null) {
             if (isAnnoPropertyPresent(annoType, properties)) {
-                return DynamicAnnotationHandler.newAnnotation(annoType,
-                        new PropertiesAnnotationHandler(annoType, properties,
-                                annoType.getSimpleName()));
+                return DynamicAnnotationHandler.newAnnotation(annoType, new PropertiesAnnotationHandler(annoType, properties, annoType.getSimpleName()));
             }
         }
         return result;

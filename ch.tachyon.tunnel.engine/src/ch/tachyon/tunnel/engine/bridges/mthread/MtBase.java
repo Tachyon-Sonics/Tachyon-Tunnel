@@ -5,7 +5,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import ch.tachyon.tunnel.engine.*;
-import ch.tachyon.tunnel.engine.bridges.chan.*;
+import ch.tachyon.tunnel.engine.bridges.chan.expand.*;
 import ch.tachyon.tunnel.engine.bridges.mthread.serial.*;
 import ch.tachyon.tunnel.engine.utils.*;
 import ch.tachyon.tunnel.engine.utils.concurrent.*;
