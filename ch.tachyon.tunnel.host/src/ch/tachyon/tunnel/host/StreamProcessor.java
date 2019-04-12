@@ -102,6 +102,9 @@ public class StreamProcessor implements IProcessingInfo {
      * <p>
      * A typical use of the the callback is to invoke {@link #getProgressPercent()} in order to monitor the current progress.
      * Note though that the callback might be called very frequently.
+     * <p>
+     * The callback is allowed to throw an <tt>ch.tachyon.tunnel.utils.OperationAbortedException</tt> to cleanly abort the processing
+     * at any time.
      * @param audioStreamLengthInFrames (optional) the length of the audio that will be processed, in frames. Unless correctly specified,
      * {@link #getProgressPercent()} will not work. Note: a 'frame' consists of a sample value in all channels, e.g. in stereo
      * one frame = two samples. Use -1 if not used or not known.
