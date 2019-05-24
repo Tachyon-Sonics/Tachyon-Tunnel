@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.utils;
+package ch.tachyon.tunnel.audio.utils;
 
 /**
  * Indicate that an operation has been aborted (typically through a GUI "abort" button).

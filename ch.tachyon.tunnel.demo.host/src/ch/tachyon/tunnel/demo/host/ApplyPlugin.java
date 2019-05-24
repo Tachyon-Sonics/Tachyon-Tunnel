@@ -3,11 +3,11 @@ package ch.tachyon.tunnel.demo.host;
 import java.io.*;
 import javax.sound.sampled.*;
 import ch.tachyon.tunnel.audio.file.*;
+import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
 import ch.tachyon.tunnel.host.engine.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * Holds the logic of applying an audio effect to an input file

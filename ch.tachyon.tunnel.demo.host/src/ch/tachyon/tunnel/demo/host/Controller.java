@@ -9,10 +9,10 @@ import javax.sound.sampled.*;
 import javax.swing.*;
 
 import ch.tachyon.tunnel.audio.file.*;
+import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
 import ch.tachyon.tunnel.host.engine.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * This class encapsulates the different operations that are usually performed by a host to apply

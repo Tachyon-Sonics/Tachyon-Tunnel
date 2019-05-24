@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.utils;
+package ch.tachyon.tunnel.audio.utils;
 
 /**
  * Interface for reporting progress of a long operation. Also used by the GUI to stop or

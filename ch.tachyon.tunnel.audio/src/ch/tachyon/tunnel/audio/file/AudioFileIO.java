@@ -5,9 +5,8 @@ import java.io.*;
 import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.spi.*;
-
+import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * Static utilities to read and write audio files into and from <code>float</code> arrays.

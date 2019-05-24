@@ -6,9 +6,8 @@ import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFormat.Encoding;
 
 import org.tritonus.share.sampled.*;
-
+import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * Convert an {@link AudioInputStream} of any supported format to a

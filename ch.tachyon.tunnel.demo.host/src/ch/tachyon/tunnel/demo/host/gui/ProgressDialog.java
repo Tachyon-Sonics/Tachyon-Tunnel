@@ -4,9 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-
+import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.demo.host.gui.utils.*;
-import ch.tachyon.tunnel.utils.*;
 
 
 public class ProgressDialog extends JDialog implements IProgressMonitor {

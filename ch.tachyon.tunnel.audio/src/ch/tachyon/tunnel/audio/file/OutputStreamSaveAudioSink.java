@@ -5,9 +5,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import javax.sound.sampled.*;
-
+import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * {@link IMultiChanAudioSink} implementation whose {@link IMultiChanAudioSink#writeSamples(float[][])} saves

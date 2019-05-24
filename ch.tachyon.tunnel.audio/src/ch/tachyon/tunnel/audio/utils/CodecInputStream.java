@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.utils;
+package ch.tachyon.tunnel.audio.utils;
 
 import java.io.*;
 import java.nio.charset.*;

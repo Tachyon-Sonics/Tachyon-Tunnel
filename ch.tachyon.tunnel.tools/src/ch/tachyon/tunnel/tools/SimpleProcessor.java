@@ -6,11 +6,11 @@ import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFileFormat.*;
 import javax.sound.sampled.AudioFormat.*;
 import ch.tachyon.tunnel.audio.file.*;
+import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.IPullEffect;
 import ch.tachyon.tunnel.plugin.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * Static utilities to transform an audio file or input stream using a single effect.

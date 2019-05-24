@@ -1,8 +1,7 @@
 package ch.tachyon.tunnel.audio.file;
 
 import java.io.*;
-
-import ch.tachyon.tunnel.utils.*;
+import ch.tachyon.tunnel.audio.utils.*;
 
 /**
  * {@link InputStream} implementation that uses a {@link RandomAccessFile}.

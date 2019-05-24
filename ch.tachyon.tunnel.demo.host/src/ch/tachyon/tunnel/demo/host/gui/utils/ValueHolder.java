@@ -1,7 +1,6 @@
 package ch.tachyon.tunnel.demo.host.gui.utils;
 
 import java.util.*;
-
 import ch.tachyon.tunnel.utils.*;
 
 /**
