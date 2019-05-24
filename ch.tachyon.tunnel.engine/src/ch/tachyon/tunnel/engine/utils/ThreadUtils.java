@@ -1,6 +1,6 @@
 package ch.tachyon.tunnel.engine.utils;
 
-import ch.tachyon.tunnel.utils.*;
+import ch.tachyon.tunnel.common.utils.*;
 
 /**
  * {@link InterruptedException}-free helper methods

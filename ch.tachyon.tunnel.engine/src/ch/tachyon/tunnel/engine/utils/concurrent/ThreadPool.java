@@ -3,8 +3,7 @@ package ch.tachyon.tunnel.engine.utils.concurrent;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
-
-import ch.tachyon.tunnel.utils.*;
+import ch.tachyon.tunnel.common.utils.*;
 
 public class ThreadPool {
 

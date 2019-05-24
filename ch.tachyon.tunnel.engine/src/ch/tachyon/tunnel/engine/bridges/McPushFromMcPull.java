@@ -5,13 +5,13 @@ import java.util.*;
 import javax.sound.sampled.*;
 
 import ch.tachyon.tunnel.common.*;
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.*;
 import ch.tachyon.tunnel.engine.utils.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.IProcessingInfo;
 import ch.tachyon.tunnel.plugin.*;
 import ch.tachyon.tunnel.plugin.opt.thread.*;
-import ch.tachyon.tunnel.utils.*;
 
 public class McPushFromMcPull extends PluginToHostWrapper<IMultiChanPullEffect> implements ch.tachyon.tunnel.host.effect.IPushEffect,
         Runnable {

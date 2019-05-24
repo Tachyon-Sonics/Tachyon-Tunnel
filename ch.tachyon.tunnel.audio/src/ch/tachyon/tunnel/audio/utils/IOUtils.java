@@ -4,7 +4,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.nio.charset.*;
 import java.util.*;
-import ch.tachyon.tunnel.utils.*;
+import ch.tachyon.tunnel.common.utils.*;
 
 public class IOUtils {
 

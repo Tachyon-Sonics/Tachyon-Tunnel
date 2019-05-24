@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.utils;
+package ch.tachyon.tunnel.common.utils;
 
 /**
  * Simple named object whose purpose is to replace

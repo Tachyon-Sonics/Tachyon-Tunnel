@@ -5,14 +5,13 @@ import java.lang.ref.*;
 import java.net.*;
 import java.util.*;
 import java.util.jar.*;
-
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.bridges.mthread.*;
 import ch.tachyon.tunnel.engine.utils.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
 import ch.tachyon.tunnel.host.engine.*;
 import ch.tachyon.tunnel.plugin.opt.thread.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * A collection of {@link IEffect plugins} in a .jar file.

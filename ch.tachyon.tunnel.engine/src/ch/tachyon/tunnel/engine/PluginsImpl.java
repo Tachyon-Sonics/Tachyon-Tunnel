@@ -3,6 +3,7 @@ package ch.tachyon.tunnel.engine;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.bridges.*;
 import ch.tachyon.tunnel.engine.bridges.chan.expand.*;
 import ch.tachyon.tunnel.engine.bridges.chan.reduce.*;
@@ -16,7 +17,6 @@ import ch.tachyon.tunnel.plugin.IPushEffect;
 import ch.tachyon.tunnel.plugin.ISimpleEffect;
 import ch.tachyon.tunnel.plugin.opt.spec.*;
 import ch.tachyon.tunnel.plugin.opt.thread.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * Implementation of the internals of the {@link PluginBundleImpl} class.

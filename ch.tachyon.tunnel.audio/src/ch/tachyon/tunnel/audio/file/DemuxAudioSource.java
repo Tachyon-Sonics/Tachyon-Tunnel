@@ -7,7 +7,7 @@ import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFormat.Encoding;
 import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
-import ch.tachyon.tunnel.utils.*;
+import ch.tachyon.tunnel.common.utils.*;
 
 /**
  * This class converts from and to {@link ISingleChanAudioSource}[] and {@link IMultiChanAudioSource}.

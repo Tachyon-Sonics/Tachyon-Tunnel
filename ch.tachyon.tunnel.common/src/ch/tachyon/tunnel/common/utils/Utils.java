@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.utils;
+package ch.tachyon.tunnel.common.utils;
 
 import java.io.*;
 

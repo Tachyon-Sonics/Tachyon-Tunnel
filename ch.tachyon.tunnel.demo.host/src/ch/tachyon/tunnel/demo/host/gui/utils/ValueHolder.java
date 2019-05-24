@@ -1,7 +1,7 @@
 package ch.tachyon.tunnel.demo.host.gui.utils;
 
 import java.util.*;
-import ch.tachyon.tunnel.utils.*;
+import ch.tachyon.tunnel.common.utils.*;
 
 /**
  * A object that holds a value, and allow listeners to be notified when the value change

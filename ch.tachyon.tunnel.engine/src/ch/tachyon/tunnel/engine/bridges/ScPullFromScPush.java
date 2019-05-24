@@ -3,6 +3,7 @@ package ch.tachyon.tunnel.engine.bridges;
 import java.util.*;
 
 import ch.tachyon.tunnel.common.*;
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.*;
 import ch.tachyon.tunnel.engine.utils.*;
 import ch.tachyon.tunnel.host.IProcessingInfo;
@@ -10,7 +11,6 @@ import ch.tachyon.tunnel.host.effect.*;
 import ch.tachyon.tunnel.plugin.*;
 import ch.tachyon.tunnel.plugin.IPushEffect;
 import ch.tachyon.tunnel.plugin.opt.thread.*;
-import ch.tachyon.tunnel.utils.*;
 
 /**
  * Wrap a plugin implementing {@link IPushEffect} into the {@link ISingleChanPullEffect} host interface.

@@ -6,10 +6,10 @@ import java.util.concurrent.*;
 import javax.sound.sampled.*;
 
 import ch.tachyon.tunnel.common.*;
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.utils.concurrent.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
-import ch.tachyon.tunnel.utils.*;
 
 
 public class McPullFromScPull extends McFromScBase<IPullEffect, ISingleChanPullEffect> implements IPullEffect {

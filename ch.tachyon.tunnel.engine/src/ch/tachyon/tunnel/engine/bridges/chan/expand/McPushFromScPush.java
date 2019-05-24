@@ -5,10 +5,10 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import ch.tachyon.tunnel.common.*;
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.utils.concurrent.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
-import ch.tachyon.tunnel.utils.*;
 
 
 public class McPushFromScPush extends McFromScBase<IPushEffect, ISingleChanPushEffect> implements IPushEffect {

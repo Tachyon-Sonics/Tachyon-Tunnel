@@ -1,10 +1,9 @@
 package ch.tachyon.tunnel.engine.bridges.mthread;
 
 import java.util.*;
-
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.utils.concurrent.*;
 import ch.tachyon.tunnel.plugin.opt.thread.*;
-import ch.tachyon.tunnel.utils.*;
 
 
 public class MtContext implements IMtContext {
