@@ -76,6 +76,7 @@ public class SerialSection {
     private final AtomicReference<Thread>[] waiters;
     private final int queueSize;
     private final long mask;
+    private volatile boolean disposed = false;
 
 
     @SuppressWarnings("unchecked")
@@ -100,6 +101,8 @@ public class SerialSection {
      * @param threadClock the logical clock of the calling Thread
      */
     public void enterSerialSection(long threadClock) {
+        if (disposed)
+            throw new IllegalStateException("Disposed");
         if (threadClock == clock.get()) // Quick check
             return; // Success
         int index = (int) (threadClock & mask);
@@ -125,7 +128,18 @@ public class SerialSection {
         enterSerialSection(threadClock);
         leaveSerialSection();
     }
-
+    
+    public void dispose() {
+        disposed = true;
+        for (AtomicReference<Thread> threadRef : waiters) {
+            if (threadRef != null) {
+                Thread thread = threadRef.get();
+                if (thread != null)
+                    LockSupport.unpark(thread);
+            }
+        }
+    }    
+    
 }
 
 

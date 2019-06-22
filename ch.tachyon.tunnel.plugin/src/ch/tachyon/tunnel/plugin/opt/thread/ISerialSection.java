@@ -103,4 +103,5 @@ public interface ISerialSection {
      */
     public long getClock();
 
+    public void dispose();
 }

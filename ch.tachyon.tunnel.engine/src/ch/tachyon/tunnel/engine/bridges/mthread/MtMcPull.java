@@ -177,6 +177,7 @@ public class MtMcPull extends MtBase<IMultiChanPullEffect> implements IMultiChan
             } else {
                 // Submit empty buffer to prevent queue deadlock if other threads are still concurrently producing chunks before EOF
                 queue.put(taskClock, new float[nbChans][0]);
+                readSection.dispose(); // Unlock any other thread still reading
             }
 
             /*

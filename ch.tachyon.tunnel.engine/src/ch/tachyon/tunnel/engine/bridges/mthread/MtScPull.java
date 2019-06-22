@@ -172,8 +172,9 @@ public class MtScPull extends MtBase<IPullEffect> implements IPullEffect, ISingl
             } else {
                 // Submit empty buffer to prevent queue deadlock if other threads are still concurrently producing chunks before EOF
                 queue.put(taskClock, new float[0]);
+                readSection.dispose(); // Unlock any other thread still reading
             }
-
+            
             /*
              * Sync. Why? to ensure a slow task won't get later than more than ThreadPool.getPoolSize()
              * other threads. This is part of the contract and must be true at any time of the processing.

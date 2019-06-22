@@ -184,6 +184,10 @@ public class ProfiledSerialSection implements ISerialSectionExt {
         }
     }
 
+    public void dispose() {
+        
+    }
+
     public static long resyncTime;
     public static long scheduleTime;
 

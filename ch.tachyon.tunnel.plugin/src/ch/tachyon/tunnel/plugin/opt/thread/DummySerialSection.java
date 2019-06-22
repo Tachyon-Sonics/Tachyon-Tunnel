@@ -54,4 +54,8 @@ public class DummySerialSection implements ISerialSection {
         return clock;
     }
 
+    public void dispose() {
+        
+    }
+
 }
