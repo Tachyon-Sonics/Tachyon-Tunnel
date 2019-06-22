@@ -51,7 +51,7 @@ public class MtContext implements IMtContext {
                         int result = Integer.parseInt(prop);
                         if (result >= 1) {
                             defaultNbThreads = result;
-                            Debug.info("Using {0} threads", result);
+//                            Debug.info("Using {0} threads", result);
                         }
                     } catch (NumberFormatException ex) {
                         Debug.warn("Illegal value for property " + NB_THREADS_PROPERTY + ": {0}", prop);
