@@ -99,7 +99,7 @@ public class SerialSection {
      * {@link #leaveSerialSection()}.
      * @param threadClock the logical clock of the calling Thread
      */
-    public void enterSerialSection(long threadClock) { // TODO [ta] (1) create and use a version with timeout
+    public void enterSerialSection(long threadClock) {
         if (threadClock == clock.get()) // Quick check
             return; // Success
         int index = (int) (threadClock & mask);
