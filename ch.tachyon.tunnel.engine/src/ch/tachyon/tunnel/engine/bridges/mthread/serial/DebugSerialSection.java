@@ -66,6 +66,10 @@ public class DebugSerialSection extends SerialSection implements ISerialSectionE
     }
 
     public void enterSerialSection() {
+        enterSerialSectionImpl(null);
+    }
+    
+    private boolean enterSerialSectionImpl(Long timeOutNano) {
         // Check for double invocation
         assert !used.get() : "enterSerialSection() invoked twice by the same Thread without leaveSerialSection()";
         used.set(true);
@@ -80,22 +84,32 @@ public class DebugSerialSection extends SerialSection implements ISerialSectionE
         assert active.get() : "enterSerialSection() invoked while serial section is inactive.\n" +
         		"The probable cause is that the calling code is not a Task submitted to the ThreadPool.";
         // Check
-        super.enterSerialSection(clock.get());
-        // Check for double entrance
-        boolean success = entered.compareAndSet(false, true);
-        assert success : "enterSerialSection() invoked twice without a matching leaveSerialSection()";
-        // Check for correct order
-        DebugSerialSection myPrevious = previousSection.get();
-        if (commonPreviousSection == null) {
-            if (myPrevious != null)
-                commonPreviousSection = myPrevious;
-        } else {
-            if (myPrevious != null)
-                assert myPrevious == commonPreviousSection : "The SerialSections are not entered by all threads in the same order.\n" +
-            		"Current thread entered " + myPrevious.name + " followed by " + name +
-            		"\nwhereas a previous thread entered " + commonPreviousSection.name + " followed by " + name;
+        boolean result = true;
+        if (timeOutNano == null)
+            super.enterSerialSection(clock.get());
+        else
+            result = super.enterSerialSection(clock.get(), timeOutNano);
+        if (result) {
+            // Check for double entrance
+            boolean success = entered.compareAndSet(false, true);
+            assert success : "enterSerialSection() invoked twice without a matching leaveSerialSection()";
+            // Check for correct order
+            DebugSerialSection myPrevious = previousSection.get();
+            if (commonPreviousSection == null) {
+                if (myPrevious != null)
+                    commonPreviousSection = myPrevious;
+            } else {
+                if (myPrevious != null)
+                    assert myPrevious == commonPreviousSection : "The SerialSections are not entered by all threads in the same order.\n" +
+                		"Current thread entered " + myPrevious.name + " followed by " + name +
+                		"\nwhereas a previous thread entered " + commonPreviousSection.name + " followed by " + name;
+            }
         }
+        return result;
+    }
 
+    public boolean tryEnterSerialSection(long timeOutNano) {
+        return enterSerialSectionImpl(timeOutNano);
     }
 
     @Override

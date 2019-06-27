@@ -76,7 +76,6 @@ public class SerialSection {
     private final AtomicReference<Thread>[] waiters;
     private final int queueSize;
     private final long mask;
-    private volatile boolean disposed = false;
 
 
     @SuppressWarnings("unchecked")
@@ -100,9 +99,7 @@ public class SerialSection {
      * {@link #leaveSerialSection()}.
      * @param threadClock the logical clock of the calling Thread
      */
-    public void enterSerialSection(long threadClock) {
-        if (disposed)
-            throw new IllegalStateException("Disposed");
+    public void enterSerialSection(long threadClock) { // TODO [ta] (1) create and use a version with timeout
         if (threadClock == clock.get()) // Quick check
             return; // Success
         int index = (int) (threadClock & mask);
@@ -110,6 +107,28 @@ public class SerialSection {
         while (threadClock != clock.get())
             LockSupport.park();
         waiters[index].set(null);
+    }
+    
+    /**
+     * Same as {@link #enterSerialSection(long)}, but with a timeout
+     * @param timeOutNano the time out in nanosecond
+     * @return true if the serial section could successfully be entered before the timeout, false else
+     */
+    public boolean enterSerialSection(long threadClock, long timeOutNano) {
+        if (threadClock == clock.get()) // Quick check
+            return true; // Success
+        int index = (int) (threadClock & mask);
+        waiters[index].set(Thread.currentThread());
+        long deadline = System.nanoTime() + timeOutNano;
+        long delay = timeOutNano;
+        while (threadClock != clock.get()) {
+            if (delay <= 0)
+                return false;
+            LockSupport.parkNanos(delay);
+            delay = deadline - System.nanoTime();
+        }
+        waiters[index].set(null);
+        return true;
     }
 
     /**
@@ -128,17 +147,6 @@ public class SerialSection {
         enterSerialSection(threadClock);
         leaveSerialSection();
     }
-    
-    public void dispose() {
-        disposed = true;
-        for (AtomicReference<Thread> threadRef : waiters) {
-            if (threadRef != null) {
-                Thread thread = threadRef.get();
-                if (thread != null)
-                    LockSupport.unpark(thread);
-            }
-        }
-    }    
     
 }
 

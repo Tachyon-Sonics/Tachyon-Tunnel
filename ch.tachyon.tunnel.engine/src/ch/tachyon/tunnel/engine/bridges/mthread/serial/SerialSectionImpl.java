@@ -43,6 +43,10 @@ public class SerialSectionImpl extends SerialSection implements ISerialSectionEx
         super.enterSerialSection(clock.get().get());
     }
 
+    public boolean tryEnterSerialSection(long timeOutNano) {
+        return super.enterSerialSection(clock.get().get(), timeOutNano);
+    }
+
     @Override
     public void leaveSerialSection() {
         super.leaveSerialSection();

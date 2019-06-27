@@ -81,20 +81,30 @@ public class ProfiledSerialSection implements ISerialSectionExt {
     }
 
     public void enterSerialSection() {
+        enterSerialSectionImpl(null);
+    }
+    
+    private boolean enterSerialSectionImpl(Long timeOutNano) {
         long time1 = System.nanoTime();
         parallelTime.addAndGet(time1 - lastTime.get());
 
         long threadClock = this.threadClocks.get();
         int index = (int) (threadClock & mask);
         waiters[index].set(Thread.currentThread());
+        Long deadline = (timeOutNano == null ? null : System.nanoTime() + timeOutNano);
         while (threadClock != clock.get()) {
             long timeW = System.nanoTime();
             enterTime.addAndGet(timeW - time1);
 
-            LockSupport.park();
+            if (timeOutNano == null)
+                LockSupport.park();
+            else
+                LockSupport.parkNanos(timeOutNano);
 
             time1 = System.nanoTime();
             blockedTime.addAndGet(time1 - timeW);
+            if (deadline != null && time1 >= deadline)
+                return false;
         }
         counter++;
         waiters[index].set(null);
@@ -102,6 +112,11 @@ public class ProfiledSerialSection implements ISerialSectionExt {
         long time2 = System.nanoTime();
         enterTime.addAndGet(time2 - time1);
         lastTime.set(time2);
+        return true;
+    }
+
+    public boolean tryEnterSerialSection(long timeOutNano) {
+        return enterSerialSectionImpl(timeOutNano);
     }
 
     public void leaveSerialSection() {

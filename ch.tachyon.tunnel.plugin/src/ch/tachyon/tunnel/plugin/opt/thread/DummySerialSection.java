@@ -42,6 +42,10 @@ public class DummySerialSection implements ISerialSection {
 
     }
 
+    public boolean tryEnterSerialSection(long timeOutNano) {
+        return true;
+    }
+
     public void leaveSerialSection() {
         clock++;
     }

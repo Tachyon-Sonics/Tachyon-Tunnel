@@ -67,6 +67,12 @@ public interface ISerialSection {
      * has left this serial section.
      */
     public void enterSerialSection();
+    
+    /**
+     * Same as {@link #enterSerialSection()}, with a timeout
+     * @return whether successfull before the timeout
+     */
+    public boolean tryEnterSerialSection(long timeOutNano);
 
     /**
      * Leave this serial section. The next thread, if waiting to enter it, will be unblocked.
@@ -103,5 +109,4 @@ public interface ISerialSection {
      */
     public long getClock();
 
-    public void dispose();
 }

@@ -1,5 +1,6 @@
 package ch.tachyon.tunnel.engine.bridges.mthread;
 
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import javax.sound.sampled.*;
@@ -172,7 +173,6 @@ public class MtScPull extends MtBase<IPullEffect> implements IPullEffect, ISingl
             } else {
                 // Submit empty buffer to prevent queue deadlock if other threads are still concurrently producing chunks before EOF
                 queue.put(taskClock, new float[0]);
-                readSection.dispose(); // Unlock any other thread still reading
             }
             
             /*
@@ -203,7 +203,12 @@ public class MtScPull extends MtBase<IPullEffect> implements IPullEffect, ISingl
     // ISingleChanAudioSource
 
     public int readSamples(float[] target) {
-        readSection.enterSerialSection();
+        boolean success = false;
+        while (!success) {
+            success = readSection.tryEnterSerialSection(TimeUnit.MILLISECONDS.toNanos(200));
+            if (!active)
+                return 0;
+        }
         try {
             if (!active)
                 return 0;
