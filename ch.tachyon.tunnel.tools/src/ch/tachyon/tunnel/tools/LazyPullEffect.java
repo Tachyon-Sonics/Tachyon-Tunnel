@@ -3,22 +3,25 @@ package ch.tachyon.tunnel.tools;
 import java.io.*;
 import java.lang.annotation.*;
 import java.util.*;
+
 import javax.swing.*;
+
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
 
 /**
- * Wrapper around {@link IPullEffect} that allows setting parameters before the effect is loaded.
+ * Wrapper around {@link IPullEffect} that allows setting parameters before the
+ * effect is loaded.
  * <p>
- * Parameters set before the effect is loaded are stored, and get "transmitted" to the effect as soon as it is loaded
+ * Parameters set before the effect is loaded are stored, and get "transmitted"
+ * to the effect as soon as it is loaded
  */
 class LazyPullEffect implements IPullEffect {
 
     private final IPullEffect target;
     private final Map<String, Object> parameters = new LinkedHashMap<>();
     private boolean loaded = false;
-
 
     public LazyPullEffect(IPullEffect target) {
         this.target = target;

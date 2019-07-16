@@ -2,9 +2,11 @@ package ch.tachyon.tunnel.tools;
 
 import java.io.*;
 import java.util.*;
+
 import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFileFormat.*;
 import javax.sound.sampled.AudioFormat.*;
+
 import ch.tachyon.tunnel.audio.file.*;
 import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
@@ -103,7 +105,7 @@ public class SimpleProcessor {
             return dflt;
         return value;
     }
-    
+
     /**
      * Process audio from the given input file using the given audio effect, and save the result in the given output file using the given
      * file format type.
@@ -134,20 +136,20 @@ public class SimpleProcessor {
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
         AudioFileIO.saveAudioFile(transformedSource, output, format, null);
         if (progress != null)
-        	progress.setProgress(100.0, 100.0); // Ensure progress is closed
+            progress.setProgress(100.0, 100.0); // Ensure progress is closed
     }
 
-	private static void setupProgressUsingProcessor(final IProgressMonitor progress, AudioFileFormat inputFormat, final StreamProcessor processor) {
-		if (progress != null) {
-	        processor.setCallbackInfo(inputFormat.getFrameLength(), new Runnable() {
-				
-				@Override
-				public void run() {
-					progress.setProgress(processor.getProgressPercent(), 100.0);
-				}
-			});
+    private static void setupProgressUsingProcessor(final IProgressMonitor progress, AudioFileFormat inputFormat, final StreamProcessor processor) {
+        if (progress != null) {
+            processor.setCallbackInfo(inputFormat.getFrameLength(), new Runnable() {
+
+                @Override
+                public void run() {
+                    progress.setProgress(processor.getProgressPercent(), 100.0);
+                }
+            });
         }
-	}
+    }
 
     public static void process(File input, IPullEffect effect, OutputStream output, AudioFileFormat.Type outputFileType) throws IOException, UnsupportedAudioFileException {
         process(input, effect, output, outputFileType, null);
@@ -156,9 +158,9 @@ public class SimpleProcessor {
     public static void process(File input, IPullEffect effect, OutputStream output, AudioFileFormat.Type outputFileType, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(input, true);
         if (outputFileType == null) {
-        	outputFileType = inputFormat.getType();
-        	if (!Arrays.asList(new Type[] { Type.WAVE, Type.AIFF, Type.AIFC, Type.AU}).contains(outputFileType))
-        		outputFileType = Type.WAVE;
+            outputFileType = inputFormat.getType();
+            if (!Arrays.asList(new Type[] { Type.WAVE, Type.AIFF, Type.AIFC, Type.AU}).contains(outputFileType))
+                outputFileType = Type.WAVE;
         }
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
@@ -186,37 +188,37 @@ public class SimpleProcessor {
     public static void process(String inputFileName, InputStream input, IPullEffect effect, OutputStream output, AudioFileFormat.Type outputFileType, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
         if (outputFileType == null) {
-        	if (inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED) {
-        		outputFileType = Type.AU;
-        	} else if (Arrays.asList(new Type[] { Type.WAVE, Type.AIFF, Type.AIFC, Type.AU}).contains(inputFormat.getType())) {
-        		outputFileType = inputFormat.getType();
-        	} else {
-        		outputFileType = Type.WAVE;
-        	}
+            if (inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED) {
+                outputFileType = Type.AU;
+            } else if (Arrays.asList(new Type[] { Type.WAVE, Type.AIFF, Type.AIFC, Type.AU}).contains(inputFormat.getType())) {
+                outputFileType = inputFormat.getType();
+            } else {
+                outputFileType = Type.WAVE;
+            }
         }
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
         effect.load(processor);
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
-        	setupProgressUsingProcessor(progress, inputFormat, processor);
+            setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
         AudioFileIO.saveAudioFile(transformedSource, output, format,
-        		inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
+                inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
     }
 
     public static void process(String inputFileName, InputStream input, IPullEffect effect, File outputFile, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
-    	AudioFileFormat.Type outputFileType = fromFileName(outputFile.getName());
-    	AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
+        AudioFileFormat.Type outputFileType = fromFileName(outputFile.getName());
+        AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
         effect.load(processor);
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
-        	setupProgressUsingProcessor(progress, inputFormat, processor);
+            setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
         AudioFileIO.saveAudioFile(transformedSource, outputFile, format,
-        		inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
+                inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
     }
 
     /**
@@ -240,11 +242,11 @@ public class SimpleProcessor {
         StreamProcessor processor = new StreamProcessor(inputFormat);
         effect.load(processor);
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
-        	setupProgressUsingProcessor(progress, inputFormat, processor);
+            setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
         return AudioFileIO.createInputStream(transformedSource, format,
-        		inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
+                inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
     }
 
     /**
@@ -271,28 +273,28 @@ public class SimpleProcessor {
         StreamProcessor processor = new StreamProcessor(inputFormat);
         effect.load(processor);
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
-        	setupProgressUsingProcessor(progress, inputFormat, processor);
+            setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileFormat, inputFormat, processor);
         return AudioFileIO.createInputStream(transformedSource, format,
-        		inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
+                inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
     }
 
     public static void process(InputFileOrStream input, IPullEffect effect, OutputFileOrStream output) throws IOException, UnsupportedAudioFileException {
-    	process(input, effect, output, null);
+        process(input, effect, output, null);
     }
-    
+
     private static Type fromFileName(String fileName) {
-    	Type[] types = new Type[] {Type.WAVE, Type.AIFF, Type.AIFC, Type.AU};
-    	for (Type type : types) {
-    		if (fileName.endsWith("." + type.getExtension()))
-    			return type;
-    	}
-    	if (fileName.endsWith(".aiff"))
-    		return Type.AIFF;
-    	return Type.WAVE;
+        Type[] types = new Type[] {Type.WAVE, Type.AIFF, Type.AIFC, Type.AU};
+        for (Type type : types) {
+            if (fileName.endsWith("." + type.getExtension()))
+                return type;
+        }
+        if (fileName.endsWith(".aiff"))
+            return Type.AIFF;
+        return Type.WAVE;
     }
-    
+
     /**
      * Transform the given file or stream using the given effect, saving the result to the given file or stream
      * <p>
@@ -305,19 +307,19 @@ public class SimpleProcessor {
      * The length can generally be known immediately from a stream of WAVE or AIFF/C format, but not from compressed streams such as mp3.
      */
     public static void process(InputFileOrStream input, IPullEffect effect, OutputFileOrStream output, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
-    	if (input.isFile()) {
-    		if (output.isFile()) {
-    			process(input.getFile(), effect, output.getFile(), progress);
-    		} else {
-    			process(input.getFile(), effect, output.getStream(), null, progress);
-    		}
-    	} else {
-    		if (output.isFile()) {
-    			process(null, input.getStream(), effect, output.getFile(), progress);
-    		} else {
-    			process(null, input.getStream(), effect, output.getStream(), null, progress);
-    		}
-    	}
+        if (input.isFile()) {
+            if (output.isFile()) {
+                process(input.getFile(), effect, output.getFile(), progress);
+            } else {
+                process(input.getFile(), effect, output.getStream(), null, progress);
+            }
+        } else {
+            if (output.isFile()) {
+                process(null, input.getStream(), effect, output.getFile(), progress);
+            } else {
+                process(null, input.getStream(), effect, output.getStream(), null, progress);
+            }
+        }
     }
 
 }
