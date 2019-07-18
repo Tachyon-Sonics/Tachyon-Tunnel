@@ -34,6 +34,11 @@ public class AwtTools {
             catch (Throwable x) {
                 x.printStackTrace();
             }
+            /*
+             * GTK always display the current value (as integer!) over sliders.
+             * This is almost always useless and stupid. Disable this behavior globally:
+             */
+            UIManager.getDefaults().put("Slider.paintValue", false);
         }
 
         // Switch to system look and feel, unless a laf is specified explicitely:

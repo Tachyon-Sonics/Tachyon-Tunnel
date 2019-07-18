@@ -68,18 +68,6 @@ public class DoubleControl  extends JPanel {
             slider.setMaximum(toSlider(maxValue));
             slider.setValue(toSlider(curValue));
             slider.setPaintLabels(false);
-            /*
-             *  Ubuntu hack: Ubuntu always display the current value (as integer!).
-             *  We can remove it by setting the font to a size of zero. Use
-             *  try catch just in case...
-             */
-            if (UIManager.getLookAndFeel().getName().contains("GTK")) {
-                try {
-                    slider.setFont(getFont().deriveFont(0.0f));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
             slider.addChangeListener(new ChangeListener() {
 
                 public void stateChanged(ChangeEvent e) {
