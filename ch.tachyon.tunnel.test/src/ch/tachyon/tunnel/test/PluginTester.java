@@ -31,10 +31,18 @@ public class PluginTester {
         this.effectName = effectName;
     }
     
+    private static TestSuite createTestSuite(String name) {
+        if (Runtime.getRuntime().availableProcessors() > 1 &&
+                Runtime.getRuntime().maxMemory() >= 5L * 1000 * 1000 * 1000)
+            return new ActiveTestSuite(name);
+        else
+            return new TestSuite(name);
+    }
+    
     public TestSuite suite() {
         TestSuite suite = new TestSuite(effectName);
         {
-            TestSuite serialSuite = new ActiveTestSuite("Single threaded");
+            TestSuite serialSuite = createTestSuite("Single threaded");
             suite.addTest(serialSuite);
             {
                 TestSuite scSuite = new TestSuite("Single channel");
@@ -60,7 +68,7 @@ public class PluginTester {
             }
         }
         {
-            TestSuite parallelSuite = new ActiveTestSuite("Multi threaded");
+            TestSuite parallelSuite = createTestSuite("Multi threaded");
             suite.addTest(parallelSuite);
             {
                 TestSuite scSuite = new TestSuite("Single channel");
