@@ -11,6 +11,7 @@ import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.engine.*;
 import ch.tachyon.tunnel.plugin.opt.callback.*;
 import ch.tachyon.tunnel.plugin.opt.doc.*;
+import ch.tachyon.tunnel.plugin.param.*;
 
 // todo continue with all stuff from all possible interfaces
 /**
@@ -130,8 +131,18 @@ public interface IEffect {
 
     public <P, T> T getParameterValue(ParameterDefinition<P, T> parameter);
 
+    /**
+     * @param name the "Java" name of the parameter. For instance if the getter is <tt>getVolumeLow()</tt>
+     * the parameter name is <tt>volumeLow</tt>, regardless of any friendly parameter name given by
+     * the {@link Name} annotation or in the plugin's properties file.
+     * @param value the value. If {@link Transform} is present on the parameter, this is the external (transformed) value,
+     * as shown to and specified by the user.
+     */
     public void setParameterValue(String name, Object value);
 
+    /**
+     * @see #setParameterValue(String, Object)
+     */
     public Object getParameterValue(String name);
 
     /**

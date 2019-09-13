@@ -44,6 +44,10 @@ import ch.tachyon.tunnel.plugin.*;
  * </pre>
  * 
  * See {@link #setCallbackInfo(long, Runnable)} and {@link #getProgressPercent()} for a way of monitoring the current progress.
+ * <p>
+ * To save the result to a {@link File} or to an {@link OutputStream}, use methods from  <tt>AudioFileIO</tt>.
+ * <p>
+ * To simply process a file os stream with a single plugin, use <tt>SimpleProcessor</tt>.
  */
 public class StreamProcessor implements IProcessingInfo {
     

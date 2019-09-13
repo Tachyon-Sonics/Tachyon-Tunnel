@@ -44,9 +44,13 @@ import ch.tachyon.tunnel.plugin.*;
  * <b>Warning: If both the input and output are specified as streams, and if the length of the input cannot be known in advance and the output file
  * format does not allow unknown length, an exception will be thrown.</b>
  * A typical case is when transforming from mp3 to wav, both using stream. To prevent this problem, either
+ * <ul>
  * <li>Use a File for either the input or the output, or both
  * <li>Use an input format whose length is specified at the beginning of the file, such as .wav or .aiff
  * <li>Use an output format that allows unknown length, such as .au ({@link Type#AU})
+ * </ul>
+ * <p>
+ * For more advanced processing, such as chaining multiple effects or capturing the result, use {@link StreamProcessor}.
  */
 public class SimpleProcessor {
 
