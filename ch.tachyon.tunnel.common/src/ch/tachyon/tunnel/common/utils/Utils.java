@@ -13,8 +13,13 @@ public class Utils {
         String javaVersion = System.getProperty("java.version");
         try {
             String[] tokens = javaVersion.split("\\.");
-            javaMajorVersion = Integer.parseInt(tokens[0]);
-            javaMinorVersion = Integer.parseInt(tokens[1]);
+            if (tokens.length == 1) {
+                javaMajorVersion = 1;
+                javaMinorVersion = Integer.parseInt(tokens[0]);
+            } else {
+                javaMajorVersion = Integer.parseInt(tokens[0]);
+                javaMinorVersion = Integer.parseInt(tokens[1]);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
