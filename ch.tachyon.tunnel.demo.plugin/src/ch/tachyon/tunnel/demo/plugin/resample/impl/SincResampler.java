@@ -25,6 +25,13 @@ public class SincResampler implements IResampler {
             float antiAliasing, int bufferSize) {
         if (nbZeroCross < 1)
             throw new IllegalArgumentException();
+        /*
+         * Down-sampling will stretch the sinc function, reducing the effective number of zero cross.
+         * If the number of zero corss is too low, amplitude issues occur. Here we ensure
+         * we have at least 3 zero cross
+         */
+        while (ratio * nbZeroCross < 3.0)
+            nbZeroCross++;
         float amplitudeCorrection = (float) Math.min(ratio, 1.0);
         // When upsampling, sinc is not stretched and lowpass filter is half the source sample rate
         // When downsampling, stretch the sinc so that lowpass filter is half the target sample rate

@@ -28,7 +28,6 @@ public class SincLiBuffer extends LinearInterpolatedBuffer {
     private void fillData(int samplesPerZeroCross, int nbZeroCross, float stretch) {
         float[] window = new float[samplesPerZeroCross * nbZeroCross * 2];
         Windows.fillHannWindow(window);
-        double nrj2 = 0.0f;
         // Create windowed sinc
         for (int i = 0; i < super.getSize(); i++) {
             float angle = (float) i / (float) samplesPerZeroCross;
@@ -36,15 +35,7 @@ public class SincLiBuffer extends LinearInterpolatedBuffer {
             if (i <= window.length / 2)
                 windowCoeff = window[window.length / 2 - i];
             float value = sinc(angle / stretch) * windowCoeff;
-            nrj2 += value * value;
             super.set(i, value);
-        }
-        double nrj1 = (double) samplesPerZeroCross * stretch / 2.0; // Squared energy of an unwindowed sinc
-        if (stretch > 1.0f) {
-            // Compensate for energy lost by windowing
-            float correction = (float) (Math.sqrt(nrj1) / Math.sqrt(nrj2));
-            for (int i = 0; i < super.getSize(); i++)
-                super.mult(i, correction);
         }
     }
 
