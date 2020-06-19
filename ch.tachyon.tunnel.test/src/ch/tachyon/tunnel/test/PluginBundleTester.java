@@ -31,9 +31,18 @@ public class BundleTest {
 public class PluginBundleTester {
     
     private final URL bundleUrl;
+    private final Set<String> exclusions = new HashSet<>();
+    
     
     public PluginBundleTester(URL bundleUrl) {
         this.bundleUrl = bundleUrl;
+    }
+    
+    /**
+     * @param pluginName full class name of plugin to exclude
+     */
+    public void addExclusion(String pluginName) {
+        this.exclusions.add(pluginName);
     }
     
     public TestSuite suite() throws IOException {
@@ -49,6 +58,7 @@ public class PluginBundleTester {
         // Load bundle
         Set<Long> threadIds = new HashSet<Long>();
         List<String> effectNames = getAllPlugins(bundleUrl);
+        effectNames.removeAll(exclusions);
         List<WeakReference<Class<?>>> classRefs = new ArrayList<WeakReference<Class<?>>>();
         
         // Create the suite
