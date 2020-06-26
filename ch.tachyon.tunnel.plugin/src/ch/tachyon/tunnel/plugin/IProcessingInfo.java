@@ -51,7 +51,7 @@ public interface IProcessingInfo {
     /**
      * Get the sample rate of the audio that will be processed, in Hz.
      */
-    public float getSampleRate();
+    public double getSampleRate();
 
     /**
      * Get the number of quantization in bits. For example <code>16</code> for 16 bits (CD quality) or

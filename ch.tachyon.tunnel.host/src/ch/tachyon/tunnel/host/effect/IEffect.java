@@ -202,7 +202,7 @@ public interface IEffect {
      * has been invoked. The result can depend on the parameters values.
      * @return output length / input length
      */
-    public float getTimeChange();
+    public double getTimeChange();
 
     /**
      * Return the approximate number of processed frames since the last call to {@link #startProcessing(IProcessingInfo)}.

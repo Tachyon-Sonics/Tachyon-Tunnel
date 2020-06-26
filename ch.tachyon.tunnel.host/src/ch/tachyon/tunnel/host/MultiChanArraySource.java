@@ -14,13 +14,13 @@ public class MultiChanArraySource implements IMultiChanAudioSource {
     private int offset;
     
 
-    public MultiChanArraySource(float[][] array, float sampleRate) {
+    public MultiChanArraySource(float[][] array, double sampleRate) {
         this(array, sampleRate, 24);
     }
     
-    public MultiChanArraySource(float[][] array, float sampleRate, int precision) {
+    public MultiChanArraySource(float[][] array, double sampleRate, int precision) {
         this.array = array;
-        this.format = new AudioFormat(sampleRate, precision, array.length, true, false);
+        this.format = new AudioFormat((float) sampleRate, precision, array.length, true, false);
         int nbFrames = 0;
         for (int chan = 0; chan < nbFrames; chan++) {
             if (chan == 0)

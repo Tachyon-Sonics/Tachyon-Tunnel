@@ -24,7 +24,7 @@ public class MonoStreamProcessor implements IProcessingInfo {
     protected final static int PREFERRED_CHUNK_LENGTH = 2048;
     protected final static int MAX_CHUNK_LENGTH = 16384;
     
-    protected float sampleRate;
+    protected double sampleRate;
     protected final long length;
     protected double lengthChange = 1.0;
     protected int chunkLength = PREFERRED_CHUNK_LENGTH;
@@ -104,7 +104,7 @@ public class MonoStreamProcessor implements IProcessingInfo {
      * @param effect the audio pugin
      * @return the resulting transformed raw audio
      */
-    public float[] process(final float[] audio, final float sampleRate, ISingleChanPullEffect effect) {
+    public float[] process(final float[] audio, final double sampleRate, ISingleChanPullEffect effect) {
         this.sampleRate = sampleRate;
         ISingleChanAudioSource source = new ISingleChanAudioSource() {
             
@@ -122,7 +122,7 @@ public class MonoStreamProcessor implements IProcessingInfo {
             }
 
             public AudioFormat getAudioFormat() {
-                return new AudioFormat(sampleRate, 24, 1, true, false);
+                return new AudioFormat((float) sampleRate, 24, 1, true, false);
             }
 
             public void close() {
@@ -249,7 +249,7 @@ public class MonoStreamProcessor implements IProcessingInfo {
         return channels;
     }
 
-    public float getSampleRate() {
+    public double getSampleRate() {
         return sampleRate;
     }
 

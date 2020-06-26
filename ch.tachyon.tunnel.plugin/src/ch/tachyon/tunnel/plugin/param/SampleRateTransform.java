@@ -17,7 +17,7 @@ public class SampleRateTransform implements IParameterTransform {
     @SuppressWarnings("unchecked")
     public <E extends Number> E transform(E value, IProcessingInfo info) {
         if (value instanceof Float)
-            return (E) (Float) (value.floatValue() * info.getSampleRate());
+            return (E) (Float) (value.floatValue() * (float) info.getSampleRate());
         else if (value instanceof Double)
             return (E) (Double) (value.doubleValue() * info.getSampleRate());
         else
@@ -27,7 +27,7 @@ public class SampleRateTransform implements IParameterTransform {
     @SuppressWarnings("unchecked")
     public <E extends Number> E untransform(E value, IProcessingInfo info) {
         if (value instanceof Float)
-            return (E) (Float) (value.floatValue() / info.getSampleRate());
+            return (E) (Float) (value.floatValue() / (float) info.getSampleRate());
         else if (value instanceof Double)
             return (E) (Double) (value.doubleValue() / info.getSampleRate());
         else

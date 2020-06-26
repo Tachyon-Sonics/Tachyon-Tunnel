@@ -109,7 +109,7 @@ public abstract class ScFromMcBase<SC extends IEffect, MC extends IEffect> imple
         return target.getRequiredSamplesAfter();
     }
 
-    public float getTimeChange() {
+    public double getTimeChange() {
         return target.getTimeChange();
     }
 

@@ -423,13 +423,13 @@ public abstract class PluginToHostWrapper<P extends IPlugin> implements IEffect 
         return 0;
     }
 
-    public float getTimeChange() {
+    public double getTimeChange() {
         checkStarted(true);
         int latencyIn = getLatency(IoDirection.INPUT);
         int latencyOut = getLatency(IoDirection.OUTPUT);
         if (latencyIn == 0)
-            return 1.0f;
-        return (float) latencyOut / (float) latencyIn;
+            return 1.0;
+        return (double) latencyOut / (double) latencyIn;
     }
 
     public void beginProcessing(ch.tachyon.tunnel.host.IProcessingInfo info) {

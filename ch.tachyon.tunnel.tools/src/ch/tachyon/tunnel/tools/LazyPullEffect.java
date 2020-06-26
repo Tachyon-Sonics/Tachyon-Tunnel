@@ -160,7 +160,7 @@ class LazyPullEffect implements IPullEffect {
     }
 
     @Override
-    public float getTimeChange() {
+    public double getTimeChange() {
         return target.getTimeChange();
     }
 

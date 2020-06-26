@@ -23,7 +23,7 @@ class OneChanProcessingInfo implements IProcessingInfo, IChanPartInfo {
         return 1;
     }
 
-    public float getSampleRate() {
+    public double getSampleRate() {
         return target.getSampleRate();
     }
 

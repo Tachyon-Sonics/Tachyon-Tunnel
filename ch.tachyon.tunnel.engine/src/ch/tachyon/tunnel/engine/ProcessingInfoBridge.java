@@ -43,7 +43,7 @@ public class ProcessingInfoBridge implements IProcessingInfo, IChanPartInfo {
         return target.getChannels();
     }
 
-    public float getSampleRate() {
+    public double getSampleRate() {
         return target.getSampleRate();
     }
 

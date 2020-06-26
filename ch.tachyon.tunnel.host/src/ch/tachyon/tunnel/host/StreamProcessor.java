@@ -55,7 +55,7 @@ public class StreamProcessor implements IProcessingInfo {
     protected final static int PREFERRED_CHUNK_LENGTH = 2048;
     protected final static int MAX_CHUNK_LENGTH = 16384;
     
-    private final float sampleRate;
+    private final double sampleRate;
     private final int nbChannels;
     private final long length;
     private double lengthChange = 1.0;
@@ -309,7 +309,7 @@ public class StreamProcessor implements IProcessingInfo {
         return channels;
     }
 
-    public float getSampleRate() {
+    public double getSampleRate() {
         return sampleRate;
     }
 

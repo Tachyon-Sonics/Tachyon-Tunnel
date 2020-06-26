@@ -72,7 +72,7 @@ public class PluginMcProcessingTest extends TestCase {
         ProcessingInfo info = new ProcessingInfo(nbChannels, 44100.0f, 16, -1, maxSize, (minSize == maxSize ? maxSize : -1));
         plugin.load(info);
         plugin.startProcessing(info);
-        float timeChange = plugin.getTimeChange();
+        double timeChange = plugin.getTimeChange();
         int nbInput = 0;
         final AtomicLong nbOutput = new AtomicLong();
         for (int k = 0; k < count; k++) {
@@ -116,8 +116,8 @@ public class PluginMcProcessingTest extends TestCase {
                 if (timeChange == 1.0f)
                     assert nbInput == nbOutput.get() : "The amount of produced frames (" + nbOutput.get() + ") does not match the amount of input frames (" + nbInput + ")";
                 else if (timeChange > 0.0f) {
-                    float expected = nbInput * timeChange;
-                    float ratio = expected / (float) nbOutput.get();
+                    double expected = nbInput * timeChange;
+                    double ratio = expected / nbOutput.get();
                     assert (ratio >= MIN_RATIO_TIME_CHANGE && ratio <= MAX_RATIO_TIME_CHANGE) || (Math.abs(expected - nbOutput.get()) <= MAX_FRAMES_TIME_CHANGE) :
                         "The amount of produced frames (" + nbOutput.get() + ") differs significantly from the expected amount of "
                         + nbInput + " * " + plugin.getTimeChange() + " (plugin.getTimeChange()) = " + expected;

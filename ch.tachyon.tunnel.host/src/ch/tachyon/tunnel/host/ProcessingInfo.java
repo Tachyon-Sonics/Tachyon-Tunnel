@@ -18,14 +18,14 @@ public class ProcessingInfo implements IProcessingInfo, Cloneable, java.io.Seria
 
     private int numberOfChannels;
     private BitSet channels;
-    private float sampleRate;
+    private double sampleRate;
     private int quantization;
     private long length;
     private int maxChunkLength;
     private int fixedChunkLength;
 
 
-    public ProcessingInfo(int numberOfChannels, float sampleRate, int quantization, int chunkLength) {
+    public ProcessingInfo(int numberOfChannels, double sampleRate, int quantization, int chunkLength) {
         this(numberOfChannels, sampleRate, quantization, LENGTH_UNKNOWN, chunkLength, chunkLength);
     }
 
@@ -35,7 +35,7 @@ public class ProcessingInfo implements IProcessingInfo, Cloneable, java.io.Seria
      * the length will be adjusted to the plugin's requested one, but no more than the specified maximum. The adjusted value can be
      * inquired after the call to {@link IEffect#startProcessing(IProcessingInfo)} using {@link #getFixedChunkLength()}.
      */
-    public ProcessingInfo(int numberOfChannels, float sampleRate, int quantization, long length,
+    public ProcessingInfo(int numberOfChannels, double sampleRate, int quantization, long length,
             int maxChunkLength, int fixedChunkLength) {
         this.numberOfChannels = numberOfChannels;
         this.sampleRate = sampleRate;
@@ -63,11 +63,11 @@ public class ProcessingInfo implements IProcessingInfo, Cloneable, java.io.Seria
         this.channels = channels;
     }
 
-    public float getSampleRate() {
+    public double getSampleRate() {
         return sampleRate;
     }
 
-    public void setSampleRate(float sampleRate) {
+    public void setSampleRate(double sampleRate) {
         this.sampleRate = sampleRate;
     }
 
@@ -118,18 +118,23 @@ public class ProcessingInfo implements IProcessingInfo, Cloneable, java.io.Seria
     }
     
     public static AudioFormat toAudioFormat(IProcessingInfo info) {
-        return new AudioFormat(info.getSampleRate(), info.getQuantization(), info.getNumberOfChannels(), true, false);
+        return new AudioFormat((float) info.getSampleRate(), info.getQuantization(), info.getNumberOfChannels(), true, false);
     }
+
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((channels == null) ? 0 : channels.hashCode());
         result = prime * result + fixedChunkLength;
         result = prime * result + (int) (length ^ (length >>> 32));
         result = prime * result + maxChunkLength;
         result = prime * result + numberOfChannels;
-        result = prime * result + Float.floatToIntBits(sampleRate);
+        result = prime * result + quantization;
+        long temp;
+        temp = Double.doubleToLongBits(sampleRate);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
@@ -142,6 +147,11 @@ public class ProcessingInfo implements IProcessingInfo, Cloneable, java.io.Seria
         if (getClass() != obj.getClass())
             return false;
         ProcessingInfo other = (ProcessingInfo) obj;
+        if (channels == null) {
+            if (other.channels != null)
+                return false;
+        } else if (!channels.equals(other.channels))
+            return false;
         if (fixedChunkLength != other.fixedChunkLength)
             return false;
         if (length != other.length)
@@ -150,7 +160,9 @@ public class ProcessingInfo implements IProcessingInfo, Cloneable, java.io.Seria
             return false;
         if (numberOfChannels != other.numberOfChannels)
             return false;
-        if (Float.floatToIntBits(sampleRate) != Float.floatToIntBits(other.sampleRate))
+        if (quantization != other.quantization)
+            return false;
+        if (Double.doubleToLongBits(sampleRate) != Double.doubleToLongBits(other.sampleRate))
             return false;
         return true;
     }

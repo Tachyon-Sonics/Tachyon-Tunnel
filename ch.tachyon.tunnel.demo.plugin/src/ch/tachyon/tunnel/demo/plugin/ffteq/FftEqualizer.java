@@ -33,7 +33,7 @@ public class FftEqualizer implements ISimpleEffect, IStartStop, IBeginProcessing
     private float g16000 = 4;
     private float globalGain = -4;
     
-    private transient float sampleRate;
+    private transient double sampleRate;
     private transient float[] equalizationCurve;
 
 
@@ -208,7 +208,7 @@ public class FftEqualizer implements ISimpleEffect, IStartStop, IBeginProcessing
         final int NbBands = Freqs.length;
         int b0 = -1;
         int b1 = 0;
-        float nextBin = freq2bin(nbBins, Freqs[0]);
+        double nextBin = freq2bin(nbBins, Freqs[0]);
         for (int i = 0; i < nbBins; i++) {
             while (i >= nextBin) {
                 b0++;
@@ -246,14 +246,14 @@ public class FftEqualizer implements ISimpleEffect, IStartStop, IBeginProcessing
         return curve;
     }
 
-    private float freq2bin(int nbBins, float freq) {
+    private double freq2bin(int nbBins, double freq) {
         int fftSize = (nbBins - 1) * 2;
-        return (freq * (float) fftSize / sampleRate);
+        return (freq * (double) fftSize / sampleRate);
     }
 
-    private float bin2freq(int nbBins, int binNum) {
+    private double bin2freq(int nbBins, int binNum) {
         int fftSize = (nbBins - 1) * 2;
-        return (float) binNum * sampleRate / (float) fftSize;
+        return (double) binNum * sampleRate / (double) fftSize;
     }
 
     /**
