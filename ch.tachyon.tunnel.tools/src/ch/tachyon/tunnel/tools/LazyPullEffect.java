@@ -106,11 +106,17 @@ class LazyPullEffect implements IPullEffect {
 
     @Override
     public <P, T> void setParameterValue(ParameterDefinition<P, T> parameter, T value) {
-        target.setParameterValue(parameter, value);
+        if (loaded)
+            target.setParameterValue(parameter, value);
+        else
+            parameters.put(parameter.getName(), value);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <P, T> T getParameterValue(ParameterDefinition<P, T> parameter) {
+        if (parameters.containsKey(parameter.getName()))
+            return (T) parameters.get(parameter.getName());
         return target.getParameterValue(parameter);
     }
 

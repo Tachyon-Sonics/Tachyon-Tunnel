@@ -227,7 +227,7 @@ public class SimpleProcessor {
 
     /**
      * Process audio from the given input stream using the given audio effect, and return the result as a readable input stream using the given
-     * file format type.
+     * file format type. The resulting {@link InputStream} can be passed to further call to this method in order to chain effects.
      * @param inputFileName a file name, or an extension, that identifies the audio format of the input stream. For example ".wav" or ".aiff".
      * @param input the input stream. The format must be an audio file format (not just raw encoded audio) that matches the extension of the specified
      * input file name
@@ -237,12 +237,29 @@ public class SimpleProcessor {
      * the returned input stream closes the 'input' input stream passed as argument
      */
     public static InputStream process(String inputFileName, InputStream input, IPullEffect effect, AudioFileFormat.Type outputFileType) throws IOException, UnsupportedAudioFileException {
-        return process(inputFileName, input, effect, outputFileType);
+        return process(inputFileName, input, effect, outputFileType, null);
     }
 
     public static InputStream process(String inputFileName, InputStream input, IPullEffect effect, AudioFileFormat.Type outputFileType, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
+        StreamProcessor processor = new StreamProcessor(inputFormat);
+        effect.load(processor);
+        if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
+            setupProgressUsingProcessor(progress, inputFormat, processor);
+        IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
+        AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
+        return AudioFileIO.createInputStream(transformedSource, format,
+                inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
+    }
+
+    public static InputStream process(File inputFile, IPullEffect effect, AudioFileFormat.Type outputFileType) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
+        return process(inputFile, effect, outputFileType, null);
+    }
+    
+    public static InputStream process(File inputFile, IPullEffect effect, AudioFileFormat.Type outputFileType, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
+        AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFile, true);
+        IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFile);
         StreamProcessor processor = new StreamProcessor(inputFormat);
         effect.load(processor);
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
