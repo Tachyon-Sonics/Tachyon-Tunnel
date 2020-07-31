@@ -3,7 +3,6 @@ package ch.tachyon.tunnel.test;
 import java.lang.ref.*;
 import java.util.*;
 import ch.tachyon.tunnel.host.engine.*;
-import junit.extensions.*;
 import junit.framework.*;
 
 /**
@@ -34,7 +33,7 @@ public class PluginTester {
     private static TestSuite createTestSuite(String name) {
         if (Runtime.getRuntime().availableProcessors() > 1 &&
                 Runtime.getRuntime().maxMemory() >= 5L * 1000 * 1000 * 1000)
-            return new ActiveTestSuite(name);
+            return new ThreadPooledSuite(name);
         else
             return new TestSuite(name);
     }
