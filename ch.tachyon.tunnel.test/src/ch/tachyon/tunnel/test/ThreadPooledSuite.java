@@ -15,7 +15,10 @@ public class ThreadPooledSuite extends TestSuite {
 
 
     private static int poolSize() {
-        return (Runtime.getRuntime().availableProcessors() + 2) / 2;
+        int nbProcs = Runtime.getRuntime().availableProcessors();
+        if (nbProcs <= 3)
+            return nbProcs;
+        return Runtime.getRuntime().availableProcessors() / 2;
     }
     
     public ThreadPooledSuite() {
