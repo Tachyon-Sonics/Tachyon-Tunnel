@@ -1,13 +1,17 @@
 package ch.tachyon.tunnel.test;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+import ch.tachyon.tunnel.common.utils.*;
 import junit.framework.*;
 
 public class ThreadPooledSuite extends TestSuite {
 
     private static ExecutorService pool = Executors.newFixedThreadPool(poolSize());
+    private final static Object lock = new Monitor(ThreadPooledSuite.class.getSimpleName());
     private final boolean noWait;
     private volatile int activeTestDeathCount;
+    private static AtomicInteger activeTestThreads = new AtomicInteger(0);
 
 
     private static int poolSize() {
@@ -56,6 +60,7 @@ public class ThreadPooledSuite extends TestSuite {
             @Override
             public void run() {
                 try {
+                    activeTestThreads.getAndIncrement();
                     test.run(result);
                 } finally {
                     ThreadPooledSuite.this.runFinished();
@@ -72,18 +77,35 @@ public class ThreadPooledSuite extends TestSuite {
             return activeTestDeathCount >= testCount();
     }
 
-    synchronized void waitUntilFinished() {
-        while (!isFinished()) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                return; // ignore
+    void waitUntilFinished() {
+        synchronized (lock) {
+            while (!isFinished()) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    return; // ignore
+                }
+            }
+        }
+    }
+    
+    static void waitAllThreads() {
+        synchronized (lock) {
+            while (activeTestThreads.get() > 0) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    return; // ignore
+                }
             }
         }
     }
 
-    synchronized public void runFinished() {
-        activeTestDeathCount++;
-        notifyAll();
+    public void runFinished() {
+        synchronized (lock) {
+            activeTestDeathCount++;
+            activeTestThreads.decrementAndGet();
+            lock.notifyAll();
+        }
     }
 }
