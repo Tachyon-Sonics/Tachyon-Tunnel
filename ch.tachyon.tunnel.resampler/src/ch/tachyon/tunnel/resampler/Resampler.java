@@ -70,7 +70,7 @@ public class Resampler {
          *   (when saving to a *File* (but not to a FileOutputStream), the length is automatically computed at the end,
          *    and updated by seeking backward in the file)
          *
-         * If none of the above applies, having the exact length is not necessary, and <tt>false</tt> can be used.
+         * If none of the above applies, then having the exact length is not necessary, and <tt>false</tt> can be used.
          * Requesting the length will then return AudioSystem.NOT_SPECIFIED (-1) if not available.
          */
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFile, true);
@@ -172,7 +172,7 @@ public class Resampler {
      * <ul>
      * <li>Specify you own audio source by implementing {@link IMultiChanAudioSource} directly
      * <li>Capture and/or modify the audio source by wrapping {@link IMultiChanAudioSource}
-     * <li>Chain multiple effects
+     * <li>Chain multiple effects efficiently
      * </ul>
      */
     public static void main2(String[] args) throws IOException, UnsupportedAudioFileException {

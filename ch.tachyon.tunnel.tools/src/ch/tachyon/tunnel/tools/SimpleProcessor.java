@@ -52,17 +52,28 @@ import ch.tachyon.tunnel.plugin.*;
  * <p>
  * For more advanced processing, such as chaining multiple effects or capturing the result, use {@link StreamProcessor}.
  * <p>
- * This class supports a limited way of chaining effects. When used, the effects are processed concurrently using multiple threads:
+ * This class supports a limited way of chaining effects. When used, the effects are processed concurrently using multiple threads.
+ * Here's an example of chaining 3 effects:
  * <pre>
- * IPullEffect effect1 = SimpleProcessor.{@link #getPlugin(Class)};
- * IPullEffect effect2 = SimpleProcessor.{@link #getPlugin(Class)};
- * // ... Set parameters ...
- * File inputFile = new File("myAudio.wav");
- * File outputFile = new File("result.wav");
- * InputStream processedByEffect1 = SimpleProcessor.process(testFile, timeStretch, Type.WAVE);
- * SimpleProcessor.process(".wav", processedByEffect1, effect2, outputFile, null); // ".wav" must match 'Type.WAV' above
+        File inputFile = new File("myAudio.wav");
+        File outputFile = new File("result.wav");
+
+        IPullEffect effect1 = SimpleProcessor.{@link #getPlugin(Class)};
+        // Set parameters of effect1 here
+        InputStream processed1 = SimpleProcessor.process(inputFile, effect1, Type.WAVE);
+
+        IPullEffect effect2 = SimpleProcessor.{@link #getPlugin(Class)};
+        // Set parameters of effect2 here
+        InputStream processed2 = SimpleProcessor.process(".wav", processed1, effect2, Type.WAVE);
+            // ".wav" above must match Type.WAVE of previous processing. This is the internal file format used between effects
+        
+        // Repeat the above block to chain more effects
+
+        IPullEffect effect3 = SimpleProcessor.{@link #getPlugin(Class)};
+        // Set parameters of effect3 here
+        SimpleProcessor.process(".wav", processed2, effect3, outputFile, null);
  * </pre>
- * This is however not as efficient as {@link StreamProcessor}, because an explicit conversion to a file format (WAVE is this
+ * This is however not as efficient as using {@link StreamProcessor}, because an explicit conversion to a file format (WAVE is this
  * example) is performed between the effects.
  */
 public class SimpleProcessor {
