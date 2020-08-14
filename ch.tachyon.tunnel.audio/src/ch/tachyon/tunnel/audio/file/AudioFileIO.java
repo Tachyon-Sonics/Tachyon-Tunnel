@@ -1,7 +1,6 @@
 package ch.tachyon.tunnel.audio.file;
 
 import java.io.*;
-
 import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.spi.*;
@@ -127,18 +126,37 @@ public class AudioFileIO {
     }
     
     /**
-     * Create an {@link InputStream} that read from the given {@link IMultiChanAudioSource} in the specified audio file format
+     * Create an {@link InputStream} that read raw samples from the given {@link IMultiChanAudioSource} and convert the result into the specified audio file format.
+     * <p>
+     * Note: du to the way the Java Audio subsystem works, this method needs to create a separate Thread and use {@link PipedInputStream} / 
+     * {@link PipedOutputStream}. On the other hand, this will allow multi-threading to be used when multiple processing are chained
      * @param audioSource the audio source to read from
      * @param saveFormat the audio file format
      * @param progress an optional progress monitor
      * @return a stream with the audio source encoded in the given audio file format
      */
-    public static AudioInputStream createInputStream(IMultiChanAudioSource audioSource, AudioFileFormat saveFormat, IProgressMonitor progress) {
+    public static InputStream convertToFormat(IMultiChanAudioSource audioSource, final AudioFileFormat saveFormat, IProgressMonitor progress) throws IOException {
         if (saveFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED && !saveFormat.getType().equals(Type.AU))
             throw new IllegalArgumentException("Writing to a stream with unspecified length is not allowed");
         AudioSourceInputStream source = AudioSourceInputStream.createAudioSourceInputStream(audioSource, saveFormat.getFormat(), progress, saveFormat.getFrameLength());
-        AudioInputStream input = new AudioInputStream(source, saveFormat.getFormat(), saveFormat.getFrameLength());
-        return input;
+        final AudioInputStream input = new AudioInputStream(source, saveFormat.getFormat(), saveFormat.getFrameLength());
+        final PipedOutputStream pipeOut = new PipedOutputStream();
+        PipedInputStream pipeIn = new PipedInputStream(pipeOut);
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                try {
+                    AudioFileTypes.write(input, saveFormat.getType(), pipeOut);
+                    pipeOut.flush();
+                    pipeOut.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }, "AudioFileIO.pipe").start();
+        // Use BufferedInputStream to support mark() - just enough to read the format's header and go back to the beginning of the stream
+        return new BufferedInputStream(pipeIn, 4096);
     }
     
     /**

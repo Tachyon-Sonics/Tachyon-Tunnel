@@ -19,7 +19,7 @@ import ch.tachyon.tunnel.plugin.*;
  * <p>
  * Example of usage:
  * <pre>
- * IPUllEffect effect = SimpleProcessor.{@link #getPlugin(Class)};
+ * IPullEffect effect = SimpleProcessor.{@link #getPlugin(Class)};
  * effect.{@link IPullEffect#setParameterValue(String, Object) setParameterValue("parameterName", value)};
  * effect.{@link IPullEffect#setParameterValue(String, Object) setParameterValue("parameterName", value)};
  *  ...
@@ -51,6 +51,19 @@ import ch.tachyon.tunnel.plugin.*;
  * </ul>
  * <p>
  * For more advanced processing, such as chaining multiple effects or capturing the result, use {@link StreamProcessor}.
+ * <p>
+ * This class supports a limited way of chaining effects. When used, the effects are processed concurrently using multiple threads:
+ * <pre>
+ * IPullEffect effect1 = SimpleProcessor.{@link #getPlugin(Class)};
+ * IPullEffect effect2 = SimpleProcessor.{@link #getPlugin(Class)};
+ * // ... Set parameters ...
+ * File inputFile = new File("myAudio.wav");
+ * File outputFile = new File("result.wav");
+ * InputStream processedByEffect1 = SimpleProcessor.process(testFile, timeStretch, Type.WAVE);
+ * SimpleProcessor.process(".wav", processedByEffect1, effect2, outputFile, null); // ".wav" must match 'Type.WAV' above
+ * </pre>
+ * This is however not as efficient as {@link StreamProcessor}, because an explicit conversion to a file format (WAVE is this
+ * example) is performed between the effects.
  */
 public class SimpleProcessor {
 
@@ -227,7 +240,11 @@ public class SimpleProcessor {
 
     /**
      * Process audio from the given input stream using the given audio effect, and return the result as a readable input stream using the given
-     * file format type. The resulting {@link InputStream} can be passed to further call to this method in order to chain effects.
+     * file format type. The resulting {@link InputStream} can be passed to further calls to this method in order to chain effects.
+     * <p>
+     * Not that due to the was the Java audio subsystem work (it can only save to an output stream), this method will create a helper Thread
+     * in order to use {@link PipedInputStream} / {@link PipedOutputStream}. On the other hand, when multiple effects are chained using
+     * this method, they will benefit from multi-threading (each effect is processed concurrently by its own thread).
      * @param inputFileName a file name, or an extension, that identifies the audio format of the input stream. For example ".wav" or ".aiff".
      * @param input the input stream. The format must be an audio file format (not just raw encoded audio) that matches the extension of the specified
      * input file name
@@ -249,7 +266,7 @@ public class SimpleProcessor {
             setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
-        return AudioFileIO.createInputStream(transformedSource, format,
+        return AudioFileIO.convertToFormat(transformedSource, format,
                 inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
     }
 
@@ -266,7 +283,7 @@ public class SimpleProcessor {
             setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
-        return AudioFileIO.createInputStream(transformedSource, format,
+        return AudioFileIO.convertToFormat(transformedSource, format,
                 inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
     }
 
@@ -297,7 +314,7 @@ public class SimpleProcessor {
             setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileFormat, inputFormat, processor);
-        return AudioFileIO.createInputStream(transformedSource, format,
+        return AudioFileIO.convertToFormat(transformedSource, format,
                 inputFormat.getFrameLength() == AudioSystem.NOT_SPECIFIED ? progress : null);
     }
 
