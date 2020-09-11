@@ -48,11 +48,15 @@ public class McPullFromMcPull extends PluginToHostWrapper<IMultiChanPullEffect>
              */
             this.wrappedTarget = new IMultiChanPullEffect() {
 
-                private final float[][] buffer = new float[info.getNumberOfChannels()][getChunkLength(info)];
-                private int bufferIndex = buffer[0].length;
+                private float[][] buffer;
+                private int bufferIndex;
                 private int bufferAvailable;
 
                 public int process(IMultiChanAudioSource source, float[][] output) {
+                    if (buffer == null) {
+                        buffer = new float[output.length][getChunkLength(info)];
+                        bufferIndex = buffer[0].length;
+                    }
                     int outIndex = 0;
                     int result = 0;
                     while (outIndex < output[0].length) {
