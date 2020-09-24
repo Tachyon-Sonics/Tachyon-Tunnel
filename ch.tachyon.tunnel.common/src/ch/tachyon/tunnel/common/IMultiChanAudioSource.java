@@ -1,13 +1,12 @@
 package ch.tachyon.tunnel.common;
 
-import java.io.*;
 import javax.sound.sampled.*;
 
 /**
  * A multi-channel audio source that can be read from in multiple chunks using
  * <tt>float[][]</tt> arrays.
  */
-public interface IMultiChanAudioSource extends Closeable {
+public interface IMultiChanAudioSource {
     
     /**
      * Get the audio format of the source, such as number of channels and sample rate.

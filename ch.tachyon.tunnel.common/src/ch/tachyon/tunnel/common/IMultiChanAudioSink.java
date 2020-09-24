@@ -1,11 +1,9 @@
 package ch.tachyon.tunnel.common;
 
-import java.io.*;
-
 /**
  * Multi-channel version of {@link ISingleChanAudioSink}
  */
-public interface IMultiChanAudioSink extends Closeable {
+public interface IMultiChanAudioSink {
 
     /**
      * Multi-channel version of {@link ISingleChanAudioSink#writeSamples(float[])}
