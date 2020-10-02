@@ -68,6 +68,7 @@ public class StreamProcessor implements IProcessingInfo {
     private Runnable callback;
     private IMultiChanAudioSource mainSource;
     private List<IPullEffect> effects = new ArrayList<>();
+    private Long additionalInputFrames; // Cached value
     
     
     /**
@@ -154,6 +155,7 @@ public class StreamProcessor implements IProcessingInfo {
         }
         terminated = false;
         effects.add(effect);
+        additionalInputFrames = null;
         return new FilterSource(effect, source);
     }
     
@@ -174,8 +176,12 @@ public class StreamProcessor implements IProcessingInfo {
             return Double.NaN;
         if (effects.isEmpty())
             throw new IllegalStateException();
-        for (IPullEffect effect : effects)
-            toProcess += effect.getAdditionalInputFrames();
+        if (additionalInputFrames == null) {
+            additionalInputFrames = 0L;
+            for (IPullEffect effect : effects)
+                additionalInputFrames += effect.getAdditionalInputFrames();
+        }
+        toProcess += additionalInputFrames;
         
         long processed = 0;
         for (IPullEffect effect : effects)
