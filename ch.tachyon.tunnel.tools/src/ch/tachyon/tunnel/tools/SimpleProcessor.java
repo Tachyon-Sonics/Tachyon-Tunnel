@@ -148,21 +148,34 @@ public class SimpleProcessor {
      * @throws UnsupportedAudioFileException if the input audio file format is not supported
      */
     public static void process(File input, IPullEffect effect, File output) throws IOException, UnsupportedAudioFileException {
-        process(input, effect, output, null);
+        process(input, effect, output, null, null);
     }
 
-    public static void process(File input, IPullEffect effect, File output, final IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
+    public static void process(File input, IPullEffect effect, File output, final IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
+        process(input, effect, output, null, progress);
+    }
+    
+    /**
+     * @param outputFormat if non-null, the output file format. Any value of {@link AudioSystem#NOT_SPECIFIED} will be replaced by the
+     * corresponding value of the input file format. The output length is always overriden with the computed output length, based on the
+     * applied effect (usually the same as the input length, except for effects changing the audio duration).
+     */
+    public static void process(File input, IPullEffect effect, File output, AudioFileFormat outputFormat, final IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(input, true);
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(input);
         final StreamProcessor processor = new StreamProcessor(inputFormat);
         effect.load(processor);
         setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
-        AudioFileFormat.Type outputFileType = AudioFileTypes.instance().getWritableType4ext(output.getName());
-        if (outputFileType == null)
-            throw new UnsupportedOperationException("Cannot infer the output audio file type from the file name: " + output.getAbsolutePath());
-        AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
-        AudioFileIO.saveAudioFile(transformedSource, output, format, null);
+        if (outputFormat == null) {
+            AudioFileFormat.Type outputFileType = AudioFileTypes.instance().getWritableType4ext(output.getName());
+            if (outputFileType == null)
+                throw new UnsupportedOperationException("Cannot infer the output audio file type from the file name: " + output.getAbsolutePath());
+            outputFormat = getOutputFormat(outputFileType, inputFormat, processor);
+        } else {
+            outputFormat = getOutputFormat(outputFormat, inputFormat, processor);
+        }
+        AudioFileIO.saveAudioFile(transformedSource, output, outputFormat, null);
         if (progress != null)
             progress.setProgress(100.0, 100.0); // Ensure progress is closed
     }
@@ -358,7 +371,7 @@ public class SimpleProcessor {
     public static void process(InputFileOrStream input, IPullEffect effect, OutputFileOrStream output, IProgressMonitor progress) throws OperationAbortedException, IOException, UnsupportedAudioFileException {
         if (input.isFile()) {
             if (output.isFile()) {
-                process(input.getFile(), effect, output.getFile(), progress);
+                process(input.getFile(), effect, output.getFile(), null, progress);
             } else {
                 process(input.getFile(), effect, output.getStream(), null, progress);
             }

@@ -93,6 +93,8 @@ public class StreamProcessor implements IProcessingInfo {
     
     /**
      * Create a new stream processor.
+     * <p>
+     * You may want to use <tt>AudioFilesTypes.instance().getAudioFileFormat()</tt> in ch.tachyon.tunnel.audio
      */
     public StreamProcessor(AudioFileFormat fileFormat) {
         this(fileFormat.getFormat(), fileFormat.getFrameLength());
