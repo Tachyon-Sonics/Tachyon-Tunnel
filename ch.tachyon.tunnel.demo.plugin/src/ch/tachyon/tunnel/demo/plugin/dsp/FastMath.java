@@ -13,12 +13,9 @@ public class FastMath {
     private final static double sPI = Math.PI * 1.5;
 
     /**
-     * Wrap an angle so that it is in the [-&pi;..&pi;] range.
-     * <p>
-     * <b>Warning:</b> the input angle is assumed to be in the [-2&pi;..2&pi;] range! This is hence a very limited wrapping,
-     * just sufficient to properly implement some of the other fast methods.
+     * Wrap an angle so that it is in the [-&pi;..&pi;] range
      */
-    private static double wrap(double angle) {
+    public static double wrap(double angle) {
         angle = angle % PI2;
         if (angle > Math.PI)
             angle -= PI2;

@@ -2,3 +2,4 @@
 
 ch.tachyon.tunnel.demo.plugin.ffteq.FftEqualizer
 ch.tachyon.tunnel.demo.plugin.resample.Resample
+ch.tachyon.tunnel.demo.plugin.timestretch.GradientTimeStretch
