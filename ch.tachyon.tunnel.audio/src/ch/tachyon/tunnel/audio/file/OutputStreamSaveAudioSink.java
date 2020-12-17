@@ -19,6 +19,7 @@ import ch.tachyon.tunnel.common.*;
  * using a separate helper Thread, and in a way similar to {@link PipedInputStream} and {@link PipedOutputStream}.
  * <p>
  * Do not forget to call {@link #close()} to flush the underlying resources, such as terminating the helper thread.
+ * A call to {@link #close()} will also close the specified {@link OutputStream}.
  * <p>
  * Note: you should only use this class if you need to save audio using a {@link IMultiChanAudioSink}.
  * In general, the recommanded way is to rely on {@link IMultiChanAudioSource} only, and to use 

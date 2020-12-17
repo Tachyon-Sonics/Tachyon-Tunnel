@@ -312,7 +312,6 @@ public class SimpleProcessor {
     }
 
     /**
-     *
      * @param inputFileName name of the input file, used to determine its format. It is sufficient to specify an extension (including the dot),
      * such as "<tt>.wav</tt>" or "<tt>.mp3</tt>".
      * @param input

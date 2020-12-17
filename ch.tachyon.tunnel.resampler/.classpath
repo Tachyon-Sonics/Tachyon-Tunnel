@@ -10,11 +10,7 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/ch.tachyon.tunnel.host"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ch.tachyon.tunnel.plugin">
-		<accessrules>
-			<accessrule kind="nonaccessible" pattern="**"/>
-		</accessrules>
-	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/ch.tachyon.tunnel.plugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ch.tachyon.tunnel.audio"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ch.tachyon.tunnel.tools"/>
 	<classpathentry kind="output" path="bin"/>

@@ -99,7 +99,7 @@ public class AudioFileIO {
      * <p>
      * This method will throw an {@link IllegalArgumentException} if the file format length is unspecified and the file format does not support unspecified
      * length (actually only AU supports unspecified length because there is no API to ask for that feature). If the file format length is unspecified, you
-     * must use {@link #saveAudioFile(IMultiChanAudioSource, File, AudioFileFormat, IProgressMonitor)} instaead, which is able to seek backward
+     * must use {@link #saveAudioFile(IMultiChanAudioSource, File, AudioFileFormat, IProgressMonitor)} instead, which is able to seek backward
      * and patch the header with the actual length before closing the file.
      * @param audioSource the audio data
      * @param target the output stream to write to. It is closed by this method.
