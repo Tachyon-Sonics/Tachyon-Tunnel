@@ -75,10 +75,6 @@ public class GradientEngine {
         processedIndexes = new BitSet(nbBins);
     }
 
-    public double getOutputLatency() {
-        return (double) (blockSize / overlap);
-    }
-
     public void process(int inHop, Cmplx[] source, Cmplx[][] spectrums) {
         normalize(source, spectrums);
 

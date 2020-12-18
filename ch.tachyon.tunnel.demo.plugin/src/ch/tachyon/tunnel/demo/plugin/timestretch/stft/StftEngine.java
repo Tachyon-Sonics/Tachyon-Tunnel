@@ -96,7 +96,7 @@ public class StftEngine {
     }
 
     public int getCurrentInputHopSize() {
-        return (int) (analyzer.getCurrentHopSize() + 0.5);
+        return analyzer.getCurrentHopSize();
     }
 
 }

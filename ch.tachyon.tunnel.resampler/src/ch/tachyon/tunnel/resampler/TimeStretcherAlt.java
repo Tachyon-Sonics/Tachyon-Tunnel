@@ -42,12 +42,19 @@ import ch.tachyon.tunnel.plugin.opt.spec.*;
 public class TimeStretcherAlt {
     
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
-        if (args.length != 3) {
-            System.out.println("Usage: java -jar TimeStretcherAlt.jar <input file> <ratio> <output file>");
+        if (args.length != 3 && args.length != 4) {
+            System.out.println("Usage: java -jar TimeStretcherAlt.jar [-z] <input file> <ratio> <output file>");
             System.exit(1);
         }
 
         // Parse arguments
+        boolean zeroPad = false;
+        if (args.length == 4) {
+            if (args[0].equals("-z"))
+                zeroPad = true;
+            System.arraycopy(args, 1, args, 0, 3);
+        }
+        
         File inputFile = new File(args[0]);
         double ratio = Double.parseDouble(args[1]);
         File outputFile = new File(args[2]);
@@ -67,7 +74,7 @@ public class TimeStretcherAlt {
         // Instanciate the time-stretching plugin, set the parameters and prepare for processing
         GradientTimeStretch stretcher = new GradientTimeStretch();
         stretcher.setRatio(ratio);
-        stretcher.setZeroPad(false);
+        stretcher.setZeroPad(zeroPad);
         
         stretcher.startProcessing(processingInfo); // FFT engine and buffers are created here
         int chunkLength = stretcher.getFixedChunkLength();

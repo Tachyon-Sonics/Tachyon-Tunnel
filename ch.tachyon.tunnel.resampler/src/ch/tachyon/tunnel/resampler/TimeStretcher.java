@@ -32,11 +32,18 @@ public class TimeStretcher {
 
     // See Resampler.java for detailled explanations
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
-        if (args.length != 3) {
-            System.out.println("Usage: java -jar TimeStretcher.jar <input file> <ratio> <output file>");
+        if (args.length != 3 && args.length != 4) {
+            System.out.println("Usage: java -jar TimeStretcher.jar [-z] <input file> <ratio> <output file>");
             System.exit(1);
         }
 
+        boolean zeroPad = false;
+        if (args.length == 4) {
+            if (args[0].equals("-z"))
+                zeroPad = true;
+            System.arraycopy(args, 1, args, 0, 3);
+        }
+        
         File inputFile = new File(args[0]);
         double ratio = Double.parseDouble(args[1]);
         File outputFile = new File(args[2]);
@@ -44,7 +51,7 @@ public class TimeStretcher {
         IPullEffect plugin = SimpleProcessor.getPlugin(GradientTimeStretch.class);
         
         plugin.setParameterValue("ratio", ratio);
-        plugin.setParameterValue("zeroPad", false);
+        plugin.setParameterValue("zeroPad", zeroPad);
         
         SimpleProcessor.process(inputFile, plugin, outputFile);
     }

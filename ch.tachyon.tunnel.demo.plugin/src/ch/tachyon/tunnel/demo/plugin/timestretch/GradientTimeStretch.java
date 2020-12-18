@@ -85,13 +85,6 @@ public class GradientTimeStretch extends AbstractTimeStretch implements IMultiCh
         return value;
     }
 
-    @Override
-    protected double getOutputLatencyAsDouble() {
-        double result = super.getOutputLatencyAsDouble();
-        result += timeStretchEngine.getOutputLatency();
-        return result;
-    }
-
     /**
      * Spectrum processing: delegate to {@link GradientEngine}
      */
