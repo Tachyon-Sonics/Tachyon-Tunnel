@@ -394,10 +394,14 @@ public abstract class PluginToHostWrapper<P extends IPlugin> implements IEffect 
     }
 
     protected int getLatency(IoDirection ioDirection) {
+        return (int) (getLatencyAsDouble(ioDirection) + 0.5);
+    }
+    
+    private double getLatencyAsDouble(IoDirection ioDirection) {
         checkStarted(true);
         if (baseTarget instanceof ILatency)
-            return (int) ( ((ILatency) baseTarget).getLatency(ioDirection) + 0.5); // TODO [tt] review
-        return 0;
+            return ((ILatency) baseTarget).getLatency(ioDirection);
+        return 0.0;
     }
 
     public long getAdditionalInputFrames() {
@@ -425,11 +429,13 @@ public abstract class PluginToHostWrapper<P extends IPlugin> implements IEffect 
 
     public double getTimeChange() {
         checkStarted(true);
-        int latencyIn = getLatency(IoDirection.INPUT);
-        int latencyOut = getLatency(IoDirection.OUTPUT);
-        if (latencyIn == 0)
+        if (baseTarget instanceof ILengthChange)
+            return ((ILengthChange) baseTarget).getLengthChange();
+        double latencyIn = getLatencyAsDouble(IoDirection.INPUT);
+        double latencyOut = getLatencyAsDouble(IoDirection.OUTPUT);
+        if (latencyIn == 0.0)
             return 1.0;
-        return (double) latencyOut / (double) latencyIn;
+        return latencyOut / latencyIn;
     }
 
     public void beginProcessing(ch.tachyon.tunnel.host.IProcessingInfo info) {
