@@ -455,7 +455,7 @@ public class AudioFileTypes {
         InputStream fileInput = new RandomFileInputStream(file, progress);
         AudioFileFormat result = getAudioFileFormat(file.getName(), fileInput);
         fileInput.close();
-        if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED) {
+        if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED && forceComputeLength) {
             Pair<AudioFormat, Integer> info = getFormatAndFrameLength(file, progress);
             AudioFormat format = info.getFirst();
             int nbFrames = info.getSecond();
