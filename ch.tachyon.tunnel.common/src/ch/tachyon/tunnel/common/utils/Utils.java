@@ -14,8 +14,14 @@ public class Utils {
         try {
             String[] tokens = javaVersion.split("\\.");
             if (tokens.length == 1) {
-                javaMajorVersion = 1;
-                javaMinorVersion = Integer.parseInt(tokens[0]);
+                int value = Integer.parseInt(tokens[0]);
+                if (value >= 11) {
+                    javaMajorVersion = value;
+                    javaMinorVersion = 0;
+                } else {
+                    javaMajorVersion = 1;
+                    javaMinorVersion = value;
+                }
             } else {
                 javaMajorVersion = Integer.parseInt(tokens[0]);
                 javaMinorVersion = Integer.parseInt(tokens[1]);
