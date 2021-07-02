@@ -73,6 +73,7 @@ public class StreamProcessor implements IProcessingInfo {
     
     /**
      * Create a new stream processor. The length of the audio is assumed to be unknown
+     * @param format the audio format. Only sample rate and number of channels are relevant
      */
     public StreamProcessor(AudioFormat format) {
         this.sampleRate = format.getSampleRate();
