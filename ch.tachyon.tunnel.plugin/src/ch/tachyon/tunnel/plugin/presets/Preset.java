@@ -9,7 +9,7 @@ import ch.tachyon.tunnel.plugin.opt.doc.*;
  * <p>
  * This annotation can only be used inside of the {@link Presets} annotation, which defines all the presets for a plugin
  * <p>
- * When applicable it is recommanded to provide the following trivial presets at the end of the list:
+ * When applicable it is recommended to provide the following trivial presets at the end of the list:
  * <ul>
  * <li><b>No Change</b> if there is a combination of parameter values that do not change the audio 
  * <li><b>Silence</b> if there is a combination of parameter values that results in silence

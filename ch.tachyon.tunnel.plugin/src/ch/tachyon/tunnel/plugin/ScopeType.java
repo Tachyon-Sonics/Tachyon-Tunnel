@@ -80,7 +80,7 @@ public enum ScopeType {
      * by the engine.
      * <p>
      * <b>Warning</b>: data stored in this scope will eat memory for the whole life time of the host.
-     * If you have a large amount of data to store, it is recommanded to store it in a temporary
+     * If you have a large amount of data to store, it is recommended to store it in a temporary
      * file instead:
      * <ul>
      * <li>Create a temporary file using {@link File#createTempFile(String, String)}.
@@ -126,7 +126,7 @@ public enum ScopeType {
      * <p>
      * <b>Warning:</b> this scope is very limited in capacity. It is backed by {@link Preferences}
      * and has the same limitations. Data is limited to a few primitive types, <code>String</code>
-     * and <code>byte[]</code>, with limited length. If you need to store larger amount of data the recommanded way is to:
+     * and <code>byte[]</code>, with limited length. If you need to store larger amount of data the recommended way is to:
      * <ul>
      * <li>Create the folder <code>{@link System#getProperty(String) System.getProperty("user.dir")} + {@link File#separator} + ".<i>mypackage</i>_data"</code>
      * if it does not exist, and create a file in that folder

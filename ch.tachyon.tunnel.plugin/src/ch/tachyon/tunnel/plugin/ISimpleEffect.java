@@ -5,7 +5,7 @@ import ch.tachyon.tunnel.plugin.opt.spec.*;
 
 /**
  * Interface for simple plugins that can process audio by chunks, and one channel at a time.
- * This is the recommanded interface plugins should implement whenever possible.
+ * This is the recommended interface plugins should implement whenever possible.
  * <p>
  * This interface cannot be used in the following cases:
  * <ul>

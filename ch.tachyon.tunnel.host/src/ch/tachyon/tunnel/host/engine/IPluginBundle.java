@@ -122,7 +122,7 @@ public interface IPluginBundle {
      * <p>
      * To work properly on JVM without class GC, this class will keep {@link WeakReference} to the {@link ClassLoader}s
      * and reuse them whenever they are still in memory (as long as the same file or URL is used), in order to
-     * avoid new versions of the classes to be loaded. It is also recommanded for plugin developers to avoid
+     * avoid new versions of the classes to be loaded. It is also recommended for plugin developers to avoid
      * static variables if possible.
      */
     public void releaseLoader();

@@ -5,7 +5,7 @@ package ch.tachyon.tunnel.demo.plugin.resample.impl;
  * sample and hold.
  * <p>
  * This implementation is really only meant for completeness but is not of acceptable quality
- * in practice. It is recommanded to use at least {@link LinearResampler} if high speed
+ * in practice. It is recommended to use at least {@link LinearResampler} if high speed
  * resampling is desired. {@link LinearResampler} is twice as slow, but of much higher quality.
  */
 public class SampleAndHoldResampler extends BufferedResampler implements ISweepableResampler {

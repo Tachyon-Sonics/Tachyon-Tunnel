@@ -413,7 +413,7 @@ public class PluginsImpl {
                     // This effect can be bridged to the target type
                     @SuppressWarnings("unchecked")
                     Class<IEffect> converterType = (Class<IEffect>) bridges.get(conversion);
-                    int priority = bridgePriorities.get(converterType) + 1; // Add 1 because using stereo interface for mono processing is not recommanded
+                    int priority = bridgePriorities.get(converterType) + 1; // Add 1 because using stereo interface for mono processing is not recommended
                     // Check if the conversion is better than what we currently have
                     if (priority < bestPriority) {
                         bestConversion = conversion;

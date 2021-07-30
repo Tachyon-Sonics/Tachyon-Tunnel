@@ -22,7 +22,7 @@ import ch.tachyon.tunnel.common.*;
  * A call to {@link #close()} will also close the specified {@link OutputStream}.
  * <p>
  * Note: you should only use this class if you need to save audio using a {@link IMultiChanAudioSink}.
- * In general, the recommanded way is to rely on {@link IMultiChanAudioSource} only, and to use 
+ * In general, the recommended way is to rely on {@link IMultiChanAudioSource} only, and to use 
  * {@link AudioFileIO#saveAudioFile(IMultiChanAudioSource, OutputStream, AudioFileFormat, IProgressMonitor)}.
  */
 public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable {

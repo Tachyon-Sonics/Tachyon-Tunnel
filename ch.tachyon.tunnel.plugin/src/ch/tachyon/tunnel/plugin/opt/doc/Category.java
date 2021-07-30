@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  * <p>
  * Both a category and optional subcategories can be specified, using the ":" separator.
  * <p>
- * While any string can be used, it is recommanded to:
+ * While any string can be used, it is recommended to:
  * <ul>
  * <li>Stick to the standard categories (for the top-level category) if possible
  * <li>Specify the main category only with {@link #value()}; for optionnal other categories, use {@link #alternatives()}

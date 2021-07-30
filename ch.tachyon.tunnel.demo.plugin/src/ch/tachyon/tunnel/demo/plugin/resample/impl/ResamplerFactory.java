@@ -36,8 +36,8 @@ public class ResamplerFactory {
      * higher quality also means lower processing speed. If you are not sure, use {@link #MEDIUM_QUALITY} which
      * is suitable for most applications. Possible values are
      * <ul>
-     * <li>0 - very low quality, not recommanded (sample and hold)
-     * <li>1 - low quality, recommanded if fast processing is required (linear interpolation)
+     * <li>0 - very low quality, not recommended (sample and hold)
+     * <li>1 - low quality, recommended if fast processing is required (linear interpolation)
      * <li>2 - medium quality (sinc with small kernel)
      * <li>3 - high quality, suitable for most listening applications, 16bit precision (sinc with medium size kernel)
      * <li>4 - very high quality, suitable for editors, 20bits precision
@@ -54,8 +54,8 @@ public class ResamplerFactory {
      * @param ratio the resampling ratio. Output rate / input rate, or output length / input length
      * @param quality the desired quality, between {@link #MIN_QUALITY} and {@link #MAX_QUALITY}
      * <ul>
-     * <li>0 - very low quality, not recommanded (sample and hold)
-     * <li>1 - low quality, recommanded if fast processing is required (linear interpolation)
+     * <li>0 - very low quality, not recommended (sample and hold)
+     * <li>1 - low quality, recommended if fast processing is required (linear interpolation)
      * <li>2 - medium quality (sinc with small kernel)
      * <li>3 - high quality, suitable for most listening applications, 16bit precision (sinc with medium size kernel)
      * <li>4 - very high quality, suitable for editors, 20bits precision
@@ -74,8 +74,8 @@ public class ResamplerFactory {
      * @param ratio the resampling ratio. Output rate / input rate, or output length / input length
      * @param quality the desired quality, between {@link #MIN_QUALITY} and {@link #MAX_QUALITY}
      * <ul>
-     * <li>0 - very low quality, not recommanded (sample and hold)
-     * <li>1 - low quality, recommanded if fast processing is required (linear interpolation)
+     * <li>0 - very low quality, not recommended (sample and hold)
+     * <li>1 - low quality, recommended if fast processing is required (linear interpolation)
      * <li>2 - medium quality (sinc with small kernel)
      * <li>3 - high quality, suitable for most listening applications, 16bit precision (sinc with medium size kernel)
      * <li>4 - very high quality, suitable for editors, 20bits precision

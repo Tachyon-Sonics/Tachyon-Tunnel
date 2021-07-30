@@ -77,7 +77,7 @@ public interface IRandomAccessor {
      * Set the current processing progress as a number between 0 and 1. A plugin implementation is not required
      * to invoke this method, but using it will allow the host to display an accurate progress indicator.
      * <p>
-     * If a plugin uses this method, it is recommanded that it invokes it with <code>0</code> before the
+     * If a plugin uses this method, it is recommended that it invokes it with <code>0</code> before the
      * first I/O operation to inform the host that is does not need to try to deduce the current progress
      * itself.
      * <p>
