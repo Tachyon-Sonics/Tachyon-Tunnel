@@ -105,7 +105,7 @@ public class PluginBundleImpl implements IPluginBundle {
                 classLoader = classLoaderRef.get();
             if (classLoader == null) {
                 // Create a new one
-                Debug.info("[New ClassLoader created]");
+                Debug.debug("[New ClassLoader created]");
                 classLoader = new ParentLastUrlClassLoader(new URL[] {url}, external);
                 classLoaderRef = new WeakReference<ClassLoader>(classLoader);
                 classLoaderCache.put(url.toExternalForm(), classLoaderRef);
