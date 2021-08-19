@@ -4,7 +4,9 @@ import java.util.*;
 
 import javax.sound.sampled.*;
 
-
+/**
+ * Extended version of {@link AudioFileFormat} to support frame length of <tt>long</tt> type (above 2^31).
+ */
 public class AudioFileFormatEx extends AudioFileFormat {
     
     private long frameLength;
