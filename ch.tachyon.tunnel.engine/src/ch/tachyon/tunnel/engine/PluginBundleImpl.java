@@ -154,7 +154,7 @@ public class PluginBundleImpl implements IPluginBundle {
             try {
                 stream.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                Debug.error(ex);
             }
         }
     }

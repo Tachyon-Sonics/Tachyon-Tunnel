@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.utils.*;
 import ch.tachyon.tunnel.engine.utils.bean.*;
 import ch.tachyon.tunnel.host.IProcessingInfo;
@@ -149,13 +150,13 @@ public class PropertyParameter<P extends IPlugin> implements IParameter {
         try {
             return reader.invoke(plugin);
         } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
             return null;
         } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
             return null;
         } catch (InvocationTargetException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
             return null;
         }
     }
@@ -201,11 +202,11 @@ public class PropertyParameter<P extends IPlugin> implements IParameter {
         } catch (IllegalArgumentException ex) {
             if (type.isPrimitive())
                 throw new ClassCastException(value.getClass() + " is not assignable to " + type);
-            ex.printStackTrace();
+            Debug.error(ex);
         } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         } catch (InvocationTargetException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         }
     }
     

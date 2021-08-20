@@ -165,7 +165,7 @@ public class ThreadPool {
                         } catch (InterruptedException ex) {
                             if (!active)
                                 return;
-                            ex.printStackTrace();
+                            Debug.warn(ex);
                         }
                         task = pollTask(index);
                     }
@@ -254,7 +254,7 @@ public class ThreadPool {
                     queueLock.notify();
                 }
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                Debug.warn(ex);
             }
         }
     }
@@ -364,7 +364,7 @@ public class ThreadPool {
                 latch.await();
             }
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Debug.warn(ex);
         }
     }
     
@@ -384,7 +384,7 @@ public class ThreadPool {
         try {
             latch.await();
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Debug.warn(ex);
         }
     }
 
@@ -454,7 +454,7 @@ public class ThreadPool {
         try {
             finishLatch.await();
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Debug.warn(ex);
         }
     }
     
@@ -487,7 +487,7 @@ public class ThreadPool {
         try {
             finishLatch.await();
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Debug.warn(ex);
         }
     }
 
@@ -499,7 +499,7 @@ public class ThreadPool {
                 try {
                     t.join(3000);
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    Debug.warn(ex);
                 }
                 if (t.isAlive())
                     Debug.warn("Failed to stop pool thread " + t.getName());

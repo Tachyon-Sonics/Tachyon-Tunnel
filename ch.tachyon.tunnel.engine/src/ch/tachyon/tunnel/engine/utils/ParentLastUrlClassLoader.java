@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import ch.tachyon.tunnel.common.utils.*;
+
 /**
  * A modified {@link URLClassLoader} that can be configured to load classes from the given
  * URL before using the parent {@link ClassLoader} (parent-last).
@@ -83,7 +85,7 @@ public class ParentLastUrlClassLoader extends ClassLoader implements Closeable {
                 try {
                     ((Closeable) this).close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    Debug.error(ex);
                 }
             }
         }

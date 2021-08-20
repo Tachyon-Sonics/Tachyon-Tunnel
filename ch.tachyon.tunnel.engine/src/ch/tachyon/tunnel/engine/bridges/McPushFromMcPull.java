@@ -235,7 +235,7 @@ public class McPushFromMcPull extends PluginToHostWrapper<IMultiChanPullEffect> 
         try {
             lock.wait();
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Debug.warn(ex);
         }
     }
 

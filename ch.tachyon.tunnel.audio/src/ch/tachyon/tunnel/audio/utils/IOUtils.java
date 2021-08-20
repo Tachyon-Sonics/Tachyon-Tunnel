@@ -28,25 +28,18 @@ public class IOUtils {
                     RuntimeException rex = (RuntimeException) cons.newInstance(ex);
                     throw rex;
                 } catch (ClassNotFoundException ex2) {
-                    ex2.printStackTrace();
                     throw new RuntimeException(ex);
                 } catch (SecurityException ex1) {
-                    ex1.printStackTrace();
                     throw new RuntimeException(ex);
                 } catch (NoSuchMethodException ex1) {
-                    ex1.printStackTrace();
                     throw new RuntimeException(ex);
                 } catch (IllegalArgumentException ex1) {
-                    ex1.printStackTrace();
                     throw new RuntimeException(ex);
                 } catch (InstantiationException ex1) {
-                    ex1.printStackTrace();
                     throw new RuntimeException(ex);
                 } catch (IllegalAccessException ex1) {
-                    ex1.printStackTrace();
                     throw new RuntimeException(ex);
                 } catch (InvocationTargetException ex1) {
-                    ex1.printStackTrace();
                     throw new RuntimeException(ex);
                 }
             }

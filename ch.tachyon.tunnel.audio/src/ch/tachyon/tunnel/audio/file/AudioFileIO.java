@@ -6,6 +6,7 @@ import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.spi.*;
 import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
+import ch.tachyon.tunnel.common.utils.*;
 
 /**
  * Static utilities to read and write audio files into and from <code>float</code> arrays.
@@ -157,7 +158,7 @@ public class AudioFileIO {
                     pipeOut.flush();
                     pipeOut.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    Debug.error(ex);
                 }
             }
         }, "AudioFileIO.pipe").start();

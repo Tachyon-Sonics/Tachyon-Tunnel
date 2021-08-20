@@ -3,6 +3,7 @@ package ch.tachyon.tunnel.engine.storage;
 import java.util.*;
 import java.util.prefs.*;
 
+import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.plugin.*;
 
 public class PluginStorage implements IStorage {
@@ -128,7 +129,7 @@ public class PluginStorage implements IStorage {
             if (!keys.contains(key))
                 return null;
         } catch (BackingStoreException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         }
         if (dataType.equals(Boolean.class) || dataType.equals(boolean.class))
             return prefs.getBoolean(key, false);

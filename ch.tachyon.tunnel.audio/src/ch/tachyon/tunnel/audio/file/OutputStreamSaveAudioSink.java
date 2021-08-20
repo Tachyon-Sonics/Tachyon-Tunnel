@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.*;
 import javax.sound.sampled.*;
 import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
+import ch.tachyon.tunnel.common.utils.*;
 
 /**
  * {@link IMultiChanAudioSink} implementation whose {@link IMultiChanAudioSink#writeSamples(float[][])} saves
@@ -141,7 +142,7 @@ public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable
             try {
                 exchanger.exchange(dstBuffer1);
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                Debug.warn(ex);
             }
             // Use double buffering so we can accept the next buffer while the previous one is being written
             float[][] temp = dstBuffer1;
@@ -160,7 +161,7 @@ public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable
             try {
                 writer.join(100);
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                Debug.warn(ex);
                 break;
             }
         }

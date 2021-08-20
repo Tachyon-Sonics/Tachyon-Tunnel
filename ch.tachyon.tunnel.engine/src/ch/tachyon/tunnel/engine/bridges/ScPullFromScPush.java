@@ -190,7 +190,7 @@ public class ScPullFromScPush extends PluginToHostWrapper<IPushEffect> implement
         try {
             lock.wait();
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Debug.warn(ex);
         }
     }
 

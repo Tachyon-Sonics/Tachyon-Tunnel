@@ -27,7 +27,7 @@ public class Utils {
                 javaMinorVersion = Integer.parseInt(tokens[1]);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         }
     }
 
@@ -71,9 +71,9 @@ public class Utils {
                 return null;
             return (E) result;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         }
         return null;
     }

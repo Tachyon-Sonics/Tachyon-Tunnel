@@ -241,7 +241,7 @@ public class ScPushFromScPull extends PluginToHostWrapper<IPullEffect> implement
         try {
             lock.wait();
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Debug.warn(ex);
         }
     }
 

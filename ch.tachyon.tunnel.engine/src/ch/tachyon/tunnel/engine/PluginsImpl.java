@@ -212,7 +212,7 @@ public class PluginsImpl {
                 try {
                     reader.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    Debug.error(ex);
                 }
             }
         }
@@ -241,11 +241,11 @@ public class PluginsImpl {
             Class<? extends IPlugin> effectType = (Class<? extends IPlugin>) type;
             return createEffect(hostInterfaces, effectType, mtContext);
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         } catch (InstantiationException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         }
         return null;
     }
@@ -276,7 +276,7 @@ public class PluginsImpl {
             properties.load(codec);
             input.close();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
         }
         return properties;
     }
@@ -536,7 +536,7 @@ public class PluginsImpl {
             wrapper.init(target, processingTarget, mtContext, properties);
             return result;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Debug.error(ex);
             return null;
         }
     }
