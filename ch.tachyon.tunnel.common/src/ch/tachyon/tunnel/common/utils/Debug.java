@@ -78,6 +78,10 @@ public class Debug {
         log(Level.INFO, message, args);
     }
 
+    public static void info(Throwable t) {
+        log(Level.INFO, t.getMessage(), t);
+    }
+
     public static void warn(String message, Object... args) {
         log(Level.WARNING, message, args);
     }
