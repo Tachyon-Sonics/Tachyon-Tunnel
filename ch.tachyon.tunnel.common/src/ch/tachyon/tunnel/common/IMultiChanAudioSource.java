@@ -27,7 +27,8 @@ public interface IMultiChanAudioSource {
      * <p>
      * This method will always fill the target array, unless the end of the audio stream has been reached.
      * Hence, the returned value will be samller that the number of sample frames of the array (<tt>target[0].length</tt>)
-     * if and only if the last sample frames have just been read.
+     * if and only if the last sample frames have just been read. Subsequent calls to this method after the last sample has been read
+     * will return 0.
      * @param target the array to fill with the sample frames read.
      * @return the number of sample frames read. If it is smaller that <tt>target[0].length</tt> the end of the audio stream has
      * been reached, and the returned sample frames are the last sample frames.
