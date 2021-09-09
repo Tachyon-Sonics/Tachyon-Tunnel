@@ -290,6 +290,7 @@ public class StreamProcessor implements IProcessingInfo {
                 effect.stopProcessing();
                 effect.unload();
                 terminated = true;
+                source.close();
                 if (callback != null)
                     callback.run();
                 disposed = true;
