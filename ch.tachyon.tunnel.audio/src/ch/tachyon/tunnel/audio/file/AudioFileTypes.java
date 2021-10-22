@@ -371,7 +371,8 @@ public class AudioFileTypes {
                     Debug.warn(ex);
                 } catch (UnsupportedAudioFileException ex) {
                     // Maybe the extension is wrong
-                    Debug.warn(ex);
+                    if (!isJreSupportedFormat(fileName))
+                        Debug.warn(ex);
                 } finally {
                     if (!threadSafe.get())
                         readLock.unlock();
@@ -489,6 +490,13 @@ public class AudioFileTypes {
                     return reader.getAudioFileFormat(fileInput);
                 } catch (IOException ex) {
                     Debug.warn(ex);
+                } catch (UnsupportedAudioFileException ex) {
+                    if (isJreSupportedFormat(fileName)) {
+                        // Ignore, we will continue with JavaSound fallback.
+                        // In particular, WaveExtensibleFileReader is only supported by JavaSound and not by tritonus (!)
+                    } else {
+                        throw ex;
+                    }
                 } finally {
                     if (!threadSafe.get())
                         readLock.unlock();
@@ -498,6 +506,16 @@ public class AudioFileTypes {
 
         // Failed. Fallback to JavaSound (try all readers)
         return AudioSystem.getAudioFileFormat(fileInput);
+    }
+    
+    private static boolean isJreSupportedFormat(String fileName) {
+        int lastDot = fileName.lastIndexOf('.');
+        if (lastDot >= 0) {
+            String extension = fileName.substring(lastDot).toLowerCase();
+            return extension.equals(".wav") || extension.equals(".au") || extension.equals(".aif")
+                    || extension.equals(".aiff") || extension.equals(".aifc");
+        }
+        return false;
     }
 
 }

@@ -14,7 +14,7 @@ public class Utils {
         try {
             String[] tokens = javaVersion.split("\\.");
             if (tokens.length == 1) {
-                int value = Integer.parseInt(tokens[0]);
+                int value = Integer.parseInt(keepDigitsOnly(tokens[0]));
                 if (value >= 11) {
                     javaMajorVersion = value;
                     javaMinorVersion = 0;
@@ -23,12 +23,22 @@ public class Utils {
                     javaMinorVersion = value;
                 }
             } else {
-                javaMajorVersion = Integer.parseInt(tokens[0]);
-                javaMinorVersion = Integer.parseInt(tokens[1]);
+                javaMajorVersion = Integer.parseInt(keepDigitsOnly(tokens[0]));
+                javaMinorVersion = Integer.parseInt(keepDigitsOnly(tokens[1]));
             }
         } catch (Exception ex) {
             Debug.error(ex);
         }
+    }
+
+    private static String keepDigitsOnly(String text) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (ch >= '0' && ch <= '9')
+                result.append(ch);
+        }
+        return result.toString();
     }
 
     public static boolean eq(Object obj1, Object obj2) {
