@@ -399,12 +399,12 @@ public class AudioFileTypes {
             return writer.write(stream, fileType, out);
         } else if (fileType.equals(AudioFileFormat.Type.AIFF) || fileType.equals(AudioFileFormat.Type.AIFC)) {
             // Force the use of tritonus
-        	AiffAudioFileWriter writer = new AiffAudioFileWriter();
-        	return writer.write(stream, fileType, out);
+            AiffAudioFileWriter writer = new AiffAudioFileWriter();
+            return writer.write(stream, fileType, out);
         } else if (fileType.equals(AudioFileFormat.Type.AU)) {
-        	// Force the use of tritonus
-        	AuAudioFileWriter writer = new AuAudioFileWriter();
-        	return writer.write(stream, fileType, out);
+            // Force the use of tritonus
+            AuAudioFileWriter writer = new AuAudioFileWriter();
+            return writer.write(stream, fileType, out);
         } else {
             return AudioSystem.write(stream, fileType, out);
         }
