@@ -52,7 +52,7 @@ public class AudioFileFilter extends FileFilter implements java.io.FileFilter {
         return result;
     }
 
-    private AudioFileFilter(boolean writing) {
+    protected AudioFileFilter(boolean writing) {
         AudioFileTypes afs = AudioFileTypes.instance();
         this.extensions = (writing ? afs.getSupportedWriteExtensions() : afs.getSupportedReadExtensions());
         this.mainExtension = null;
