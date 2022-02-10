@@ -56,7 +56,7 @@ public class Resampler {
         File outputFile = new File(args[2]);
 
         /*
-         * Retrieve the input file format. It contains various informations, such as sample rate, that some
+         * Retrieve the input file format. It contains various information, such as sample rate, that some
          * plugins might require for optimal results. It will be passed to the StreamProcessor class.
          *
          * Some format (such as .mp3), do not explicitely provide the exact length of the audio in frames.

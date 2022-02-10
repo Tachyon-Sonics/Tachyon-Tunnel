@@ -23,7 +23,7 @@ public interface ISerialSectionFactory {
     public void ensureMinInputHistorySize(int value);
 
     /**
-     * Get the processing informations (number of channels, sample rate, etc).
+     * Get the processing information (number of channels, sample rate, etc).
      * <p>
      * The information are the same as those passed to {@link IStartStop#startProcessing(IProcessingInfo)}
      * or {@link IBeginProcessing#beginProcessing(IProcessingInfo)}.

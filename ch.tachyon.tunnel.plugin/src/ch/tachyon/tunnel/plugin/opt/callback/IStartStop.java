@@ -23,7 +23,7 @@ public interface IStartStop {
      * <p>
      * When several instances are used for parallel processing, this method is invoked on every instance
      * sequentially (no two instances will have this method invoked concurrently).
-     * @param info processing informations such as sample rate, number of channels, etc.
+     * @param info processing information such as sample rate, number of channels, etc.
      * @see IBeginProcessing#beginProcessing(IProcessingInfo)
      */
     public void startProcessing(IProcessingInfo info);
