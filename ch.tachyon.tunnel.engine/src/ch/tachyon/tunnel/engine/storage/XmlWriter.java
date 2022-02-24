@@ -104,7 +104,7 @@ public class XmlWriter extends XmlCommon {
             elt.appendChild(itemChild);
             Object item = entry.getValue();
             Class<?> itemType = (item == null ? null : item.getClass());
-            if (itemType.getSuperclass().isEnum())
+            if (itemType != null && itemType.getSuperclass().isEnum())
                 itemType = itemType.getSuperclass(); // Replace enum item's type by enum's type
             if (itemsType == null && itemType != null)
                 itemChild.setAttribute(TYPE_ATTR, itemType.getName());

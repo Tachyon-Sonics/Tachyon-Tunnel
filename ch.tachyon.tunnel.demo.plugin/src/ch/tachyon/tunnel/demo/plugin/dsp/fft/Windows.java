@@ -196,9 +196,8 @@ public class Windows {
             double coeff = gegenbauer(length, u, xu * Math.cos(Math.PI * (double) i / (double) length));
             coeffs[i] = new Cmplx((float) coeff, 0.0f);
         }
-        BooFFT rFft = new BooFFT(window.length / 2);
         float[] uswt = new float[window.length];
-        rFft.backC2R(coeffs, uswt);
+        fft.backC2R(coeffs, uswt);
 
         float w0 = uswt[0];
         for (int i = 0; i < length; i++)
@@ -418,7 +417,7 @@ public class Windows {
     public static void main(String[] args) {
         final int Size = 32;
         float[] window = new float[Size];
-        BooFFT fft = new BooFFT(Size);
+        BooFFT fft = new BooFFT(Size / 2);
         for (int db = 20; db <= 200; db += 10) {
             System.out.println();
             System.out.println("*** sidelobe level (db): -" + db);
