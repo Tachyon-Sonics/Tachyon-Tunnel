@@ -39,6 +39,17 @@ public class ThreadPooledSuite extends TestSuite {
         super(name);
         noWait = false;
     }
+    
+    /**
+     * Create a {@link ThreadPooledSuite} if there is more than 1 core and enough memory (3 GB). Else return a regular test suite.
+     */
+    public static TestSuite create(String name) {
+        if (Runtime.getRuntime().availableProcessors() > 1 &&
+                Runtime.getRuntime().maxMemory() >= 3L * 1000 * 1000 * 1000)
+            return new ThreadPooledSuite(name);
+        else
+            return new TestSuite(name);
+    }
 
     public ThreadPooledSuite(String name, boolean noWait) {
         super(name);
