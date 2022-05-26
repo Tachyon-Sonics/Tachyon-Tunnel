@@ -26,7 +26,7 @@ public interface IMultiChanAudioSource {
      * allows you to read 2048 sample frames (at a time) of a stereo (2 channels) audio stream.
      * <p>
      * This method will always fill the target array, unless the end of the audio stream has been reached.
-     * Hence, the returned value will be samller that the number of sample frames of the array (<tt>target[0].length</tt>)
+     * Hence, the returned value will be smaller that the number of sample frames of the array (<tt>target[0].length</tt>)
      * if and only if the last sample frames have just been read. Subsequent calls to this method after the last sample has been read
      * will return 0.
      * @param target the array to fill with the sample frames read.
