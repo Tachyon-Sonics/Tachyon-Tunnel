@@ -76,7 +76,7 @@ public class StreamProcessor {
      * Create a new stream processor. The length of the audio is assumed to be unknown
      * @param format the audio format. Only sample rate and number of channels are relevant
      */
-    public StreamProcessor(AudioFormat format) {
+    public StreamProcessor(AudioStreamFormat format) {
         this.sampleRate = format.getSampleRate();
         this.nbChannels = format.getChannels();
         this.length = -1;
@@ -87,7 +87,7 @@ public class StreamProcessor {
      * @param length the length of the audio stream to convert in sample frames (1 sample frames corresponds to
      * 1 <code>float</code> in mono, and n <code>float</code>s for n channels). Use <code>-1</code> if unknown
      */
-    public StreamProcessor(AudioFormat format, long length) {
+    public StreamProcessor(AudioStreamFormat format, long length) {
         this.sampleRate = format.getSampleRate();
         this.nbChannels = format.getChannels();
         this.length = length;
@@ -109,8 +109,15 @@ public class StreamProcessor {
      * <p>
      * You may want to use <tt>AudioFilesTypes.instance().getAudioFileFormat()</tt> in ch.tachyon.tunnel.audio
      */
-    public StreamProcessor(AudioFileFormat fileFormat) {
-        this(fileFormat.getFormat(), fileFormat.getFrameLength());
+    public StreamProcessor(AudioFileFormat fileFormat) { // TODO [qt] remove to remove dependcy to javax.sound.sampled
+        this(from(fileFormat), fileFormat.getFrameLength());
+    }
+    
+    private static AudioStreamFormat from(AudioFileFormat fileFormat) {
+        AudioFormat af = fileFormat.getFormat();
+        AudioStreamFormat asf = new AudioStreamFormat(af.getSampleRate(), af.getChannels(), af.getSampleSizeInBits());
+        asf.setAudioFormat(af);
+        return asf;
     }
     
     /**
@@ -187,7 +194,7 @@ public class StreamProcessor {
         if (terminated)
             return 100.0;
         long toProcess = inputLength;
-        if (toProcess == AudioSystem.NOT_SPECIFIED)
+        if (toProcess == -1)
             return Double.NaN;
         if (effects.isEmpty())
             throw new IllegalStateException();
@@ -231,7 +238,7 @@ public class StreamProcessor {
             this.target = target;
         }
 
-        public AudioFormat getAudioFormat() {
+        public AudioStreamFormat getAudioFormat() {
             return target.getAudioFormat();
         }
 
@@ -309,7 +316,7 @@ public class StreamProcessor {
             }
         }
 
-        public AudioFormat getAudioFormat() {
+        public AudioStreamFormat getAudioFormat() {
             return source.getAudioFormat();
         }
 

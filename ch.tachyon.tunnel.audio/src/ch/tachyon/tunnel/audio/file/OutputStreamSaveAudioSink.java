@@ -27,7 +27,7 @@ import ch.tachyon.tunnel.common.utils.*;
  * {@link AudioFileIO#saveAudioFile(IMultiChanAudioSource, OutputStream, AudioFileFormat, IProgressMonitor)}.
  */
 public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable {
-    
+
     private final Thread writer;
     private final Exchanger<float[][]> exchanger = new Exchanger<float[][]>();
     private float[][] dstBuffer1;
@@ -39,8 +39,8 @@ public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable
     private IOException ioEx;
     private OperationAbortedException abortion;
     private AtomicInteger nbWriters = new AtomicInteger();
-    
-    
+
+
     /**
      * @param target the {@link OutputStream} into which to save the file. It can be a {@link FileOutputStream} but does not need to
      * @param saveFormat the format in which to save the file
@@ -48,19 +48,19 @@ public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable
      */
     public OutputStreamSaveAudioSink(final OutputStream target, final AudioFileFormat saveFormat, final IProgressMonitor progress) {
         this.writer = new Thread(new Runnable() {
-            
+
             @Override
             public void run() {
                 IMultiChanAudioSource pipedSource = new IMultiChanAudioSource() {
-                    
+
                     @Override
                     public int readSamples(float[][] target) {
                         return OutputStreamSaveAudioSink.this.readSamples(target);
                     }
-                    
+
                     @Override
-                    public AudioFormat getAudioFormat() {
-                        return saveFormat.getFormat();
+                    public AudioStreamFormat getAudioFormat() {
+                        return FormatUtils.toStreamFormat(saveFormat.getFormat());
                     }
 
                     @Override
@@ -75,7 +75,7 @@ public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable
                 } catch (OperationAbortedException ex) {
                     abortion = ex;
                 }
-                
+
                 // Kill remaining writers
                 aborted = true;
                 while (nbWriters.get() > 0) {
@@ -91,7 +91,7 @@ public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable
         writer.setName("OutputStreamSaveAudioSink");
         writer.start();
     }
-    
+
     int readSamples(float[][] dstBuffer) {
         int length = dstBuffer[0].length;
         int dstOffset = 0;
@@ -132,7 +132,7 @@ public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable
                 else
                     return; // Early end-of-stream
             }
-            
+
             if (dstBuffer1 == null || dstBuffer1.length != samples.length || dstBuffer1[0].length != samples[0].length)
                 dstBuffer1 = new float[samples.length][samples[0].length];
             // Copy buffer as it might be overwritten before it has been saved
@@ -152,7 +152,7 @@ public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable
             nbWriters.decrementAndGet();
         }
     }
-    
+
     @Override
     public void close() {
         closed = true;

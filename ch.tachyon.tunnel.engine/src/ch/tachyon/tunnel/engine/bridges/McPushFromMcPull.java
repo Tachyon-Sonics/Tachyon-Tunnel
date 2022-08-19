@@ -2,8 +2,6 @@ package ch.tachyon.tunnel.engine.bridges;
 
 import java.util.*;
 
-import javax.sound.sampled.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.*;
@@ -221,7 +219,7 @@ public class McPushFromMcPull extends PluginToHostWrapper<IMultiChanPullEffect> 
             }
         }
 
-        public AudioFormat getAudioFormat() {
+        public AudioStreamFormat getAudioFormat() {
             return ProcessingInfo.toAudioFormat(McPushFromMcPull.super.getHostInfo());
         }
 

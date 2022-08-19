@@ -1,7 +1,5 @@
 package ch.tachyon.tunnel.host;
 
-import javax.sound.sampled.*;
-
 import ch.tachyon.tunnel.common.*;
 
 /**
@@ -10,7 +8,7 @@ import ch.tachyon.tunnel.common.*;
 public class MultiChanArraySource implements IMultiChanAudioSource {
     
     private final float[][] array;
-    private final AudioFormat format;
+    private final AudioStreamFormat format;
     private int offset;
     
 
@@ -20,7 +18,7 @@ public class MultiChanArraySource implements IMultiChanAudioSource {
     
     public MultiChanArraySource(float[][] array, double sampleRate, int precision) {
         this.array = array;
-        this.format = new AudioFormat((float) sampleRate, precision, array.length, true, false);
+        this.format = new AudioStreamFormat((float) sampleRate, array.length, precision);
         int nbFrames = 0;
         for (int chan = 0; chan < nbFrames; chan++) {
             if (chan == 0)
@@ -31,7 +29,7 @@ public class MultiChanArraySource implements IMultiChanAudioSource {
         }
     }
 
-    public AudioFormat getAudioFormat() {
+    public AudioStreamFormat getAudioFormat() {
         return format;
     }
 

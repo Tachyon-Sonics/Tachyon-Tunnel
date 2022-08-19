@@ -3,8 +3,6 @@ package ch.tachyon.tunnel.engine.bridges.chan.expand;
 import java.util.*;
 import java.util.concurrent.*;
 
-import javax.sound.sampled.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.common.utils.*;
 import ch.tachyon.tunnel.engine.utils.concurrent.*;
@@ -36,15 +34,15 @@ public class McPullFromScPull extends McFromScBase<IPullEffect, ISingleChanPullE
     
     class CollectingSource implements ISingleChanAudioSource {
         
-        private final AudioFormat format;
+        private final AudioStreamFormat format;
         private final int chan;
 
-        public CollectingSource(AudioFormat format, int chan) {
+        public CollectingSource(AudioStreamFormat format, int chan) {
             this.format = format;
             this.chan = chan;
         }
 
-        public AudioFormat getAudioFormat() {
+        public AudioStreamFormat getAudioFormat() {
             return format;
         }
 
@@ -108,7 +106,7 @@ public class McPullFromScPull extends McFromScBase<IPullEffect, ISingleChanPullE
         this.tasks = new ProcessOneChanTask[2][nbChans];
         this.inputs = new ArrayList<Queue<float[]>>(nbChans);
         this.offsets = new int[nbChans];
-        AudioFormat format = new AudioFormat((float) info.getSampleRate(), info.getQuantization(), nbChans, true, false);
+        AudioStreamFormat format = new AudioStreamFormat((float) info.getSampleRate(), nbChans, info.getQuantization());
         for (int chan = 0; chan < nbChans; chan++) {
             sources[chan] = new CollectingSource(format, chan);
             tasks[0][chan] = new ProcessOneChanTask(chan);

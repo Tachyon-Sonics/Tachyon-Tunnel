@@ -1,8 +1,8 @@
 package ch.tachyon.tunnel.host;
 
 import java.util.*;
-import javax.sound.sampled.*;
 
+import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.effect.*;
 
 /**
@@ -117,8 +117,8 @@ public class ProcessingInfo implements IProcessingInfo, Cloneable, java.io.Seria
         this.fixedChunkLength = fixedChunkLength;
     }
     
-    public static AudioFormat toAudioFormat(IProcessingInfo info) {
-        return new AudioFormat((float) info.getSampleRate(), info.getQuantization(), info.getNumberOfChannels(), true, false);
+    public static AudioStreamFormat toAudioFormat(IProcessingInfo info) {
+        return new AudioStreamFormat((float) info.getSampleRate(), info.getNumberOfChannels(), info.getQuantization());
     }
 
 

@@ -1,12 +1,10 @@
 package ch.tachyon.tunnel.common;
 
-import javax.sound.sampled.*;
-
 /**
  * A multi-channel audio source that can be read from in multiple chunks using
  * <tt>float[][]</tt> arrays.
  */
-public interface IMultiChanAudioSource { // TODO [qt] remove references to javax.sampled
+public interface IMultiChanAudioSource {
     
     /**
      * Get the audio format of the source, such as number of channels and sample rate.
@@ -15,13 +13,13 @@ public interface IMultiChanAudioSource { // TODO [qt] remove references to javax
      * But they are of no use for processing as the stream is always converted to Java <tt>float</tt>s
      * (as passed to the {@link #readSamples(float[][])} method) between <tt>-1</tt> and <tt>1</tt>, corresponding to the raw PCM signal.
      */
-    public AudioFormat getAudioFormat();
+    public AudioStreamFormat getAudioFormat();
     
     /**
      * Read as much sample frames as available to fill the given target array.
      * <p>
      * The first dimension of the array corresponds to the audio channel, and its size must match the number of channels
-     * of this source ({@link #getAudioFormat()}.{@link AudioFormat#getChannels() getChannels()}). The second dimension
+     * of this source ({@link #getAudioFormat()}.{@link AudioStreamFormat#getChannels() getChannels()}). The second dimension
      * corresponds to the samples and must have the same size in all channels. As a typical example, <tt>float[2][2048]</tt>
      * allows you to read 2048 sample frames (at a time) of a stereo (2 channels) audio stream.
      * <p>

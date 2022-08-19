@@ -2,8 +2,6 @@ package ch.tachyon.tunnel.engine.bridges;
 
 import java.util.*;
 
-import javax.sound.sampled.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.engine.*;
 import ch.tachyon.tunnel.engine.utils.*;
@@ -111,7 +109,7 @@ public class McPullFromMcEffect extends PluginToHostWrapper<IMultiChanEffect> im
         return result;
     }
 
-    public AudioFormat getAudioFormat() {
+    public AudioStreamFormat getAudioFormat() {
         return curSource.getAudioFormat();
     }
 

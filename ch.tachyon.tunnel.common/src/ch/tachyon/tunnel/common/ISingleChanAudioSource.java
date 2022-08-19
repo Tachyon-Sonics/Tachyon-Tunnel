@@ -1,7 +1,6 @@
 package ch.tachyon.tunnel.common;
 
 import java.io.*;
-import javax.sound.sampled.*;
 
 /**
  * Interface for reading consecutive audio samples by blocks represented by a <code>float</code> array.
@@ -18,9 +17,9 @@ public interface ISingleChanAudioSource extends Closeable {
      * But they are of no use for processing as the stream is always converted to Java <tt>float</tt>s
      * (as passed to the {@link #readSamples(float[])} method) between <tt>-1</tt> and <tt>1</tt>, corresponding to the raw PCM signal.
      * <p>
-     * The resulting {@link AudioFormat} must have one channel.
+     * The resulting {@link AudioStreamFormat} must have one channel.
      */
-    public AudioFormat getAudioFormat();
+    public AudioStreamFormat getAudioFormat();
 
     /**
      * Read the next block of audio samples into the given array.

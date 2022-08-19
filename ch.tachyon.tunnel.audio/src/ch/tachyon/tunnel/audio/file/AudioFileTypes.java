@@ -475,7 +475,7 @@ public class AudioFileTypes {
             nbFrames += read;
             read = source.readSamples(buffer);
         }
-        return new Pair<AudioFormat, Long>(source.getAudioFormat(), nbFrames);
+        return new Pair<AudioFormat, Long>(FormatUtils.fromStreamFormat(source.getAudioFormat()), nbFrames);
     }
 
     public AudioFileFormat getAudioFileFormat(String fileName, InputStream fileInput) throws IOException, UnsupportedAudioFileException {

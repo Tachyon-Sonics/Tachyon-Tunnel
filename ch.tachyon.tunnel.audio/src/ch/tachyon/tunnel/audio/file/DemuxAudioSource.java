@@ -88,13 +88,15 @@ public class DemuxAudioSource implements IMultiChanAudioSource, Closeable {
     }
 
     @Override
-    public AudioFormat getAudioFormat() {
+    public AudioStreamFormat getAudioFormat() {
         if (mcAudioSource != null) {
-            AudioFormat af = mcAudioSource.getAudioFormat();
-            return new AudioFormat(af.getSampleRate(), af.getSampleSizeInBits(), 1, !af.getEncoding().equals(Encoding.PCM_UNSIGNED), af.isBigEndian());
+            AudioFormat af = FormatUtils.fromStreamFormat(mcAudioSource.getAudioFormat());
+            AudioFormat result = new AudioFormat(af.getSampleRate(), af.getSampleSizeInBits(), 1, !af.getEncoding().equals(Encoding.PCM_UNSIGNED), af.isBigEndian());
+            return FormatUtils.toStreamFormat(result);
         } else {
-            AudioFormat af = audioSources[0].getAudioFormat();
-            return new AudioFormat(af.getSampleRate(), af.getSampleSizeInBits(), audioSources.length, !af.getEncoding().equals(Encoding.PCM_UNSIGNED), af.isBigEndian());
+            AudioFormat af = FormatUtils.fromStreamFormat(audioSources[0].getAudioFormat());
+            AudioFormat result = new AudioFormat(af.getSampleRate(), af.getSampleSizeInBits(), audioSources.length, !af.getEncoding().equals(Encoding.PCM_UNSIGNED), af.isBigEndian());
+            return FormatUtils.toStreamFormat(result);
         }
     }
 
@@ -203,7 +205,7 @@ public class DemuxAudioSource implements IMultiChanAudioSource, Closeable {
         }
 
         @Override
-        public AudioFormat getAudioFormat() {
+        public AudioStreamFormat getAudioFormat() {
             return DemuxAudioSource.this.getAudioFormat();
         }
     }

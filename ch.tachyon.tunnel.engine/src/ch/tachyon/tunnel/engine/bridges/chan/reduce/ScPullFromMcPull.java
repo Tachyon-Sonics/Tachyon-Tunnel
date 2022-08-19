@@ -1,6 +1,5 @@
 package ch.tachyon.tunnel.engine.bridges.chan.reduce;
 
-import javax.sound.sampled.*;
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.effect.*;
 
@@ -40,7 +39,7 @@ public class ScPullFromMcPull extends ScFromMcBase<ISingleChanPullEffect, IPullE
             this.target = target;
         }
 
-        public AudioFormat getAudioFormat() {
+        public AudioStreamFormat getAudioFormat() {
             return target.getAudioFormat();
         }
 

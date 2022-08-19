@@ -2,8 +2,6 @@ package ch.tachyon.tunnel.engine.bridges;
 
 import java.util.*;
 
-import javax.sound.sampled.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.engine.*;
 import ch.tachyon.tunnel.host.*;
@@ -127,7 +125,7 @@ public class ScPullFromScPull extends PluginToHostWrapper<IPullEffect> implement
         return result;
     }
 
-    public AudioFormat getAudioFormat() {
+    public AudioStreamFormat getAudioFormat() {
         return ProcessingInfo.toAudioFormat(super.getHostInfo());
     }
 

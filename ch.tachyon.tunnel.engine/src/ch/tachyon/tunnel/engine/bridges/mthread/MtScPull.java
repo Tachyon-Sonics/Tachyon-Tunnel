@@ -3,8 +3,6 @@ package ch.tachyon.tunnel.engine.bridges.mthread;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
-import javax.sound.sampled.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.engine.bridges.mthread.serial.*;
 import ch.tachyon.tunnel.engine.utils.concurrent.*;
@@ -113,7 +111,7 @@ public class MtScPull extends MtBase<IPullEffect> implements IPullEffect, ISingl
         return dstIndex;
     }
 
-    public AudioFormat getAudioFormat() {
+    public AudioStreamFormat getAudioFormat() {
         return source.getAudioFormat();
     }
 

@@ -3,8 +3,6 @@ package ch.tachyon.tunnel.host;
 import java.io.*;
 import java.util.*;
 
-import javax.sound.sampled.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.effect.*;
 import ch.tachyon.tunnel.plugin.*;
@@ -121,8 +119,8 @@ public class MonoStreamProcessor implements IProcessingInfo {
                 return amount;
             }
 
-            public AudioFormat getAudioFormat() {
-                return new AudioFormat((float) sampleRate, 24, 1, true, false);
+            public AudioStreamFormat getAudioFormat() {
+                return new AudioStreamFormat((float) sampleRate, 1, 32);
             }
 
             public void close() {
@@ -214,7 +212,7 @@ public class MonoStreamProcessor implements IProcessingInfo {
             return result;
         }
 
-        public AudioFormat getAudioFormat() {
+        public AudioStreamFormat getAudioFormat() {
             return source.getAudioFormat();
         }
 
