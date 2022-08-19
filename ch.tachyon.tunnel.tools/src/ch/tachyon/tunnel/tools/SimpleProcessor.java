@@ -164,7 +164,7 @@ public class SimpleProcessor {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(input, true);
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(input);
         final StreamProcessor processor = new StreamProcessor(inputFormat);
-        effect.load(processor);
+        effect.load(processor.getProcessingInfo());
         setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         if (outputFormat == null) {
@@ -205,7 +205,7 @@ public class SimpleProcessor {
         }
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
-        effect.load(processor);
+        effect.load(processor.getProcessingInfo());
         setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
         AudioFileFormat format = getOutputFormat(outputFileType, inputFormat, processor);
@@ -239,7 +239,7 @@ public class SimpleProcessor {
         }
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
-        effect.load(processor);
+        effect.load(processor.getProcessingInfo());
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
             setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
@@ -253,7 +253,7 @@ public class SimpleProcessor {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
-        effect.load(processor);
+        effect.load(processor.getProcessingInfo());
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
             setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
@@ -285,7 +285,7 @@ public class SimpleProcessor {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
-        effect.load(processor);
+        effect.load(processor.getProcessingInfo());
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
             setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
@@ -302,7 +302,7 @@ public class SimpleProcessor {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFile, true);
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFile);
         StreamProcessor processor = new StreamProcessor(inputFormat);
-        effect.load(processor);
+        effect.load(processor.getProcessingInfo());
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
             setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);
@@ -332,7 +332,7 @@ public class SimpleProcessor {
         AudioFileFormat inputFormat = AudioFileTypes.instance().getAudioFileFormat(inputFileName, input);
         IMultiChanAudioSource fileSource = AudioFileIO.createAudioSource(inputFileName, input);
         StreamProcessor processor = new StreamProcessor(inputFormat);
-        effect.load(processor);
+        effect.load(processor.getProcessingInfo());
         if (inputFormat.getFrameLength() != AudioSystem.NOT_SPECIFIED)
             setupProgressUsingProcessor(progress, inputFormat, processor);
         IMultiChanAudioSource transformedSource = processor.filter(fileSource, effect);

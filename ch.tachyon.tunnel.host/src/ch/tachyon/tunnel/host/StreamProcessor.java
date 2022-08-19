@@ -48,9 +48,8 @@ import ch.tachyon.tunnel.plugin.*;
  * To save the result to a {@link File} or to an {@link OutputStream}, use methods from  <tt>AudioFileIO</tt>.
  * <p>
  * To simply process a file os stream with a single plugin, use <tt>SimpleProcessor</tt>.
- * TODO [qt] isolate IProcessingInfo implementation in a nested class
  */
-public class StreamProcessor implements IProcessingInfo {
+public class StreamProcessor {
     
     protected final static int MIN_CHUNK_LENGTH = 64;
     protected final static int PREFERRED_CHUNK_LENGTH = 2048;
@@ -59,6 +58,7 @@ public class StreamProcessor implements IProcessingInfo {
     private final double sampleRate;
     private final int nbChannels;
     private final long length;
+    private final ProcessingInfo processingInfo = new ProcessingInfo();
     private double lengthChange = 1.0;
     private int chunkLength = PREFERRED_CHUNK_LENGTH;
     private BitSet channels;
@@ -143,7 +143,7 @@ public class StreamProcessor implements IProcessingInfo {
      */
     public <E extends IPlugin> IPullEffect getPlugin(Class<E> pluginClass) {
         IPullEffect effect = EngineResolver.getEngine().getStaticPlugin(IPullEffect.class, pluginClass);
-        effect.load(this);
+        effect.load(processingInfo);
         return effect;
     }
     
@@ -162,7 +162,7 @@ public class StreamProcessor implements IProcessingInfo {
             throw new IllegalArgumentException("The numnber of channel in the source (" + source.getAudioFormat().getChannels() + ") does not match the number of channels of this StreamProcessor (" + nbChannels + ")");
         if (sampleRate != source.getAudioFormat().getSampleRate())
             throw new IllegalArgumentException("The sample rate of the source (" + source.getAudioFormat().getSampleRate() + ") does not match the sample rate of the StreamProcessor (" + sampleRate + ")");
-        effect.startProcessing(this);
+        effect.startProcessing(processingInfo);
         this.lengthChange *= effect.getTimeChange();
         if (mainSource == null) {
             source = new MainSourceWrapper(source); // Wrap to help monitoring progress
@@ -318,63 +318,13 @@ public class StreamProcessor implements IProcessingInfo {
             closeImpl(false);
         }
     }
-
-    public int getNumberOfChannels() {
-        return nbChannels;
-    }
-
-    public BitSet getChannels() {
-        if (channels == null) {
-            channels = new BitSet();
-            channels.set(0, nbChannels);
-        }
-        return channels;
-    }
-
-    public double getSampleRate() {
-        return sampleRate;
-    }
-
-    /**
-     * Quantization. We return 24 to match the full precision of Java's <code>float</code>.
-     * <p>
-     * Few plugins really require this, but some do. You may override to return 16 if CD quality
-     * is enough (it might speed up some plugins)
-     */
-    public int getQuantization() {
-        return 24;
-    }
-
-    public int getMaxChunkLength(int pluginOptimalChunkLength) {
-        return chunkLength;
-    }
     
+    /**
+     * Get the preferred chunk length in sample frames.
+     * <p>
+     * Reading audio chunks of the returned length will result in optimal performances.
+     */
     public int getPreferredChunkLength() {
-        return chunkLength;
-    }
-
-    /**
-     * Our preferred chunk length. Note that we will accept any preferred length from the plugin
-     * as long as it is between the min and max.
-     * <p>
-     * If low latency is required (at the expense of performance and parallelization on multi-cores),
-     * you may change or override the code to return {@link #MIN_CHUNK_LENGTH} instead.
-     * <p>
-     * If best performances are required (at the expense of latency, which is corrected anyway), you
-     * may change or override the code to return {@link #MAX_CHUNK_LENGTH} instead.
-     */
-    public int getHostPreferredChunkLength() {
-        return PREFERRED_CHUNK_LENGTH;
-    }
-
-    /**
-     * Do not use. IProcessingInfo implementation
-     */
-    public int negociateFixedChunkLength(int pluginOptimalChunkLength) {
-        if (pluginOptimalChunkLength < MIN_CHUNK_LENGTH || pluginOptimalChunkLength > MAX_CHUNK_LENGTH)
-            chunkLength = PREFERRED_CHUNK_LENGTH;
-        else
-            chunkLength = pluginOptimalChunkLength;
         return chunkLength;
     }
 
@@ -384,12 +334,82 @@ public class StreamProcessor implements IProcessingInfo {
 
     /**
      * The number of sample frame of the resulting audio stream.
-     * This is the same as {@link #getLength()}, unless plugins that change the audio speed (resampling, time stretching) are involved
+     * This is the same as the input length, unless plugins that change the audio speed (resampling, time stretching) are involved
      */
     public long getOutputLength() {
         if (length == -1)
             return -1;
         return (long) ((double) length * lengthChange + 0.5);
+    }
+    
+    /**
+     * An {@link IProcessingInfo} implementation based on this processor
+     */
+    public IProcessingInfo getProcessingInfo() {
+        return this.processingInfo;
+    }
+    
+    class ProcessingInfo implements IProcessingInfo {
+
+        public int getNumberOfChannels() {
+            return nbChannels;
+        }
+
+        public BitSet getChannels() {
+            if (channels == null) {
+                channels = new BitSet();
+                channels.set(0, nbChannels);
+            }
+            return channels;
+        }
+
+        public double getSampleRate() {
+            return sampleRate;
+        }
+
+        /**
+         * Quantization. We return 24 to match the full precision of Java's <code>float</code>.
+         * <p>
+         * Few plugins really require this, but some do. You may override to return 16 if CD quality
+         * is enough (it might speed up some plugins)
+         */
+        public int getQuantization() {
+            return 24;
+        }
+
+        public int getMaxChunkLength(int pluginOptimalChunkLength) {
+            return chunkLength;
+        }
+        
+        /**
+         * Our preferred chunk length. Note that we will accept any preferred length from the plugin
+         * as long as it is between the min and max.
+         * <p>
+         * If low latency is required (at the expense of performance and parallelization on multi-cores),
+         * you may change or override the code to return {@link #MIN_CHUNK_LENGTH} instead.
+         * <p>
+         * If best performances are required (at the expense of latency, which is corrected anyway), you
+         * may change or override the code to return {@link #MAX_CHUNK_LENGTH} instead.
+         */
+        public int getHostPreferredChunkLength() {
+            return PREFERRED_CHUNK_LENGTH;
+        }
+
+        /**
+         * Do not use. IProcessingInfo implementation
+         */
+        public int negociateFixedChunkLength(int pluginOptimalChunkLength) {
+            if (pluginOptimalChunkLength < MIN_CHUNK_LENGTH || pluginOptimalChunkLength > MAX_CHUNK_LENGTH)
+                chunkLength = PREFERRED_CHUNK_LENGTH;
+            else
+                chunkLength = pluginOptimalChunkLength;
+            return chunkLength;
+        }
+
+        public long getLength() {
+            return length;
+        }
+
     }
 
 }
