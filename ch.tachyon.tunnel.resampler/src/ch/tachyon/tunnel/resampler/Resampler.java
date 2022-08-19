@@ -5,6 +5,7 @@ import java.io.*;
 import javax.sound.sampled.*;
 
 import ch.tachyon.tunnel.audio.file.*;
+import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.demo.plugin.resample.*;
 import ch.tachyon.tunnel.host.*;
@@ -90,7 +91,7 @@ public class Resampler {
          * Create a StreamProcessor to transform the audio using a plugin.
          * Specify the format using the file format of our source file.
          */
-        StreamProcessor processor = new StreamProcessor(inputFormat);
+        StreamProcessor processor = new StreamProcessor(FormatUtils.toStreamFormat(inputFormat.getFormat()), inputFormat.getFrameLength());
 
         /*
          * Load the resampler plugin. Note that StreamProcessor only works with the IPullEffect interface.

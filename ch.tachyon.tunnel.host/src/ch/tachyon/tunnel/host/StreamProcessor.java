@@ -2,8 +2,6 @@ package ch.tachyon.tunnel.host;
 
 import java.io.*;
 import java.util.*;
-import javax.sound.sampled.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.effect.*;
 import ch.tachyon.tunnel.host.effect.IPullEffect;
@@ -102,22 +100,6 @@ public class StreamProcessor {
         this.sampleRate = sampleRate;
         this.nbChannels = nbChannels;
         this.length = length;
-    }
-    
-    /**
-     * Create a new stream processor.
-     * <p>
-     * You may want to use <tt>AudioFilesTypes.instance().getAudioFileFormat()</tt> in ch.tachyon.tunnel.audio
-     */
-    public StreamProcessor(AudioFileFormat fileFormat) { // TODO [qt] remove to remove dependcy to javax.sound.sampled
-        this(from(fileFormat), fileFormat.getFrameLength());
-    }
-    
-    private static AudioStreamFormat from(AudioFileFormat fileFormat) {
-        AudioFormat af = fileFormat.getFormat();
-        AudioStreamFormat asf = new AudioStreamFormat(af.getSampleRate(), af.getChannels(), af.getSampleSizeInBits());
-        asf.setAudioFormat(af);
-        return asf;
     }
     
     /**
