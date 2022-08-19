@@ -28,7 +28,7 @@ import ch.tachyon.tunnel.plugin.*;
  * };
  *     // or use AudioFileIO.createAudioSource() from the ch.tachyon.tunnel.audio package to create a source from an audio file or input stream
  *     
- * StreamProcessor processor = new StreamProcessor(44100.0f); // Replace with another sample rate if relevant
+ * StreamProcessor processor = new StreamProcessor(44100.0f, 2, -1); // Replace with another sample rate if relevant
  * IEffect plugin = {@link #getPlugin(Class) processor.getPlugin(<i>plugin_class</i>)}; // Load a plugin
  * {@link IEffect#setParameterValue(ParameterDefinition, Object) plugin.setParameterValue(<i>plugin_class.parameter</i>, <i>value</i>)}; // Set zero or more parameters
  * {@link IMultiChanAudioSource} resultingAudio = {@link #filter(IMultiChanAudioSource, IPullEffect) processor.filter(source, plugin);} // Apply the effect
@@ -48,6 +48,7 @@ import ch.tachyon.tunnel.plugin.*;
  * To save the result to a {@link File} or to an {@link OutputStream}, use methods from  <tt>AudioFileIO</tt>.
  * <p>
  * To simply process a file os stream with a single plugin, use <tt>SimpleProcessor</tt>.
+ * TODO [qt] isolate IProcessingInfo implementation in a nested class
  */
 public class StreamProcessor implements IProcessingInfo {
     
@@ -89,6 +90,17 @@ public class StreamProcessor implements IProcessingInfo {
     public StreamProcessor(AudioFormat format, long length) {
         this.sampleRate = format.getSampleRate();
         this.nbChannels = format.getChannels();
+        this.length = length;
+    }
+    
+    /**
+     * Create a new stream processor
+     * @param length the length of the audio stream to convert in sample frames (1 sample frames corresponds to
+     * 1 <code>float</code> in mono, and n <code>float</code>s for n channels). Use <code>-1</code> if unknown
+     */
+    public StreamProcessor(double sampleRate, int nbChannels, long length) {
+        this.sampleRate = sampleRate;
+        this.nbChannels = nbChannels;
         this.length = length;
     }
     
@@ -336,6 +348,10 @@ public class StreamProcessor implements IProcessingInfo {
     public int getMaxChunkLength(int pluginOptimalChunkLength) {
         return chunkLength;
     }
+    
+    public int getPreferredChunkLength() {
+        return chunkLength;
+    }
 
     /**
      * Our preferred chunk length. Note that we will accept any preferred length from the plugin
@@ -351,6 +367,9 @@ public class StreamProcessor implements IProcessingInfo {
         return PREFERRED_CHUNK_LENGTH;
     }
 
+    /**
+     * Do not use. IProcessingInfo implementation
+     */
     public int negociateFixedChunkLength(int pluginOptimalChunkLength) {
         if (pluginOptimalChunkLength < MIN_CHUNK_LENGTH || pluginOptimalChunkLength > MAX_CHUNK_LENGTH)
             chunkLength = PREFERRED_CHUNK_LENGTH;
@@ -368,6 +387,8 @@ public class StreamProcessor implements IProcessingInfo {
      * This is the same as {@link #getLength()}, unless plugins that change the audio speed (resampling, time stretching) are involved
      */
     public long getOutputLength() {
+        if (length == -1)
+            return -1;
         return (long) ((double) length * lengthChange + 0.5);
     }
 
