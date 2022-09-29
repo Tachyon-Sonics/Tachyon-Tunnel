@@ -4,8 +4,6 @@ import java.io.*;
 import java.lang.annotation.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.engine.*;
@@ -121,9 +119,15 @@ public interface IEffect {
      */
     public void load(IProcessingInfo info);
 
-    public JPanel createControlPanel();
+    /**
+     * @return a <tt>javax.swing.JPanel</tt>
+     */
+    public Object createControlPanel();
 
-    public void showGui(JFrame parent, IGuiListener listener);
+    /**
+     * @param parent a <tt>javax.swing.JFrame</tt>
+     */
+    public void showGui(Object parent, IGuiListener listener);
 
     public void hideGui();
 

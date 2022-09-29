@@ -3,7 +3,6 @@ package ch.tachyon.tunnel.engine.bridges.chan.reduce;
 import java.io.*;
 import java.lang.annotation.*;
 import java.util.*;
-import javax.swing.*;
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
@@ -54,11 +53,11 @@ public abstract class ScFromMcBase<SC extends IEffect, MC extends IEffect> imple
         target.load(info);
     }
 
-    public JPanel createControlPanel() {
+    public Object createControlPanel() {
         return target.createControlPanel();
     }
 
-    public void showGui(JFrame parent, IGuiListener listener) {
+    public void showGui(Object parent, IGuiListener listener) {
         target.showGui(parent, listener);
     }
 

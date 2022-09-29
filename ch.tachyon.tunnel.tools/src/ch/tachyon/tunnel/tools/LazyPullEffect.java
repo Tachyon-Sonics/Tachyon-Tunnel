@@ -4,8 +4,6 @@ import java.io.*;
 import java.lang.annotation.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.effect.*;
@@ -90,12 +88,12 @@ class LazyPullEffect implements IPullEffect {
     }
 
     @Override
-    public JPanel createControlPanel() {
+    public Object createControlPanel() {
         return target.createControlPanel();
     }
 
     @Override
-    public void showGui(JFrame parent, IGuiListener listener) {
+    public void showGui(Object parent, IGuiListener listener) {
         target.showGui(parent, listener);
     }
 

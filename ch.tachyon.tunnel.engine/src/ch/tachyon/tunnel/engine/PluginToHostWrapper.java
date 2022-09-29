@@ -233,12 +233,12 @@ public abstract class PluginToHostWrapper<P extends IPlugin> implements IEffect 
         return new EffectControlPanel(this, hostInfo);
     }
 
-    public void showGui(JFrame parent, IGuiListener listener) {
+    public void showGui(Object parent, IGuiListener listener) {
         checkLoaded();
         checkStarted(false);
-        dialog = new EffectDialog(parent, this, hostInfo, listener);
+        dialog = new EffectDialog((JFrame) parent, this, hostInfo, listener);
         dialog.pack();
-        dialog.setLocationRelativeTo(parent);
+        dialog.setLocationRelativeTo((JFrame) parent);
         dialog.setVisible(true);
     }
 

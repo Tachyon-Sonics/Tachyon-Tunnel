@@ -4,8 +4,6 @@ import java.io.*;
 import java.lang.annotation.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.engine.bridges.mthread.*;
 import ch.tachyon.tunnel.engine.utils.concurrent.*;
@@ -130,11 +128,11 @@ public abstract class McFromScBase<MC extends IEffect, SC extends IEffect> imple
         }
     }
 
-    public JPanel createControlPanel() {
+    public Object createControlPanel() {
         return descTarget.createControlPanel();
     }
 
-    public void showGui(JFrame parent, IGuiListener listener) {
+    public void showGui(Object parent, IGuiListener listener) {
         descTarget.showGui(parent, listener);
     }
 
