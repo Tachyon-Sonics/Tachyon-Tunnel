@@ -11,7 +11,7 @@ class EngineResolver {
         if (engine == null) {
             Class<?> engineClass;
             try {
-                engineClass = Class.forName(ENGINE_CLASS);
+                engineClass = Class.forName(ENGINE_CLASS); // TODO [graal]
                 engine = (IEngine) engineClass.newInstance();
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(e);
