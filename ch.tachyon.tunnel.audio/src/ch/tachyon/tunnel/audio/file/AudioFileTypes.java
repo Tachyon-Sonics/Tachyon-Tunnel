@@ -93,7 +93,7 @@ public class AudioFileTypes {
                             String className = (String) props.get(key);
                             if (className != null && !"".equals(className.trim()) && !"".equals(ext.substring(1).trim())) {
                                 try {
-                                    Class.forName(className, false, cl); // TODO [graal]
+                                    Class.forName(className, false, cl);
                                     Collection<String> classNames = ext2fileReader.get(ext);
                                     if (classNames == null) {
                                         classNames = new ArrayList<String>();
@@ -330,7 +330,7 @@ public class AudioFileTypes {
             if (fileReaderClassNames != null) {
                 for (String fileReaderClassName : fileReaderClassNames) {
                     try {
-                        Class<?> clazz = Class.forName(fileReaderClassName, true, classLoader); // TODO [graal]
+                        Class<?> clazz = Class.forName(fileReaderClassName, true, classLoader);
                         AudioFileReader reader = (AudioFileReader) clazz.newInstance();
                         threadSafe.set(!threadUnsafeProviders.contains(fileReaderClassName));
                         return reader;

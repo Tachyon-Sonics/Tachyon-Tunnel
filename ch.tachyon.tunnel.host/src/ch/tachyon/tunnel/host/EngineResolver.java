@@ -11,14 +11,14 @@ class EngineResolver {
         if (engine == null) {
             Class<?> engineClass;
             try {
-                engineClass = Class.forName(ENGINE_CLASS); // TODO [graal]
-                engine = (IEngine) engineClass.newInstance();
-            } catch (ClassNotFoundException e) {
-                throw new IllegalStateException(e);
-            } catch (InstantiationException e) {
-                throw new IllegalStateException(e);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
+                engineClass = Class.forName(ENGINE_CLASS); // [graal] should be ok if ch.tachyon.tunnel.engine project is in the classpath
+                engine = (IEngine) engineClass.getConstructor().newInstance();
+            } catch (ReflectiveOperationException ex) {
+                throw new IllegalStateException(ex);
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalStateException(ex);
+            } catch (SecurityException ex) {
+                throw new IllegalStateException(ex);
             }
         }
         return engine;
