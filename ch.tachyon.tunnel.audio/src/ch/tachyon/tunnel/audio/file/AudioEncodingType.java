@@ -1,6 +1,5 @@
 package ch.tachyon.tunnel.audio.file;
 
-
 /**
  * Audio encoding/decoding types for a single channel. Includes bits per sample, endianess and signed/unsigned.
  * <p>
@@ -338,4 +337,5 @@ public enum AudioEncodingType {
             source[i] = (s < min ? min : (s > max ? max : s));
         }
     }
+    
 }

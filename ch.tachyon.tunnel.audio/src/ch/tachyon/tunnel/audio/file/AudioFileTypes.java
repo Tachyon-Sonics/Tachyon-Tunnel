@@ -457,7 +457,7 @@ public class AudioFileTypes {
         AudioFileFormat result = getAudioFileFormat(file.getName(), fileInput);
         fileInput.close();
         if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED && forceComputeLength) {
-            Pair<AudioFormat, Long> info = getFormatAndFrameLength(file, progress);
+            Pair<AudioFormat, Long> info = getFormatAndFrameLength(file, result.getFormat(), progress);
             AudioFormat format = info.getFirst();
             long nbFrames = info.getSecond();
             result = new AudioFileFormatEx(result.getType(), format, nbFrames, result.properties());
@@ -465,7 +465,7 @@ public class AudioFileTypes {
         return result;
     }
 
-    private Pair<AudioFormat, Long> getFormatAndFrameLength(File file, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
+    private Pair<AudioFormat, Long> getFormatAndFrameLength(File file, AudioFormat format, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
         final int bufferSize = 16384;
         IMultiChanAudioSource source = AudioFileIO.createAudioSource(file, progress);
         long nbFrames = 0;
@@ -475,7 +475,7 @@ public class AudioFileTypes {
             nbFrames += read;
             read = source.readSamples(buffer);
         }
-        return new Pair<AudioFormat, Long>(FormatUtils.fromStreamFormat(source.getAudioFormat()), nbFrames);
+        return new Pair<AudioFormat, Long>(format, nbFrames);
     }
 
     public AudioFileFormat getAudioFileFormat(String fileName, InputStream fileInput) throws IOException, UnsupportedAudioFileException {
