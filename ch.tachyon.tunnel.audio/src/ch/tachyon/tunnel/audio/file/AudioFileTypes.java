@@ -455,6 +455,7 @@ public class AudioFileTypes {
     public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
         InputStream fileInput = new RandomFileInputStream(file, progress);
         AudioFileFormat result = getAudioFileFormat(file.getName(), fileInput);
+        // TODO [qt] handle 64 bit length if TAudioFileFormat
         fileInput.close();
         if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED && forceComputeLength) {
             Pair<AudioFormat, Long> info = getFormatAndFrameLength(file, result.getFormat(), progress);

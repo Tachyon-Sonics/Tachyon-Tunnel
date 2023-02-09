@@ -11,18 +11,18 @@ import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
 
 /**
- * Convert a {@link IMultiChannelAudioSource} (audio data as floats) into an
+ * Convert a {@link IMultiChanAudioSource} (audio data as floats) into an
  * {@link InputStream} with the given {@link AudioEncodingType}.
  * <p>
- * {@link #createAudioInputStream(IMultiChannelAudioSource, AudioFormat, IProgressMonitor, int)} internally
- * uses this class to directly convert an {@link IMultiChannelAudioSource} to an
+ * {@link #createAudioInputStream(IMultiChanAudioSource, AudioFormat, IProgressMonitor, long)} internally
+ * uses this class to directly convert an {@link IMultiChanAudioSource} to an
  * {@link AudioInputStream}. This method is typically used when saving to file an audio file stored as float arrays in memory.
  * <p>
  * Optionally report reading progress to an {@link IProgressMonitor}. If the progress monitor
  * throws an {@link InterruptedException}, an {@link IOException} with message <code>Interrupted</code>
  * is thrown.
  */
-class AudioSourceInputStream extends InputStream {
+public class AudioSourceInputStream extends InputStream {
 
     private final static int BUFFER_SIZE = 32768; // in frames
 
