@@ -107,6 +107,10 @@ class AudioInputStreamSource implements IMultiChanAudioSource, Closeable {
         AudioFormat aFmt = new AudioFormat(format.getSampleRate(), format.getSampleSizeInBits(), format.getChannels(), true, false);
         return FormatUtils.toStreamFormat(aFmt);
     }
+    
+    public AudioFormat getBaseFormat() {
+        return this.format;
+    }
 
     @Override
     public int readSamples(float[][] target) {

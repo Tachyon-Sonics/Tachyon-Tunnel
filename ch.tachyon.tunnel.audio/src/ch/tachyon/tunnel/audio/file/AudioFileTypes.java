@@ -12,6 +12,8 @@ import javax.sound.sampled.spi.*;
 
 import org.tritonus.sampled.file.*;
 import org.tritonus.share.sampled.*;
+import org.tritonus.share.sampled.file.*;
+
 import ch.tachyon.tunnel.audio.utils.*;
 import ch.tachyon.tunnel.common.*;
 import ch.tachyon.tunnel.common.utils.*;
@@ -440,6 +442,8 @@ public class AudioFileTypes {
      * @param forceComputeLength Some audio format does not provide an exact frame length (mp3, m4a, etc), and hence if this flag is <tt>false</tt>,
      * {@link AudioFileFormat#getFrameLength()} will return {@link AudioSystem#NOT_SPECIFIED}. If this flag is <tt>true</tt> and no exact length
      * is available, this method will decode the entire file to compute the frame length. Be aware that this can be very time consuming.
+     * @return an {@link AudioFileFormat}. If the frame length is known and does not fit in a 32-bit int, a {@link AudioFileFormatEx} is returned instead,
+     * with the length as a 64-bit long.
      */
     public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength) throws IOException, UnsupportedAudioFileException {
         return getAudioFileFormat(file, forceComputeLength, null);
@@ -451,20 +455,71 @@ public class AudioFileTypes {
      * {@link AudioFileFormat#getFrameLength()} will return {@link AudioSystem#NOT_SPECIFIED}. If this flag is <tt>true</tt> and no exact length
      * is available, this method will decode the entire file to compute the frame length. Be aware that this can be very time consuming.
      * @param progress an optional progress monitor. Mostly useful when the file has to be scanned to compute its length. Can be <tt>null</tt>
+     * @return an {@link AudioFileFormat}. If the frame length is known and does not fit in a 32-bit int, a {@link AudioFileFormatEx} is returned instead,
+     * with the length as a 64-bit long.
      */
+//    public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
+//        InputStream fileInput = new RandomFileInputStream(file, progress);
+//        AudioFileFormat result = getAudioFileFormat(file.getName(), fileInput);
+//        fileInput.close();
+//        if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED && forceComputeLength) {
+//            Pair<AudioFormat, Long> info = getFormatAndFrameLength(file, progress);
+//            AudioFormat format = info.getFirst();
+//            long nbFrames = info.getSecond();
+//            result = new AudioFileFormatEx(result.getType(), format, nbFrames, result.properties());
+//        }
+//        return result;
+//    }
     public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
-        InputStream fileInput = new RandomFileInputStream(file, progress);
-        AudioFileFormat result = getAudioFileFormat(file.getName(), fileInput);
-        // TODO [qt] handle 64 bit length if TAudioFileFormat
-        fileInput.close();
-        if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED && forceComputeLength) {
-            Pair<AudioFormat, Long> info = getFormatAndFrameLength(file, result.getFormat(), progress);
-            AudioFormat format = info.getFirst();
-            long nbFrames = info.getSecond();
-            result = new AudioFileFormatEx(result.getType(), format, nbFrames, result.properties());
+        AudioFileFormat result;
+        if (file.getName().toLowerCase().endsWith(".au")) {
+            // Using the file rather than an InputStream allows for faster loading if length is unknown
+            result = getAudioFileFormat(file.getName(), file);
+        } else {
+            // RandomFileInputStream solves mark/reset problems on files with large unknown chunks (Call of the Sea.mp3)
+            InputStream fileInput = new RandomFileInputStream(file, progress);
+            result = getAudioFileFormat(file.getName(), fileInput);
+            fileInput.close();
+        }
+        if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED) {
+            if (result instanceof TAudioFileFormat) {
+                TAudioFileFormat taff = (TAudioFileFormat) result;
+                if (taff.getFrameLengthEx() != -1L) {
+                    result = new AudioFileFormatEx(result.getType(), result.getFormat(), taff.getFrameLengthEx(), result.properties());
+                } else if (forceComputeLength) {
+                    result = forceComputeLength(file, progress, result);
+                }
+            } else if (forceComputeLength) {
+                result = forceComputeLength(file, progress, result);
+            }
+        } else if (result.getFrameLength() < 0) {
+            // length is between 2^31 and 2^32 and results in a negative value when a signed int is used
+            result = new AudioFileFormatEx(result.getType(), result.getFormat(),
+                    (long) result.getFrameLength() & 0xFFFFFFL, result.properties());
         }
         return result;
     }
+
+    private AudioFileFormat forceComputeLength(File file, IProgressMonitor progress, AudioFileFormat result) throws IOException, UnsupportedAudioFileException {
+        Pair<AudioFormat, Long> info = getFormatAndFrameLength(file, result.getFormat(), progress);
+        AudioFormat format = info.getFirst();
+        long nbFrames = info.getSecond();
+        result = new AudioFileFormatEx(result.getType(), format, nbFrames, result.properties());
+        return result;
+    }
+
+//    private Pair<AudioFormat, Long> getFormatAndFrameLength(File file, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
+//        final int bufferSize = 16384;
+//        IMultiChanAudioSource source = AudioFileIO.createAudioSource(file, progress);
+//        long nbFrames = 0;
+//        float[][] buffer = new float[source.getAudioFormat().getChannels()][bufferSize];
+//        int read = source.readSamples(buffer);
+//        while (read > 0) {
+//            nbFrames += read;
+//            read = source.readSamples(buffer);
+//        }
+//        return new Pair<AudioFormat, Long>(FormatUtils.fromStreamFormat(source.getAudioFormat()), nbFrames);
+//    }
 
     private Pair<AudioFormat, Long> getFormatAndFrameLength(File file, AudioFormat format, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
         final int bufferSize = 16384;
@@ -476,9 +531,41 @@ public class AudioFileTypes {
             nbFrames += read;
             read = source.readSamples(buffer);
         }
-        return new Pair<AudioFormat, Long>(format, nbFrames);
+        // Patch for .m4a: format is only determined when reading from the file
+        AudioFormat sourceFormat = ((AudioInputStreamSource) source).getBaseFormat();
+        return new Pair<AudioFormat, Long>(sourceFormat, nbFrames);
     }
 
+    public AudioFileFormat getAudioFileFormat(String fileName, File file) throws IOException, UnsupportedAudioFileException {
+        AtomicBoolean threadSafe = new AtomicBoolean();
+        if (fileName != null) {
+            // Try with the reader corresponding to the extension
+            AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
+            if (reader != null) {
+                try {
+                    if (!threadSafe.get())
+                        readLock.lock();
+                    return reader.getAudioFileFormat(file);
+                } catch (IOException ex) {
+                    Debug.warn(ex);
+                } catch (UnsupportedAudioFileException ex) {
+                    if (isJreSupportedFormat(fileName)) {
+                        // Ignore, we will continue with JavaSound fallback.
+                        // In particular, WaveExtensibleFileReader is only supported by JavaSound and not by tritonus (!)
+                    } else {
+                        throw ex;
+                    }
+                } finally {
+                    if (!threadSafe.get())
+                        readLock.unlock();
+                }
+            }
+        }
+
+        // Failed. Fallback to JavaSound (try all readers)
+        return AudioSystem.getAudioFileFormat(file);
+    }
+    
     public AudioFileFormat getAudioFileFormat(String fileName, InputStream fileInput) throws IOException, UnsupportedAudioFileException {
         AtomicBoolean threadSafe = new AtomicBoolean();
         if (fileName != null) {
