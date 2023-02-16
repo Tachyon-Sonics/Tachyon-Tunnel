@@ -1,6 +1,9 @@
 package ch.tachyon.tunnel.audio.file;
 
 import java.io.*;
+
+import org.tritonus.share.sampled.file.*;
+
 import ch.tachyon.tunnel.audio.utils.*;
 
 /**
@@ -12,89 +15,60 @@ import ch.tachyon.tunnel.audio.utils.*;
  * of reading the file. Note that the progress is based on the current position in the file.
  * When using {@link #mark(int)} and {@link #reset()} it might go backward.
  */
-public class RandomFileInputStream extends InputStream {
+public class RandomFileProgressInputStream extends RandomFileInputStream {
 
-    private final RandomAccessFile raFile;
     private final IProgressMonitor progress;
-    private long markPos = -1;
-    private boolean closed = false;
 
 
-    public RandomFileInputStream(File file) throws IOException {
+    public RandomFileProgressInputStream(File file) throws IOException {
         this(file, null);
     }
     
-    public RandomFileInputStream(File file, IProgressMonitor progress) throws IOException {
-        this.raFile = new RandomAccessFile(file, "r");
+    public RandomFileProgressInputStream(File file, IProgressMonitor progress) throws IOException {
+        super(file);
         this.progress = progress;
     }
 
     @Override
     public int read() throws IOException {
         updateProgress();
-        return raFile.read();
-    }
-
-    @Override
-    public int available() throws IOException {
-        return (int) (raFile.length() - raFile.getFilePointer());
+        return super.read();
     }
 
     @Override
     public void close() throws IOException {
-        if (closed)
-            return;
-        closed = true;
         updateProgress();
-        raFile.close();
-    }
-
-    @Override
-    public synchronized void mark(int readlimit) {
-        try {
-            this.markPos = raFile.getFilePointer();
-        } catch (IOException ex) {
-            this.markPos = -2;
-        }
-    }
-
-    @Override
-    public boolean markSupported() {
-        return true;
+        super.close();
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         updateProgress();
-        return raFile.read(b, off, len);
+        return super.read(b, off, len);
     }
 
     @Override
     public int read(byte[] b) throws IOException {
         updateProgress();
-        return raFile.read(b);
+        return super.read(b);
     }
 
     @Override
     public synchronized void reset() throws IOException {
-        if (markPos == -2)
-            throw new IOException("mark() failed to get file pointer");
-        else if (markPos == -1)
-            throw new IOException("No mark()");
-        raFile.seek(markPos);
+        super.reset();
         updateProgress();
     }
 
     @Override
     public long skip(long n) throws IOException {
         updateProgress();
-        return raFile.skipBytes((int) n);
+        return super.skip(n);
     }
     
     private void updateProgress() throws IOException {
         if (progress == null)
             return;
-        double pos = (double) raFile.getFilePointer() / (double) raFile.length();
+        double pos = (double) super.getFilePointer() / (double) super.getFileSize();
         progress.setProgress(pos, 1.0);
     }
 

@@ -21,8 +21,8 @@ import ch.tachyon.tunnel.common.utils.*;
 /**
  * Extension of {@link AudioSystem} for coping with file types.
  * <p>
- * This class looks for resources named <code>META-INF/services/org.corebounce.audio.file.FileReader</code>
- * in the classpath. Such files add the following information about an {@link AudioFileReader} spi:
+ * This class looks for resources named <code>META-INF/services/tachyon.tunnel.audio.file.FileReader</code>
+ * in the classpath. Such a file adds the following information about an {@link AudioFileReader} spi:
  * <ul>
  * <li>The typical file extensions for the format (such as <code>.wav</code>, <code>.mp3</code>, etc)
  * <li>(Optional) A descriptive name for the format (such as <code>WAVE</code>)
@@ -33,6 +33,30 @@ import ch.tachyon.tunnel.common.utils.*;
  * <li><b>Extension</b> (String): typical file extensions such as ".wav", ".mp3", ".m4u", etc
  * <li><b>Type</b> (String): the human-readable name of the format, such as "WAVE", "MP3", "MP4/AAC"
  * </ul>
+ * Exemple for a <code>META-INF/services/tachyon.tunnel.audio.file.FileReader</code>:
+ * <pre>
+## PCM - force use of tritonus
+loader.au=org.tritonus.sampled.file.AuAudioFileReader
+type.au=AU
+
+loader.wav=org.tritonus.sampled.file.WaveAudioFileReader
+type.wav=WAVE
+
+loader.aiff=org.tritonus.sampled.file.AiffAudioFileReader
+type.aiff=AIFF/AIFC
+
+loader.aifc=org.tritonus.sampled.file.AiffAudioFileReader
+type.aifc=AIFF/AIFC
+
+loader.aif=org.tritonus.sampled.file.AiffAudioFileReader
+type.aif=AIFF/AIFC
+
+
+## mp3 - use javazoom
+loader.mp3=javazoom.spi.mpeg.sampled.file.MpegAudioFileReader
+type.mp3=MP3
+ * </pre>
+ * <p>
  * You generally do not need to use this class directly.
  * It is used by {@link AudioFileFilter} to create file chooser filters.
  * It is also used by {@link AudioFileIO} to recognize file types when loading and saving.
@@ -41,7 +65,7 @@ import ch.tachyon.tunnel.common.utils.*;
  */
 public class AudioFileTypes {
 
-    private static final String SERVICE_RESOURCE = "META-INF/services/org.corebounce.audio.file.FileReader";
+    private static final String SERVICE_RESOURCE = "META-INF/services/tachyon.tunnel.audio.file.FileReader";
 
     private final static ThreadLocal<AudioFileTypes> instances = new ThreadLocal<AudioFileTypes>();
     private final static Lock readLock = new ReentrantLock(true); // Some providers are not thread safe
@@ -458,29 +482,12 @@ public class AudioFileTypes {
      * @return an {@link AudioFileFormat}. If the frame length is known and does not fit in a 32-bit int, a {@link AudioFileFormatEx} is returned instead,
      * with the length as a 64-bit long.
      */
-//    public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
-//        InputStream fileInput = new RandomFileInputStream(file, progress);
-//        AudioFileFormat result = getAudioFileFormat(file.getName(), fileInput);
-//        fileInput.close();
-//        if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED && forceComputeLength) {
-//            Pair<AudioFormat, Long> info = getFormatAndFrameLength(file, progress);
-//            AudioFormat format = info.getFirst();
-//            long nbFrames = info.getSecond();
-//            result = new AudioFileFormatEx(result.getType(), format, nbFrames, result.properties());
-//        }
-//        return result;
-//    }
     public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
         AudioFileFormat result;
-        if (file.getName().toLowerCase().endsWith(".au")) {
-            // Using the file rather than an InputStream allows for faster loading if length is unknown
-            result = getAudioFileFormat(file.getName(), file);
-        } else {
-            // RandomFileInputStream solves mark/reset problems on files with large unknown chunks (Call of the Sea.mp3)
-            InputStream fileInput = new RandomFileInputStream(file, progress);
-            result = getAudioFileFormat(file.getName(), fileInput);
-            fileInput.close();
-        }
+        // RandomFileInputStream solves mark/reset problems on files with large unknown chunks (Call of the Sea.mp3)
+        InputStream fileInput = new RandomFileProgressInputStream(file, progress);
+        result = getAudioFileFormat(file.getName(), fileInput);
+        fileInput.close();
         if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED) {
             if (result instanceof TAudioFileFormat) {
                 TAudioFileFormat taff = (TAudioFileFormat) result;
@@ -507,19 +514,6 @@ public class AudioFileTypes {
         result = new AudioFileFormatEx(result.getType(), format, nbFrames, result.properties());
         return result;
     }
-
-//    private Pair<AudioFormat, Long> getFormatAndFrameLength(File file, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
-//        final int bufferSize = 16384;
-//        IMultiChanAudioSource source = AudioFileIO.createAudioSource(file, progress);
-//        long nbFrames = 0;
-//        float[][] buffer = new float[source.getAudioFormat().getChannels()][bufferSize];
-//        int read = source.readSamples(buffer);
-//        while (read > 0) {
-//            nbFrames += read;
-//            read = source.readSamples(buffer);
-//        }
-//        return new Pair<AudioFormat, Long>(FormatUtils.fromStreamFormat(source.getAudioFormat()), nbFrames);
-//    }
 
     private Pair<AudioFormat, Long> getFormatAndFrameLength(File file, AudioFormat format, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
         final int bufferSize = 16384;

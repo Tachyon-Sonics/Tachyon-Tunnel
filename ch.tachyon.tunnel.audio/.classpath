@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ch.tachyon.tunnel.common"/>
-	<classpathentry kind="lib" path="lib/tritonus-sampled-0.3.7-tachyon.jar" sourcepath="lib/tritonus-sampled-0.3.7-tachyon-sources.jar"/>
+	<classpathentry kind="lib" path="/tritonus-tachyon/lib/tritonus-tachyon-0.3.8.jar" sourcepath="/tritonus-tachyon/lib/tritonus-tachyon-0.3.8-src.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

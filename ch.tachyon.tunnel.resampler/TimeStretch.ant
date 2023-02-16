@@ -12,7 +12,7 @@
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="ch.tachyon.tunnel.resampler.TimeStretcher"/>
                 <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./ tritonus-sampled-0.3.7-tachyon.jar"/>
+                <attribute name="Rsrc-Class-Path" value="./ tritonus-tachyon-0.3.8.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
             <fileset dir="${dir.jarfile}/bin"/>
@@ -22,7 +22,7 @@
             <fileset dir="${dir.workspace}/ch.tachyon.tunnel.engine/bin"/>
             <fileset dir="${dir.workspace}/ch.tachyon.tunnel.host/bin"/>
             <fileset dir="${dir.workspace}/ch.tachyon.tunnel.audio/bin"/>
-            <zipfileset dir="${dir.workspace}/ch.tachyon.tunnel.audio/lib" includes="tritonus-sampled-0.3.7-tachyon.jar"/>
+            <zipfileset dir="${dir.workspace}/tritonus-tachyon/lib" includes="tritonus-tachyon-0.3.8.jar"/>
             <fileset dir="${dir.workspace}/ch.tachyon.tunnel.tools/bin"/>
         </jar>
     </target>

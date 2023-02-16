@@ -17,7 +17,7 @@ import ch.tachyon.tunnel.common.utils.*;
  * <p>
  * This class supports the following extensions of Java's {@link AudioSystem} for reading audio files.
  * <p>
- * This class looks for resources named <code>META-INF/services/org.corebounce.audio.file.FileReader</code>
+ * This class looks for resources named <code>META-INF/services/tachyon.tunnel.audio.file.FileReader</code>
  * in the classpath. Such files add the following information about an {@link AudioFileReader} spi:
  * <ul>
  * <li>The typical file extensions for the format (such as <code>.wav</code>, <code>.mp3</code>, etc)
@@ -33,6 +33,7 @@ import ch.tachyon.tunnel.common.utils.*;
  * <li>A provider scans the whole file to figure out it cannot read it, significantly slowing down the
  * whole process.
  * </ul>
+ * See {@link AudioFileTypes} for more.
  * @see AudioFileTypes to detect audio file format information
  * @see DemuxAudioSource to extract a single channel
  */
@@ -48,12 +49,12 @@ public class AudioFileIO {
      * @see DemuxAudioSource if you need to extract a single audio channel (or the unique channel as a {@link ISingleChanAudioSource} if the audio file is monophonic)
      */
     public static IMultiChanAudioSource createAudioSource(File file) throws IOException, UnsupportedAudioFileException {
-        InputStream input = new RandomFileInputStream(file);
+        InputStream input = new RandomFileProgressInputStream(file);
         return createAudioSource(file.getName(), input);
     }
     
     public static IMultiChanAudioSource createAudioSource(File file, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
-        InputStream input = new RandomFileInputStream(file, progress);
+        InputStream input = new RandomFileProgressInputStream(file, progress);
         return createAudioSource(file.getName(), input);
     }
     
