@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="tritonus-tachyon/lib/tritonus-tachyon-full-0.3.8-src.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/tritonus-tachyon/tritonus-tachyon-full-src.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <selectedElements exportClassFiles="false" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file.pvorbis"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.midi.device.alsa"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.cdda"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.lame"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.convert.gsm"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.midi.device.java"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled.convert"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.pogg"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.convert"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.esd"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.convert.vorbis"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.alsa"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.gsm"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.midi.device.fluidsynth"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.dsp.interfaces"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.cdda.cdparanoia"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.dsp"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.mixer.alsa"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.core"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file.vorbis"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file.gsm"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.cdda"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled.file"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled.mixer"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.convert.pvorbis"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.ogg"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.midi"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file.mpeg"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.dsp.processor"/>
+        <file path="/tritonus-tachyon/.project"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.pvorbis"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.midi.sb.fluidsynth"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.dsp.ais"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.cdda.cooked_ioctl"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.mixer.esd"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.vorbis"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.convert.lame"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.midi.file"/>
+        <folder path="/tritonus-tachyon/src/META-INF"/>
+        <file path="/tritonus-tachyon/.classpath"/>
+    </selectedElements>
+</jardesc>

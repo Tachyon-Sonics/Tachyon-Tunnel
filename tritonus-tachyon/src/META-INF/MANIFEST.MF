@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-Name: Tritonus
+Bundle-Description: Open Source Java Sound
+Bundle-SymbolicName: org.tritonus
+Bundle-Copyright: Copyright (c) 2000 by Florian Bomers <http://www.bomers.de>
+Bundle-Version: 0.3.7

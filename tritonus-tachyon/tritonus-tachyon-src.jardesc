@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="tritonus-tachyon/lib/tritonus-tachyon-0.3.8-src.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/tritonus-tachyon/tritonus-tachyon-src.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <selectedElements exportClassFiles="false" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share"/>
+        <file path="/tritonus-tachyon/.project"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled.file"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled.convert"/>
+        <file path="/tritonus-tachyon/tritonus-tachyon-full.jardesc"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.core"/>
+        <folder path="/tritonus-tachyon/src/META-INF"/>
+        <file path="/tritonus-tachyon/.classpath"/>
+    </selectedElements>
+</jardesc>
