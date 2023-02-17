@@ -56,6 +56,7 @@ public class AiffTool {
     public static final int AIFF_COMM_FL32 = 0x666C3332; // "fl32"
     public static final int AIFF_COMM_FL32b = 0x464C3332; // "FL32"
     public static final int AIFF_COMM_FL64 = 0x666C3634; // "fl64"
+    public static final int AIFF_COMM_FL64b = 0x464c3634; // "FL64
     public static final int AIFF_COMM_IMA_ADPCM = 0x696D6134; // "ima4"
     public static final int AIFF_FVER_TIME_STAMP = 0xA2805140; // May 23, 1990, 2:40pm
 
@@ -89,6 +90,15 @@ public class AiffTool {
         } else {
             return AIFF_COMM_UNSPECIFIED;
         }
+    }
+    
+    public static void main(String[] args) {
+        int b0 = 'F';
+        int b1 = 'L';
+        int b2 = '6';
+        int b3 = '4';
+        int value = (b0 << 24) + (b1 << 16) + (b2 << 8) + b3;
+        System.out.println(Integer.toHexString(value));
     }
 
 }

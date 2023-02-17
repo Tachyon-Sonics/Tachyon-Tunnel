@@ -45,7 +45,6 @@
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file.mpeg"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.dsp.processor"/>
-        <file path="/tritonus-tachyon/.project"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.lowlevel.pvorbis"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.midi.sb.fluidsynth"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.dsp.ais"/>
@@ -55,6 +54,5 @@
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.convert.lame"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.midi.file"/>
         <folder path="/tritonus-tachyon/src/META-INF"/>
-        <file path="/tritonus-tachyon/.classpath"/>
     </selectedElements>
 </jardesc>

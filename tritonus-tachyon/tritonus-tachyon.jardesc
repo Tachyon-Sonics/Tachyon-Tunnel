@@ -12,14 +12,11 @@
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share"/>
-        <file path="/tritonus-tachyon/.project"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled.file"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled.convert"/>
-        <file path="/tritonus-tachyon/tritonus-tachyon-full.jardesc"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.core"/>
         <folder path="/tritonus-tachyon/src/META-INF"/>
-        <file path="/tritonus-tachyon/.classpath"/>
     </selectedElements>
 </jardesc>

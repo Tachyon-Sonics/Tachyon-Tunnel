@@ -101,7 +101,7 @@ public class AiffAudioFileReader extends TAudioFileReader {
                 // Float 32
                 encoding = Encodings.PCM_IEEE_FLOAT;
                 nSampleSize = 32;
-            } else if (nEncoding == AiffTool.AIFF_COMM_FL64) {
+            } else if (nEncoding == AiffTool.AIFF_COMM_FL64 || nEncoding == AiffTool.AIFF_COMM_FL64b) {
                 // Float 64
                 encoding = Encodings.PCM_IEEE_FLOAT;
                 nSampleSize = 64;
