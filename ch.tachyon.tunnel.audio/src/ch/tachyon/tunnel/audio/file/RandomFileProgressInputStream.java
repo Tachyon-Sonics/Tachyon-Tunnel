@@ -18,6 +18,7 @@ import ch.tachyon.tunnel.audio.utils.*;
 public class RandomFileProgressInputStream extends RandomFileInputStream {
 
     private final IProgressMonitor progress;
+    private boolean closed;
 
 
     public RandomFileProgressInputStream(File file) throws IOException {
@@ -39,6 +40,7 @@ public class RandomFileProgressInputStream extends RandomFileInputStream {
     public void close() throws IOException {
         updateProgress();
         super.close();
+        closed = true;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class RandomFileProgressInputStream extends RandomFileInputStream {
     }
     
     private void updateProgress() throws IOException {
-        if (progress == null)
+        if (progress == null || closed)
             return;
         double pos = (double) super.getFilePointer() / (double) super.getFileSize();
         progress.setProgress(pos, 1.0);
