@@ -51,7 +51,7 @@ public class WaveTool {
     public static final int WAVE_JUNK_MAGIC = 0x4a554e4b; // "JUNK"
     public static final int WAVE_DS64_MAGIC = 0x64733634; // "ds64"
     public static final int WAVE_FMT_MAGIC = 0x666D7420; // "fmt "
-    public static final int WAVE_DATA_MAGIC = 0x64617461; // "DATA"
+    public static final int WAVE_DATA_MAGIC = 0x64617461; // "data"
     public static final int WAVE_FACT_MAGIC = 0x66616374; // "fact"
 
     public static final long AUDIO_UNKNOWN_SIZE = 0xFFFFFFFFL;

@@ -11,6 +11,7 @@
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.file"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.share.sampled.convert"/>
+        <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.sampled.convert"/>
         <file path="/tritonus-tachyon/tritonus-tachyon-full.jardesc"/>
         <javaElement handleIdentifier="=tritonus-tachyon/src&lt;org.tritonus.core"/>
         <folder path="/tritonus-tachyon/src/META-INF"/>

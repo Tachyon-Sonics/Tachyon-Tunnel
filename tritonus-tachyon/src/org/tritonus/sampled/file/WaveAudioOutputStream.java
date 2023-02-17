@@ -49,6 +49,7 @@ public class WaveAudioOutputStream extends TAudioOutputStream {
 
     // this constant is used for chunk lengths when the length is not known yet
     private static final int LENGTH_NOT_KNOWN = -1;
+    private boolean junkChunkWritten = false;
 
 
     public WaveAudioOutputStream(AudioFormat audioFormat,
@@ -88,7 +89,7 @@ public class WaveAudioOutputStream extends TAudioOutputStream {
             formatChunkAdd += 2;
         }
         int dataOffset = WaveTool.DATA_OFFSET + formatChunkAdd;
-        if (formatCode != WaveTool.WAVE_FORMAT_PCM) {
+        if (formatCode != WaveTool.WAVE_FORMAT_PCM && formatCode != WaveTool.WAVE_FORMAT_FLOAT) {
             // space for fact chunk
             dataOffset += WaveTool.MIN_FACT_CHUNK_LENGTH + WaveTool.CHUNK_HEADER_SIZE;
         }
@@ -100,6 +101,13 @@ public class WaveAudioOutputStream extends TAudioOutputStream {
         }
 
         long RIFF_Size = lDataChunkSize + dataOffset - WaveTool.CHUNK_HEADER_SIZE;
+        if (lLength != AudioSystem.NOT_SPECIFIED && RIFF_Size > 0xFFFFFFFFL) {
+            // Will write a ds64 chunk
+            RIFF_Size += WaveTool.MIN_DS64_CHUNK_LENGTH + WaveTool.CHUNK_HEADER_SIZE;
+        } else if (lLength == AudioSystem.NOT_SPECIFIED || junkChunkWritten) {
+            // Will write a JUNK chunk
+            RIFF_Size += WaveTool.MIN_DS64_CHUNK_LENGTH + WaveTool.CHUNK_HEADER_SIZE;
+        }
         if (lLength == AudioSystem.NOT_SPECIFIED) {
             RIFF_Size = WaveTool.AUDIO_UNKNOWN_SIZE;
         }
@@ -114,25 +122,23 @@ public class WaveAudioOutputStream extends TAudioOutputStream {
         dos.writeLittleEndian32(crop(RIFF_Size));
         dos.writeInt(WaveTool.WAVE_WAVE_MAGIC);
 
-        if (lLength == AudioSystem.NOT_SPECIFIED) {
-            // Write a JUNK chunk that we can patch later
-            if (RIFF_Size != WaveTool.AUDIO_UNKNOWN_SIZE)
-                RIFF_Size += WaveTool.MIN_DS64_CHUNK_LENGTH + WaveTool.CHUNK_HEADER_SIZE;
-            dos.writeInt(WaveTool.WAVE_JUNK_MAGIC);
-            dos.writeLittleEndian32(WaveTool.MIN_DS64_CHUNK_LENGTH);
-            dos.writeLittleEndian64(0);
-            dos.writeLittleEndian64(0);
-            dos.writeLittleEndian64(0);
-            dos.writeLittleEndian32(0);
-        } else if (RIFF_Size > 0xFFFFFFFFL) {
+        if (lLength != AudioSystem.NOT_SPECIFIED && RIFF_Size > 0xFFFFFFFFL) {
             // Write a ds64 chunk
-            RIFF_Size += WaveTool.MIN_DS64_CHUNK_LENGTH + WaveTool.CHUNK_HEADER_SIZE;
             dos.writeInt(WaveTool.WAVE_DS64_MAGIC);
             dos.writeLittleEndian32(WaveTool.MIN_DS64_CHUNK_LENGTH);
             dos.writeLittleEndian64(RIFF_Size);
             dos.writeLittleEndian64(lLength);
             dos.writeLittleEndian64(lLength / (long) format.getFrameSize());
             dos.writeLittleEndian32(0); // Table length: 0
+        } else if (lLength == AudioSystem.NOT_SPECIFIED || junkChunkWritten) {
+            // Write a JUNK chunk that we can patch later (or rewrite it)
+            dos.writeInt(WaveTool.WAVE_JUNK_MAGIC);
+            dos.writeLittleEndian32(WaveTool.MIN_DS64_CHUNK_LENGTH);
+            dos.writeLittleEndian64(0);
+            dos.writeLittleEndian64(0);
+            dos.writeLittleEndian64(0);
+            dos.writeLittleEndian32(0);
+            junkChunkWritten = true;
         }
 
         // write fmt_ chunk
@@ -169,7 +175,7 @@ public class WaveAudioOutputStream extends TAudioOutputStream {
 
         // write fact chunk
 
-        if (formatCode != WaveTool.WAVE_FORMAT_PCM) {
+        if (formatCode != WaveTool.WAVE_FORMAT_PCM && formatCode != WaveTool.WAVE_FORMAT_FLOAT) {
             // write "fact" chunk: number of samples
             // todo: add this as an attribute or property
             // in AudioOutputStream or AudioInputStream

@@ -105,8 +105,9 @@ public class AudioFileIO {
      * Save an audio source to a stream. This method will fully read the given source, encode using the given format and write the result to the
      * specified stream.
      * <p>
-     * This method will throw an {@link IllegalArgumentException} if the file format length is unspecified and the file format does not support unspecified
-     * length (actually only AU supports unspecified length because there is no API to ask for that feature). If the file format length is unspecified, you
+     * This method will throw an {@link IllegalArgumentException} if the file format length is unspecified, the output stream is not a {@link FileOutputStream},
+     * and the file format does not support unspecified length (actually only AU supports unspecified length because there is no API to ask for that feature).
+     * If the file format length is unspecified, you
      * must use {@link #saveAudioFile(IMultiChanAudioSource, File, AudioFileFormat, IProgressMonitor)} instead, which is able to seek backward
      * and patch the header with the actual length before closing the file.
      * @param audioSource the audio data
@@ -117,7 +118,9 @@ public class AudioFileIO {
      * @throws OperationAbortedException if the operation was aborted by the progress monitor
      */
     public static void saveAudioFile(IMultiChanAudioSource audioSource, OutputStream target, AudioFileFormat saveFormat, IProgressMonitor progress) throws IOException, OperationAbortedException {
-        if (getNbFrames(saveFormat) == AudioSystem.NOT_SPECIFIED && !saveFormat.getType().equals(Type.AU))
+        if (getNbFrames(saveFormat) == AudioSystem.NOT_SPECIFIED 
+                && !(target instanceof FileOutputStream)
+                && !saveFormat.getType().equals(Type.AU))
             throw new IllegalArgumentException("Writing to a stream with unspecified length is not allowed");
         AudioSourceInputStream source = AudioSourceInputStream.createAudioSourceInputStream(audioSource, saveFormat.getFormat(), progress, getNbFrames(saveFormat));
         AudioInputStream input = new AudioInputStream(source, saveFormat.getFormat(), getNbFrames(saveFormat));
