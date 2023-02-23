@@ -1,7 +1,9 @@
 package ch.tachyon.tritonus.test.aiff;
 
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,6 +22,7 @@ import org.junit.Test;
 import org.tritonus.share.sampled.file.TAudioFileFormat;
 
 import ch.tachyon.tritonus.test.util.FfmpegAudioFileChecker;
+import ch.tachyon.tritonus.test.util.IffUtils;
 import ch.tachyon.tritonus.test.util.TestAudioSource;
 import ch.tachyon.tunnel.audio.file.AudioFileFormatEx;
 import ch.tachyon.tunnel.audio.file.AudioFileIO;
@@ -28,10 +31,10 @@ import ch.tachyon.tunnel.common.IMultiChanAudioSource;
 
 public class AiffFileTest {
 
-
     private static final int AUDIO_FRAME_LENGTH = 10000;
 	private final List<AudioFormat> formats;
 
+	
     public AiffFileTest() {
         formats = new ArrayList<>();
         addFormat(2, 44100.0f, 16, Encoding.PCM_SIGNED);
@@ -187,11 +190,53 @@ public class AiffFileTest {
         assert format.getEncoding().equals(expectedFormat.getEncoding());
         assert format.getSampleSizeInBits() == expectedFormat.getSampleSizeInBits();
 
-        // TODO [qt] AIFF check content?
+        // Check content
+        FileInputStream fInput = new FileInputStream(outputFile);
+        DataInputStream input = new DataInputStream(fInput);
+        
+        String formId = IffUtils.readChunkId(input);
+        assert formId.equals("FORM");
+        int fileLength = input.readInt();
+        assert fInput.getChannel().size() == fileLength + 8;
+        String aiffId = IffUtils.readChunkId(input);
+        assert aiffId.equals("AIFF") || aiffId.equals("AIFC");
+        if (aiffId.equals("AIFC")) {
+        	String fverId = IffUtils.readChunkId(input);
+        	assert fverId.equals("FVER");
+        	int fverLength = input.readInt();
+        	assert fverLength == 4;
+        	assert input.readInt() == 0xA2805140;
+        }
+        
+        String commId = IffUtils.readChunkId(input);
+        assert commId.equals("COMM");
+        int commSize = input.readInt();
+        if (aiffId.equals("AIFC"))
+        	assert commSize == 24;
+        else
+        	assert commSize == 18;
+        int nbChans = input.readShort();
+        assert nbChans == expectedFormat.getChannels();
+        int frameLength = input.readInt();
+        assert frameLength == length;
+        int sizeInBits = input.readShort();
+        assert sizeInBits == expectedFormat.getSampleSizeInBits();
+        input.skipBytes(10); // Skip sample rate
+        if (aiffId.equals("AIFC")) {
+        	input.skipBytes(6); // Skip format code & name
+        }
+        String ssndId = IffUtils.readChunkId(input);
+        assert ssndId.equals("SSND");
+        int ssndSize = input.readInt();
+        assert ssndSize == fInput.getChannel().size() - fInput.getChannel().position();
+        int ssndOffset = input.readInt();
+        assert ssndOffset == 0;
+        int ssndBlockSize = input.readInt();
+        assert ssndBlockSize == 0;
+        input.close();
         
         // Check with ffmpeg
         FfmpegAudioFileChecker.assertAudioFileSane(outputFile);
     }
-
 
 }

@@ -6,17 +6,9 @@ import javax.sound.sampled.*;
 
 import org.tritonus.sampled.file.*;
 
-class WaveFileUtils {
+import ch.tachyon.tritonus.test.util.IffUtils;
 
-    static String readChunkId(InputStream input) throws IOException {
-        long b0 = input.read();
-        long b1 = input.read();
-        long b2 = input.read();
-        long b3 = input.read();
-        if ((b0 | b1 | b2 | b3) < 0)
-            throw new EOFException();
-        return "" + (char) b0 + (char) b1 + (char) b2 + (char) b3;
-    }
+class WaveFileUtils {
 
     static int readLittleEndianInt(InputStream input) throws IOException {
         int b0 = input.read();
@@ -55,7 +47,7 @@ class WaveFileUtils {
             WaveExtraChunkType extraChunk) throws FileNotFoundException, IOException {
         // Check RIFF size value
         FileInputStream input = new FileInputStream(outputFile);
-        String riffId = WaveFileUtils.readChunkId(input);
+        String riffId = IffUtils.readChunkId(input);
         if (extraChunk == WaveExtraChunkType.DS64)
             assert riffId.equals("RF64");
         else
@@ -66,17 +58,17 @@ class WaveFileUtils {
         else
             assert riffLength == AudioSystem.NOT_SPECIFIED;
 
-        String waveId = readChunkId(input);
+        String waveId = IffUtils.readChunkId(input);
         assert waveId.equals("WAVE");
 
         Ds64Chunk ds64Chunk = null;
         if (extraChunk == WaveExtraChunkType.JUNK) {
-            String junkId = readChunkId(input);
+            String junkId = IffUtils.readChunkId(input);
             assert junkId.equals("JUNK");
             int ckLength = readLittleEndianInt(input);
             skip(input, ckLength);
         } else if (extraChunk == WaveExtraChunkType.DS64) {
-            String ds64Id = readChunkId(input);
+            String ds64Id = IffUtils.readChunkId(input);
             assert ds64Id.equals("ds64");
             int ckLength = readLittleEndianInt(input);
             assert ckLength == 28;
@@ -90,12 +82,12 @@ class WaveFileUtils {
             ds64Chunk = new Ds64Chunk(riffLengthL, dataLengthL, frameLengthL);
         }
 
-        String fmtId = readChunkId(input);
+        String fmtId = IffUtils.readChunkId(input);
         assert fmtId.equals("fmt ");
         int ckLength = readLittleEndianInt(input);
         skip(input, ckLength);
 
-        String dataId = readChunkId(input);
+        String dataId = IffUtils.readChunkId(input);
         assert dataId.equals("data");
         ckLength = readLittleEndianInt(input);
 

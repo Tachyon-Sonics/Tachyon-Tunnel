@@ -2,13 +2,11 @@ package ch.tachyon.tritonus.test.au;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -24,6 +22,7 @@ import org.junit.Test;
 import org.tritonus.share.sampled.file.TAudioFileFormat;
 
 import ch.tachyon.tritonus.test.util.FfmpegAudioFileChecker;
+import ch.tachyon.tritonus.test.util.IffUtils;
 import ch.tachyon.tritonus.test.util.TestAudioSource;
 import ch.tachyon.tunnel.audio.file.AudioFileFormatEx;
 import ch.tachyon.tunnel.audio.file.AudioFileIO;
@@ -220,7 +219,7 @@ public class AuFileTest {
         FileInputStream fInput = new FileInputStream(outputFile);
         DataInputStream input = new DataInputStream(fInput);
         
-        String fileId = readChunkId(input);
+        String fileId = IffUtils.readChunkId(input);
         assert fileId.equals(".snd");
         int dataOffset = input.readInt();
         int fLength = input.readInt();
@@ -249,16 +248,5 @@ public class AuFileTest {
         
         // TODO [qt] AU test large and huge files
     }
-
-    private static String readChunkId(InputStream input) throws IOException {
-        long b0 = input.read();
-        long b1 = input.read();
-        long b2 = input.read();
-        long b3 = input.read();
-        if ((b0 | b1 | b2 | b3) < 0)
-            throw new EOFException();
-        return "" + (char) b0 + (char) b1 + (char) b2 + (char) b3;
-    }
-
 
 }
