@@ -19,6 +19,7 @@ import javax.sound.sampled.AudioFormat.Encoding;
 import org.junit.Test;
 import org.tritonus.share.sampled.file.TAudioFileFormat;
 
+import ch.tachyon.tritonus.test.util.FfmpegAudioFileChecker;
 import ch.tachyon.tritonus.test.util.TestAudioSource;
 import ch.tachyon.tunnel.audio.file.AudioFileFormatEx;
 import ch.tachyon.tunnel.audio.file.AudioFileIO;
@@ -174,6 +175,7 @@ public class AiffFileTest {
 
     private void checkResult(long length, AudioFormat expectedFormat, AudioFileFormat.Type type, File outputFile)
             throws IOException, UnsupportedAudioFileException, FileNotFoundException {
+    	// Check format
         TAudioFileFormat fileFormat = (TAudioFileFormat) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
         AudioFormat format = fileFormat.getFormat();
         assert fileFormat.getFrameLengthEx() == length;
@@ -186,6 +188,9 @@ public class AiffFileTest {
         assert format.getSampleSizeInBits() == expectedFormat.getSampleSizeInBits();
 
         // TODO [qt] AIFF check content?
+        
+        // Check with ffmpeg
+        FfmpegAudioFileChecker.assertAudioFileSane(outputFile);
     }
 
 

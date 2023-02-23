@@ -5,7 +5,7 @@ import ch.tachyon.tunnel.audio.utils.*;
 
 public class ConsoleProgressMonitor implements IProgressMonitor {
 
-    private final int LENGTH = 78;
+    private final int LENGTH = 75; // + 4 for "< " and " >"
     private int lastPercent = 0;
 
 
