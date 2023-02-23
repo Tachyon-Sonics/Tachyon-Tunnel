@@ -8,8 +8,6 @@ import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFormat.*;
 
 import org.junit.*;
-import org.tritonus.share.sampled.file.*;
-
 import ch.tachyon.tritonus.test.util.FfmpegAudioFileChecker;
 import ch.tachyon.tritonus.test.util.TestAudioSource;
 import ch.tachyon.tunnel.audio.file.*;
@@ -163,9 +161,9 @@ public class WaveFileTest {
             WaveExtraChunkType extraChunk, File outputFile)
             throws IOException, UnsupportedAudioFileException, FileNotFoundException {
     	// Check format
-        TAudioFileFormat fileFormat = (TAudioFileFormat) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
+        AudioFileFormatEx fileFormat = (AudioFileFormatEx) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
         AudioFormat format = fileFormat.getFormat();
-        assert fileFormat.getFrameLengthEx() == length;
+        assert fileFormat.getFrameLengthLong() == length;
         assert fileFormat.getFrameLength() == (int) length;
         assert fileFormat.getType() == type;
         assert format.getChannels() == expectedFormat.getChannels();

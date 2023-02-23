@@ -1,6 +1,8 @@
 package ch.tachyon.tunnel.audio.file;
 
 import java.io.*;
+import java.util.*;
+
 import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.spi.*;
@@ -83,6 +85,31 @@ public class AudioFileIO {
     }
     
     /**
+     * Get the {@link AudioFormat} from an {@link AudioFileFormat}, adding the properties of the {@link AudioFileFormat}
+     * into the properties of the resulting {@link AudioFormat}.
+     * <p>
+     * This is used when writing an audio file, because {@link AudioFileWriter}s do not have access to the {@link AudioFileFormat}.
+     * This method allow us to transfer any file properties to the {@link AudioFileWriter} by putting them in to
+     * {@link AudioFormat}.
+     */
+    private static AudioFormat saveFormatOf(AudioFileFormat fileFormat) {
+        AudioFormat format = fileFormat.getFormat();
+        Map<String, Object> properties = new HashMap<>();
+        properties.putAll(fileFormat.properties());
+        properties.putAll(format.properties());
+        AudioFormat result = new AudioFormat(
+                format.getEncoding(), 
+                format.getSampleRate(), 
+                format.getSampleSizeInBits(), 
+                format.getChannels(), 
+                format.getFrameSize(), 
+                format.getFrameRate(), 
+                format.isBigEndian(), 
+                properties);
+        return result;
+    }
+    
+    /**
      * Save an audio source to a file. This method will fully read the given source, encode using the given format and write the result to the
      * specified file.
      * @param audioSource the audio data
@@ -92,7 +119,7 @@ public class AudioFileIO {
      * @throws IOException 
      */
     public static void saveAudioFile(IMultiChanAudioSource audioSource, File outputFile, AudioFileFormat saveFormat, IProgressMonitor progress) throws IOException {
-        AudioInputStream input = AudioSourceInputStream.createAudioInputStream(audioSource, saveFormat.getFormat(), progress, getNbFrames(saveFormat));
+        AudioInputStream input = AudioSourceInputStream.createAudioInputStream(audioSource, saveFormatOf(saveFormat), progress, getNbFrames(saveFormat));
         try {
             AudioFileTypes.write(input, saveFormat.getType(), outputFile);
         } finally {
@@ -123,7 +150,7 @@ public class AudioFileIO {
                 && !saveFormat.getType().equals(Type.AU))
             throw new IllegalArgumentException("Writing to a stream with unspecified length is not allowed");
         AudioSourceInputStream source = AudioSourceInputStream.createAudioSourceInputStream(audioSource, saveFormat.getFormat(), progress, getNbFrames(saveFormat));
-        AudioInputStream input = new AudioInputStream(source, saveFormat.getFormat(), getNbFrames(saveFormat));
+        AudioInputStream input = new AudioInputStream(source, saveFormatOf(saveFormat), getNbFrames(saveFormat));
         try {
             AudioFileTypes.write(input, saveFormat.getType(), target);
         } finally {
@@ -150,7 +177,7 @@ public class AudioFileIO {
         if (getNbFrames(saveFormat) == AudioSystem.NOT_SPECIFIED && !saveFormat.getType().equals(Type.AU))
             throw new IllegalArgumentException("Writing to a stream with unspecified length is not allowed");
         AudioSourceInputStream source = AudioSourceInputStream.createAudioSourceInputStream(audioSource, saveFormat.getFormat(), progress, getNbFrames(saveFormat));
-        final AudioInputStream input = new AudioInputStream(source, saveFormat.getFormat(), getNbFrames(saveFormat));
+        final AudioInputStream input = new AudioInputStream(source, saveFormatOf(saveFormat), getNbFrames(saveFormat));
         final PipedOutputStream pipeOut = new PipedOutputStream();
         PipedInputStream pipeIn = new PipedInputStream(pipeOut);
         new Thread(new Runnable() {

@@ -19,8 +19,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.AudioFormat.Encoding;
 
 import org.junit.Test;
-import org.tritonus.share.sampled.file.TAudioFileFormat;
-
 import ch.tachyon.tritonus.test.util.FfmpegAudioFileChecker;
 import ch.tachyon.tritonus.test.util.IffUtils;
 import ch.tachyon.tritonus.test.util.TestAudioSource;
@@ -53,7 +51,7 @@ public class AiffFileTest {
     }
 
     private void addFormat(int nbChans, float sampleRate, int nbBits, Encoding encoding) {
-        formats.add(new AudioFormat(encoding, sampleRate, nbBits, nbChans, nbBits * nbChans / 8, sampleRate, false));
+        formats.add(new AudioFormat(encoding, sampleRate, nbBits, nbChans, nbBits * nbChans / 8, sampleRate, true));
     }
 
     @Test
@@ -179,9 +177,9 @@ public class AiffFileTest {
     private void checkResult(long length, AudioFormat expectedFormat, AudioFileFormat.Type type, File outputFile)
             throws IOException, UnsupportedAudioFileException, FileNotFoundException {
     	// Check format
-        TAudioFileFormat fileFormat = (TAudioFileFormat) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
+        AudioFileFormatEx fileFormat = (AudioFileFormatEx) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
         AudioFormat format = fileFormat.getFormat();
-        assert fileFormat.getFrameLengthEx() == length;
+        assert fileFormat.getFrameLengthLong() == length;
         assert fileFormat.getFrameLength() == (int) length;
         assert fileFormat.getType() == type;
         assert format.getChannels() == expectedFormat.getChannels();

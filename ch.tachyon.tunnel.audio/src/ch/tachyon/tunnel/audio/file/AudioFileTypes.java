@@ -569,7 +569,14 @@ public class AudioFileTypes {
                 try {
                     if (!threadSafe.get())
                         readLock.lock();
-                    return reader.getAudioFileFormat(fileInput);
+                    AudioFileFormat result = reader.getAudioFileFormat(fileInput);
+                    if (result instanceof TAudioFileFormat) {
+                        TAudioFileFormat taff = (TAudioFileFormat) result;
+                        if (taff.getFrameLengthEx() != -1L) {
+                            result = new AudioFileFormatEx(result.getType(), result.getFormat(), taff.getFrameLengthEx(), result.properties());
+                        }
+                    }
+                    return result;
                 } catch (IOException ex) {
                     Debug.warn(ex);
                 } catch (UnsupportedAudioFileException ex) {
@@ -587,7 +594,14 @@ public class AudioFileTypes {
         }
 
         // Failed. Fallback to JavaSound (try all readers)
-        return AudioSystem.getAudioFileFormat(fileInput);
+        AudioFileFormat result = AudioSystem.getAudioFileFormat(fileInput);
+        if (result instanceof TAudioFileFormat) {
+            TAudioFileFormat taff = (TAudioFileFormat) result;
+            if (taff.getFrameLengthEx() != -1L) {
+                result = new AudioFileFormatEx(result.getType(), result.getFormat(), taff.getFrameLengthEx(), result.properties());
+            }
+        }
+        return result;
     }
     
     private static boolean isJreSupportedFormat(String fileName) {

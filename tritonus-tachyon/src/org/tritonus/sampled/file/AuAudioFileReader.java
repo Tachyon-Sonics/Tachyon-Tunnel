@@ -179,11 +179,13 @@ public class AuAudioFileReader extends TAudioFileReader {
             if (inputStream instanceof FileInputStream) {
                 FileInputStream fileInputStream = (FileInputStream) inputStream;
                 long fileSize = fileInputStream.getChannel().size();
-                dataLength = fileSize - nDataOffset;
+                long position = fileInputStream.getChannel().position();
+                dataLength = fileSize - position;
             } else if (inputStream instanceof RandomFileInputStream) {
                 RandomFileInputStream rfis = (RandomFileInputStream) inputStream;
                 long fileSize = rfis.getFileSize();
-                dataLength = fileSize - nDataOffset;
+                long position = rfis.getFilePointer();
+                dataLength = fileSize - position;
             }
         }
 

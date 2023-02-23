@@ -2,19 +2,14 @@ package ch.tachyon.tritonus.test.wave;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.concurrent.atomic.*;
-
 import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFormat.*;
 
 import org.junit.*;
-import org.tritonus.sampled.file.*;
 import org.tritonus.share.sampled.*;
-import org.tritonus.share.sampled.file.*;
-
 import ch.tachyon.tritonus.test.util.ConsoleProgressMonitor;
 import ch.tachyon.tritonus.test.util.TestAudioSource;
-import ch.tachyon.tritonus.test.util.ZeroPaddedRandomAccessFile;
+import ch.tachyon.tritonus.test.util.ZeroPaddedFileOutputStream;
 import ch.tachyon.tunnel.audio.file.*;
 import ch.tachyon.tunnel.audio.file.AudioFileTypes;
 import ch.tachyon.tunnel.audio.utils.*;
@@ -55,7 +50,7 @@ public class LargeWaveFileTest {
     static void doTestWriteLargeAudioFile(long length, int nbChans, float sampleRate, int bits, Encoding encoding,
             AudioFileFormat.Type type, WaveExtraChunkType extraChunk) throws IOException, UnsupportedAudioFileException {
         File outputFile = File.createTempFile("Output", ".wav");
-        AtomicLong fileLength = new AtomicLong();
+        long fileLength = -1;
         {
             AudioFormat format = new AudioFormat(encoding, sampleRate, bits, nbChans, bits * nbChans / 8,
                     sampleRate, false);
@@ -64,52 +59,31 @@ public class LargeWaveFileTest {
             IProgressMonitor progress = new ConsoleProgressMonitor();
             IMultiChanAudioSource audioSource = new TestAudioSource(length, nbChans, sampleRate, bits, progress);
 
-            AudioInputStream input = AudioSourceInputStream.createAudioInputStream(audioSource, fileFormat.getFormat(),
-                    null, length);
-            WaveAudioFileWriter writer = new WaveAudioFileWriter() {
-
-                /**
-                 * Overriden so we can replace the output stream using a version based on {@link ZeroPaddedRandomAccessFile}
-                 * to prevent actually writing a huge file.
-                 */
-                @Override
-                protected int writeImpl(AudioInputStream audioInputStream, AudioOutputStream audioOutputStream, boolean bNeedsConversion) throws IOException {
-                    AudioFormat format = audioOutputStream.getFormat();
-                    long length = audioOutputStream.getLength();
-                    audioOutputStream.close(); // Close previous file
-                    // Reopen as a zero padded file
-                    ZeroPaddedRandomAccessFile zpraf = new ZeroPaddedRandomAccessFile(outputFile, 1000, 0);
-                    // Create patched output stream
-                    WaveAudioOutputStream mockStream = new WaveAudioOutputStream(format, length, zpraf);
-                    int result = super.writeImpl(audioInputStream, mockStream, bNeedsConversion);
-                    fileLength.set(zpraf.length());
-                    return result;
-                }
-
-            };
-            writer.write(input, fileFormat.getType(), outputFile);
+            ZeroPaddedFileOutputStream output = new ZeroPaddedFileOutputStream(outputFile, 1000);
+            AudioFileIO.saveAudioFile(audioSource, output, fileFormat, progress);
+            fileLength = output.getLength();
         }
         {
-            // No need to patch here as we will not read past the initial headers
-            AudioFileFormat fileFormat = AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
-            AudioFormat format = fileFormat.getFormat();
-            if (length > 0x7FFFFFFFL) {
-                AudioFileFormatEx fileFormatEx = (AudioFileFormatEx) fileFormat;
-                assert fileFormatEx.getFrameLengthLong() == length;
-            }
-            assert fileFormat.getFrameLength() == crop(length);
-            assert fileFormat.getType() == type;
-            assert format.getChannels() == nbChans;
-            assert format.getSampleRate() == sampleRate;
-            assert format.getFrameRate() == sampleRate;
-            assert format.getEncoding().equals(encoding);
-            assert format.getSampleSizeInBits() == bits;
+        	// No need to zero pad here as we will not read past the initial headers
+        	AudioFileFormat fileFormat = AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
+        	AudioFormat format = fileFormat.getFormat();
+        	if (length > 0x7FFFFFFFL || fileFormat instanceof AudioFileFormatEx) {
+        		AudioFileFormatEx fileFormatEx = (AudioFileFormatEx) fileFormat;
+        		assert fileFormatEx.getFrameLengthLong() == length;
+        	}
+        	assert fileFormat.getFrameLength() == crop(length);
+        	assert fileFormat.getType() == type;
+        	assert format.getChannels() == nbChans;
+        	assert format.getSampleRate() == sampleRate;
+        	assert format.getFrameRate() == sampleRate;
+        	assert format.getEncoding().equals(encoding);
+        	assert format.getSampleSizeInBits() == bits;
 
-            WaveFileUtils.checkContent(outputFile, fileLength.get(), length, extraChunk);
+        	WaveFileUtils.checkContent(outputFile, fileLength, length, extraChunk);
         }
         Files.delete(outputFile.toPath());
     }
-
+    
     private static int crop(long length) {
         if (length > 0x7FFFFFFFL)
             return -1;

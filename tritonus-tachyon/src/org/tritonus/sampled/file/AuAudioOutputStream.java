@@ -48,7 +48,7 @@ import org.tritonus.share.sampled.file.TDataOutputStream;
 
 public class AuAudioOutputStream extends TAudioOutputStream {
 
-    private static String description = "Created by Tritonus";
+    private static final String DEFAULT_DESCRIPTION = "Created by Tritonus";
 
 
     /**
@@ -115,13 +115,18 @@ public class AuAudioOutputStream extends TAudioOutputStream {
             TDebug.out("AuAudioOutputStream.writeHeader(): length: " + lLength);
         }
 
+        String title = DEFAULT_DESCRIPTION;
+        Object givenTitle = super.getFormat().getProperty("title");
+        if (givenTitle != null && (givenTitle instanceof String))
+            title = (String) givenTitle;
+
         dos.writeInt(AuTool.AU_HEADER_MAGIC);
-        dos.writeInt(AuTool.DATA_OFFSET + getTextLength(description));
+        dos.writeInt(AuTool.DATA_OFFSET + getTextLength(title));
         dos.writeInt((lLength != AudioSystem.NOT_SPECIFIED && lLength <= 0x7FFFFFFFl) ? ((int) lLength) : AuTool.AUDIO_UNKNOWN_SIZE);
         dos.writeInt(AuTool.getFormatCode(format));
         dos.writeInt((int) format.getSampleRate());
         dos.writeInt(format.getChannels());
-        writeText(dos, description);
+        writeText(dos, title);
     }
 
     @Override

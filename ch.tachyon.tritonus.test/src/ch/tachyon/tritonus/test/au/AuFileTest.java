@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -19,8 +21,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.AudioFormat.Encoding;
 
 import org.junit.Test;
-import org.tritonus.share.sampled.file.TAudioFileFormat;
-
 import ch.tachyon.tritonus.test.util.FfmpegAudioFileChecker;
 import ch.tachyon.tritonus.test.util.IffUtils;
 import ch.tachyon.tritonus.test.util.TestAudioSource;
@@ -53,7 +53,7 @@ public class AuFileTest {
     }
 
     private void addFormat(int nbChans, float sampleRate, int nbBits, Encoding encoding) {
-        formats.add(new AudioFormat(encoding, sampleRate, nbBits, nbChans, nbBits * nbChans / 8, sampleRate, false));
+        formats.add(new AudioFormat(encoding, sampleRate, nbBits, nbChans, nbBits * nbChans / 8, sampleRate, true));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class AuFileTest {
             AudioFileIO.saveAudioFile(audioSource, outputFile, fileFormat, null);
         }
 
-        checkResult(length, format, type, outputFile, false);
+        checkResult(length, format, type, outputFile, false, "Created by Tritonus");
         Files.delete(outputFile.toPath());
     }
 
@@ -138,11 +138,13 @@ public class AuFileTest {
         {
             IMultiChanAudioSource audioSource = new TestAudioSource(length, format.getChannels(),
                     format.getSampleRate(), format.getSampleSizeInBits(), null);
-            AudioFileFormat fileFormat = new AudioFileFormatEx(type, format, length);
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("title", "Test Song Title");
+            AudioFileFormat fileFormat = new AudioFileFormatEx(type, format, length, properties);
             AudioFileIO.saveAudioFile(audioSource, new FileOutputStream(outputFile), fileFormat, null);
         }
 
-        checkResult(length, format, type, outputFile, false);
+        checkResult(length, format, type, outputFile, false, "Test Song Title");
         Files.delete(outputFile.toPath());
     }
 
@@ -156,7 +158,7 @@ public class AuFileTest {
             AudioFileIO.saveAudioFile(audioSource, output, fileFormat, null);
         }
 
-        checkResult(length, format, type, outputFile, false);
+        checkResult(length, format, type, outputFile, false, "Created by Tritonus");
         Files.delete(outputFile.toPath());
     }
 
@@ -169,7 +171,7 @@ public class AuFileTest {
             AudioFileIO.saveAudioFile(audioSource, outputFile, fileFormat, null);
         }
 
-        checkResult(length, format, type, outputFile, false);
+        checkResult(length, format, type, outputFile, false, "Created by Tritonus");
         Files.delete(outputFile.toPath());
     }
 
@@ -182,7 +184,7 @@ public class AuFileTest {
             AudioFileIO.saveAudioFile(audioSource, new FileOutputStream(outputFile), fileFormat, null);
         }
 
-        checkResult(length, format, type, outputFile, false);
+        checkResult(length, format, type, outputFile, false, "Created by Tritonus");
         Files.delete(outputFile.toPath());
     }
 
@@ -196,17 +198,17 @@ public class AuFileTest {
             AudioFileIO.saveAudioFile(audioSource, output, fileFormat, null);
         }
 
-        checkResult(length, format, type, outputFile, true);
+        checkResult(length, format, type, outputFile, true, "Created by Tritonus");
         Files.delete(outputFile.toPath());
     }
 
     private void checkResult(long length, AudioFormat expectedFormat, AudioFileFormat.Type type, File outputFile,
-    		boolean unknownLength)
+    		boolean unknownLength, String songTitle)
             throws IOException, UnsupportedAudioFileException, FileNotFoundException {
     	// Check format
-        TAudioFileFormat fileFormat = (TAudioFileFormat) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
+        AudioFileFormatEx fileFormat = (AudioFileFormatEx) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
         AudioFormat format = fileFormat.getFormat();
-        assert fileFormat.getFrameLengthEx() == length;
+        assert fileFormat.getFrameLengthLong() == length;
         assert fileFormat.getFrameLength() == (int) length;
         assert fileFormat.getType() == type;
         assert format.getChannels() == expectedFormat.getChannels();
@@ -235,18 +237,18 @@ public class AuFileTest {
         int channels = input.readInt();
         assert channels == format.getChannels();
         int toSkip = dataOffset - (int) fInput.getChannel().position();
-        for (int i = 0; i < toSkip; i++) {
+        StringBuilder titleBuilder = new StringBuilder();
+        for (int i = 0; i < toSkip - 1; i++) {
         	int value = input.read();
-        	System.out.print((char) value);
+        	titleBuilder.append((char) value);
         }
-        System.out.println();
+        assert input.read() == 0; // null-terminated string
+        assert titleBuilder.toString().equals(songTitle);
         assert fInput.getChannel().position() + dataLength == fileLength;
         input.close();
         
         // Check with ffmpeg
         FfmpegAudioFileChecker.assertAudioFileSane(outputFile);
-        
-        // TODO [qt] AU test large and huge files
     }
 
 }
