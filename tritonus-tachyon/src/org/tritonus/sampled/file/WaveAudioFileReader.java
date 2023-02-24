@@ -73,7 +73,7 @@ public class WaveAudioFileReader extends TAudioFileReader {
             dis.skip(((prevLength + 1) & 0xFFFFFFFE) - prevRead);
         }
     }
-
+    
 
     protected long findChunk(DataInputStream dis, int key, Ds64Chunk ds64Chunk)
             throws UnsupportedAudioFileException, IOException {
@@ -97,7 +97,7 @@ public class WaveAudioFileReader extends TAudioFileReader {
                 // of WAVE files which store data in different chunks.
                 // maybe we can find a nice description of the "required chunk" ?
                 throw new UnsupportedAudioFileException(
-                        "unsupported WAVE file: required chunk not found.");
+                        "unsupported WAVE file: required chunk not found: " + chunkName(key));
             }
             chunkLength = (long) readLittleEndianInt(dis) & 0xFFFFFFFFL; // unsigned
             if (chunkLength == WaveTool.AUDIO_UNKNOWN_SIZE) {
@@ -108,7 +108,7 @@ public class WaveAudioFileReader extends TAudioFileReader {
                     chunkLength = ds64Chunk.getDataSize();
                 } else {
                     throw new UnsupportedAudioFileException(
-                            "unsupported WAVE file: chunk " + thisKey + " has unknown size.");
+                            "unsupported WAVE file: chunk " + chunkName(thisKey) + " has unknown size.");
                 }
             }
         } while (thisKey != key);

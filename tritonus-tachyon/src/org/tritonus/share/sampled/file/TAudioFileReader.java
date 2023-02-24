@@ -84,6 +84,19 @@ public abstract class TAudioFileReader
         return m_bRereading;
     }
 
+    protected static String chunkName(int chunkId) {
+        int c0 = (chunkId >> 24) & 0xff;
+        int c1 = (chunkId >> 16) & 0xff;
+        int c2 = (chunkId >> 8) & 0xff;
+        int c3 = (chunkId) & 0xff;
+        StringBuilder result = new StringBuilder();
+        result.append((char) c0);
+        result.append((char) c1);
+        result.append((char) c2);
+        result.append((char) c3);
+        return result.toString();
+    }
+
 
     /**	Get an AudioFileFormat object for a File.
     	This method calls getAudioFileFormat(InputStream, long).

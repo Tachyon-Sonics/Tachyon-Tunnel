@@ -222,7 +222,7 @@ public class AiffAudioFileReader extends TAudioFileReader {
                 default:
                     if (TDebug.TraceAudioFileReader) {
                         TDebug.out("Skipping unknown chunk: "
-                                + Integer.toHexString(nMagic));
+                                + chunkName(nMagic));
                     }
                     skipChunk(dataInputStream, nChunkLength, 0);
                     break;
