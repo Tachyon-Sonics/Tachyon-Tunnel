@@ -1,10 +1,14 @@
 package ch.tachyon.opus.test;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -13,9 +17,12 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.concentus.OpusApplication;
+import org.concentus.OpusSignal;
 import org.junit.Test;
 import ch.tachyon.opus.spi.Opus;
 import ch.tachyon.opus.spi.OpusAudioFileReader;
+import ch.tachyon.opus.spi.OpusAudioFileWriter;
 
 public class OpusSpiProviderTest {
     
@@ -69,7 +76,7 @@ public class OpusSpiProviderTest {
     public void testGetFileFormatInvalidThroughAudioSystem() throws UnsupportedAudioFileException, IOException {
         InputStream input = getClass().getResourceAsStream(getClass().getSimpleName() + ".class");
         try {
-            AudioSystem.getAudioFileFormat(input);
+            AudioSystem.getAudioFileFormat(new BufferedInputStream(input, 100000));
             assert false : "File should not be recognized as an audio file";
         } catch (UnsupportedAudioFileException ex) {
             // Expected
@@ -82,7 +89,7 @@ public class OpusSpiProviderTest {
     public void testGetFileFormatInvalid() throws UnsupportedAudioFileException, IOException {
         InputStream input = getClass().getResourceAsStream(getClass().getSimpleName() + ".class");
         try {
-            new OpusAudioFileReader().getAudioFileFormat(input);
+            new OpusAudioFileReader().getAudioFileFormat(new BufferedInputStream(input, 100000));
             assert false : "File should not be recognized as an audio file";
         } catch (UnsupportedAudioFileException ex) {
             // Expected
@@ -144,13 +151,7 @@ public class OpusSpiProviderTest {
     }
 
     private void checkPcmDecodedStream(AudioInputStream pcmStream) throws IOException {
-        AudioFormat format = pcmStream.getFormat();
-        assert format.getChannels() == NB_CHANNELS;
-        assert format.getEncoding().equals(Encoding.PCM_SIGNED);
-        assert format.getSampleRate() == SAMPLE_RATE;
-        assert !format.isBigEndian();
-        assert format.getSampleSizeInBits() == 16;
-        assert pcmStream.getFrameLength() == -1;
+        quickCheckPcmDecodedStream(pcmStream);
         BufferedInputStream bInput = new BufferedInputStream(pcmStream);
         long total = 0;
         while (true) {
@@ -172,12 +173,98 @@ public class OpusSpiProviderTest {
         }
         bInput.close();
     }
+
+    private void quickCheckPcmDecodedStream(AudioInputStream pcmStream) {
+        AudioFormat format = pcmStream.getFormat();
+        assert format.getChannels() == NB_CHANNELS;
+        assert format.getEncoding().equals(Encoding.PCM_SIGNED);
+        assert format.getSampleRate() == SAMPLE_RATE;
+        assert !format.isBigEndian();
+        assert format.getSampleSizeInBits() == 16;
+        assert pcmStream.getFrameLength() == -1;
+    }
     
     private void checkFrameLengthConsistency(long fl) {
         if (frameLength == null) {
             frameLength = fl;
         } else  {
             assert frameLength.longValue() == fl : "Frame length differ between tests: " + frameLength + " != " + fl;
+        }
+    }
+    
+    @Test
+    public void testWriteOpusFile() throws UnsupportedAudioFileException, IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        { // Decode file to PCM, and re-encode in opus in memory
+            AudioInputStream opusStream = AudioSystem.getAudioInputStream(new File(TEST_FILE));
+            AudioInputStream pcmStream = AudioSystem.getAudioInputStream(Encoding.PCM_SIGNED, opusStream);
+            AudioSystem.write(pcmStream, Opus.OPUS_FILE_TYPE, output);
+            output.close();
+        
+            System.out.println("Encoded opus file length [bytes]: " + output.size());
+        }
+        
+        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+        {
+            AudioInputStream opusStream = AudioSystem.getAudioInputStream(input);
+            AudioInputStream pcmStream = AudioSystem.getAudioInputStream(Encoding.PCM_SIGNED, opusStream);
+            
+            /*
+             * Writing is still somewhat buggy at this stage, the exact number of sample frames does not match
+             * after decoding/encoding/decoding.
+             * 
+             * Hence for the moment we only quick check the audio format, but not the exact length:
+             */
+            quickCheckPcmDecodedStream(pcmStream);
+        }
+    }
+
+    @Test
+    public void testWriteOpusFileWithProperties() throws UnsupportedAudioFileException, IOException {
+        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(new File(TEST_FILE));
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        { // Decode file to PCM, and re-encode in opus in memory
+            AudioInputStream opusStream = AudioSystem.getAudioInputStream(new File(TEST_FILE));
+            AudioFormat opusFormat = opusStream.getFormat();
+            
+            // Customize opus encoding:
+            Map<String, Object> properties = new HashMap<>();
+            properties.put(OpusAudioFileWriter.OPUS_COMPLEXITY_KEY, 1);
+            properties.put(OpusAudioFileWriter.OPUS_BITRATE_KEY, 48000);
+            properties.put(OpusAudioFileWriter.OPUS_PACKET_SAMPLES_KEY, 480);
+            properties.put(OpusAudioFileWriter.OPUS_APPLICATION_KEY, OpusApplication.OPUS_APPLICATION_VOIP);
+            properties.put(OpusAudioFileWriter.OPUS_SIGNAL_KEY, OpusSignal.OPUS_SIGNAL_VOICE);
+            properties.put(OpusAudioFileWriter.OPUS_TAG_KEY_PREFIX + "encoder", "ch.tachyon.opus");
+            properties.put(Opus.OPUS_PRE_SKIP_KEY, fileFormat.getProperty(Opus.OPUS_PRE_SKIP_KEY));
+            properties.put(Opus.OPUS_OUTPUT_GAIN_KEY, fileFormat.getProperty(Opus.OPUS_OUTPUT_GAIN_KEY));
+            
+            // Conversion is only supported with PCM_SIGNED, 16-bit
+            AudioFormat pcmFormat = new AudioFormat(
+                    Encoding.PCM_SIGNED, 
+                    opusFormat.getSampleRate(), 
+                    16, 
+                    opusFormat.getChannels(), 
+                    2 * opusFormat.getChannels(), // Important: do not leave NOT_SPECIFIED here
+                    opusFormat.getSampleRate(), // Important: do not leave NOT_SPECIFIED here
+                    false,
+                    properties);
+            
+            AudioInputStream pcmStream = AudioSystem.getAudioInputStream(pcmFormat, opusStream);
+            
+            AudioSystem.write(pcmStream, Opus.OPUS_FILE_TYPE, output);
+            output.close();
+        
+            System.out.println("Encoded opus file length [bytes]: " + output.size());
+        }
+        
+        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+        {
+            AudioInputStream opusStream = AudioSystem.getAudioInputStream(input);
+            AudioInputStream pcmStream = AudioSystem.getAudioInputStream(Encoding.PCM_SIGNED, opusStream);
+            quickCheckPcmDecodedStream(pcmStream);
         }
     }
 

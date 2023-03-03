@@ -59,7 +59,8 @@ public class OpusAudioFileReader extends AudioFileReader {
             
             // Gather properties
             Map<String, Object> properties = new HashMap<>();
-            properties.put("outputGain", opusInfo.getOutputGain());
+            properties.put(Opus.OPUS_OUTPUT_GAIN_KEY, opusInfo.getOutputGain());
+            properties.put(Opus.OPUS_PRE_SKIP_KEY, opusInfo.getPreSkip());
             OpusTags tags = opusFile.getTags();
             if (tags != null) {
                 Map<String, List<String>> comments = tags.getAllComments();
@@ -78,7 +79,7 @@ public class OpusAudioFileReader extends AudioFileReader {
             if (stream instanceof FileInputStream && calculateLength) {
                 // Calculate length
                 frameLength = calculateFrameLength(opusFile, opusInfo);
-                properties.put(Opus.FRAME_LENGTH_PROPERTY, frameLength);
+                properties.put(Opus.FRAME_LENGTH_KEY, frameLength);
             }
             AudioFileFormat fileFormat;
             fileFormat = new AudioFileFormat(Opus.OPUS_FILE_TYPE, format, cropLength(frameLength), properties);
