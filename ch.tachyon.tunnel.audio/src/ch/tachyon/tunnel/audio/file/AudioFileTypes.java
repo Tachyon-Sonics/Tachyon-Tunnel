@@ -483,11 +483,27 @@ public class AudioFileTypes {
      * with the length as a 64-bit long.
      */
     public AudioFileFormat getAudioFileFormat(File file, boolean forceComputeLength, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
+        return getAudioFileFormat(file, null, forceComputeLength, progress);
+    }
+
+    public AudioFileFormat getAudioFileFormat(File file, IFileFormatDetector detector, boolean forceComputeLength, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
         AudioFileFormat result;
         // RandomFileInputStream solves mark/reset problems on files with large unknown chunks (Call of the Sea.mp3)
         InputStream fileInput = new RandomFileProgressInputStream(file, progress);
         result = getAudioFileFormat(file.getName(), fileInput);
         fileInput.close();
+        
+        // Apply detector
+        if (detector != null) {
+            try {
+                result = applyDetector(file, detector, result);
+            } catch (IOException ex) {
+                // Ignore additional detection
+            } catch (UnsupportedAudioFileException ex) {
+                // Ignore additional detection
+            }
+        }
+        
         if (result.getFrameLength() == AudioSystem.NOT_SPECIFIED) {
             if (result instanceof TAudioFileFormat) {
                 TAudioFileFormat taff = (TAudioFileFormat) result;
@@ -505,6 +521,46 @@ public class AudioFileTypes {
                     (long) result.getFrameLength() & 0xFFFFFFL, result.properties());
         }
         return result;
+    }
+
+    private AudioFileFormat applyDetector(File file, IFileFormatDetector detector, AudioFileFormat fileFormat)
+            throws IOException, UnsupportedAudioFileException {
+        // Detect channel & sample rate if unkown
+        AudioFormat audioFormat = fileFormat.getFormat();
+        if (audioFormat.getChannels() == AudioSystem.NOT_SPECIFIED || audioFormat.getSampleRate() == AudioSystem.NOT_SPECIFIED) {
+            AudioFormat detectedFormat = detector.detectFormat(file, audioFormat);
+            if (detectedFormat != audioFormat) {
+                // Apply improved info
+                if (fileFormat instanceof TAudioFileFormat) {
+                    TAudioFileFormat taff = (TAudioFileFormat) fileFormat;
+                    fileFormat = new TAudioFileFormat(taff.getType(), detectedFormat, taff.getFrameLengthEx(), taff.getByteLengthEx(), fileFormat.properties());
+                } else {
+                    fileFormat = new TAudioFileFormat(fileFormat.getType(), detectedFormat, fileFormat.getFrameLength(), fileFormat.getByteLength(), fileFormat.properties());
+                }
+            }
+        }
+        
+        // Detect length if unknown
+        long length;
+        if (fileFormat instanceof TAudioFileFormat) {
+            TAudioFileFormat taff = (TAudioFileFormat) fileFormat;
+            length = taff.getFrameLengthEx();
+        } else {
+            length = fileFormat.getFrameLength();
+        }
+        if (length == -1L) {
+            length = detector.detectLength(file, fileFormat);
+            if (length >= 0) {
+                // Apply new length
+                if (fileFormat instanceof TAudioFileFormat) {
+                    TAudioFileFormat taff = (TAudioFileFormat) fileFormat;
+                    fileFormat = new TAudioFileFormat(taff.getType(), taff.getFormat(), length, taff.getByteLengthEx(), fileFormat.properties());
+                } else {
+                    fileFormat = new TAudioFileFormat(fileFormat.getType(), fileFormat.getFormat(), length, fileFormat.getByteLength(), fileFormat.properties());
+                }
+            }
+        }
+        return fileFormat;
     }
 
     private AudioFileFormat forceComputeLength(File file, IProgressMonitor progress, AudioFileFormat result) throws IOException, UnsupportedAudioFileException {

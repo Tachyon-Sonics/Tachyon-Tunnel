@@ -1,0 +1,166 @@
+package ch.tachyon.tunnel.audio.file;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+import org.tritonus.share.sampled.file.RandomFileInputStream;
+
+import com.jcraft.jorbis.VorbisFile;
+
+import ch.tachyon.opus.spi.Opus;
+import ch.tachyon.opus.spi.OpusAudioFileReader;
+import ch.tachyon.tunnel.audio.file.AudioFileTypes;
+import ch.tachyon.tunnel.audio.file.IFileFormatDetector;
+import ch.tachyon.tunnel.audio.file.RandomFileProgressInputStream;
+import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
+import javazoom.spi.mpeg.sampled.file.MpegEncoding;
+import javazoom.spi.vorbis.sampled.file.VorbisEncoding;
+import net.sourceforge.jaad.mp4.MP4Container;
+import net.sourceforge.jaad.mp4.api.Movie;
+import net.sourceforge.jaad.spi.javasound.AACAudioFileReader;
+
+/**
+ * This is an exemple {@link IFileFormatDetector} implementation that knows and improves on various providers:
+ * opus (ch.tachyon.opus.spi), ogg (javazoom.spi.vorbis), mp3 (javazoom.spi.mpeg) and m4a (net.sourceforge.jaad).
+ * <p>
+ * Why does this class even exist?
+ * <p>
+ * JavaSound allow us to query an audio file format either using a {@link File} or an {@link InputStream}.
+ * It would seem logical that using a {@link File} gives use more information (such as the audio length in
+ * sample frames), because a <tt>File</tt> provides random access.
+ * <p>
+ * This is indeed the case: the mp3 and ogg providers do only report the length when a <tt>File</tt> is used.
+ * Else they give {@link AudioSystem#NOT_SPECIFIED}.
+ * <p>
+ * Unfortunately, using a <tt>File</tt> also comes with problems:
+ * <ul>
+ * <li>Many provider just wrap the <tt>File</tt> into a {@link FileInputStream} and a {@link BufferedInputStream}
+ * and delegate to the code based on <tt>InputStream</tt>. The problem is that identifying the format using
+ * an <tt>InputStream</tt> relies on {@link InputStream#mark(int)} and {@link InputStream#reset()}. Some providers
+ * just read past the mark limit in some case and thus fail to load some files (an old version of the mp3 provider
+ * had this problem)</li>
+ * <li>The ogg provider sometimes crash when calculating the duration of very large files</li>
+ * <li>The mp3 provider returns the length in its own curious way, that does not correspond to the
+ * {@link AudioFileFormat} JavaDoc</li>
+ * </ul>
+ * Then add the following problems:
+ * <ul>
+ * <li>Some provider do not report the length at all, although they have a specific API to retrieve it</li>
+ * <li>Sometimes, the specific API to retrieve the length allows us to get a length as <tt>long</tt>, whereas
+ * {@link AudioFileFormat} is limited to <tt>int</tt>.</li>
+ * <li>The m4a provider is special: it does not even report channel count and sample rate until the audio stream
+ * is actually created using {@link AudioSystem#getAudioInputStream(InputStream)}!</li>
+ * </ul>
+ * For all these reasons:
+ * <ul>
+ * <li>{@link AudioFileTypes#getAudioFileFormat(File, boolean) AudioFileTypes#getAudioFileFormat()} methods use
+ * a {@link RandomFileInputStream} behind the scene. This is an {@link InputStream} implementation that not only supports
+ * {@link InputStream#mark(int)} and {@link InputStream#reset()}, but it never invalidates the mark, even if reading
+ * past it.</li>
+ * <li>If the length, the channel count or the sample rate is reported as unknown, and an {@link IFileFormatDetector}
+ * is supplied, it is used to fill the missing information.</li>
+ * </ul>
+ */
+public class FileFormatDetector implements IFileFormatDetector {
+
+    @Override
+    public AudioFormat detectFormat(File file, AudioFormat format) throws IOException, UnsupportedAudioFileException {
+        if (format.getEncoding().toString().equals("AAC")) { // m4a
+            /*
+             * The m4a spi does not report channel count and sample rate until we actually open
+             * an AudioInputStream.
+             */
+            InputStream input = new RandomFileProgressInputStream(file);
+            try {
+                AACAudioFileReader reader = new AACAudioFileReader();
+                AudioInputStream stream = reader.getAudioInputStream(input);
+                AudioFormat m4aFormat = stream.getFormat();
+                return m4aFormat;
+            } finally {
+                input.close();
+            }
+        }
+        return format;
+    }
+
+    @Override
+    public long detectLength(File file, AudioFileFormat format) throws IOException, UnsupportedAudioFileException {
+        Encoding encoding = format.getFormat().getEncoding();
+        if (encoding.equals(VorbisEncoding.VORBISENC)) {
+            /*
+             * Ogg/vorbis allows us to get the duration in seconds
+             */
+            try {
+                VorbisFile vorbisFile = new VorbisFile(file.getAbsolutePath()); // Might crash here on long files
+                try {
+                    float durationSeconds = vorbisFile.time_total(-1);
+                    float sampleRate = format.getFormat().getSampleRate();
+                    long frameLength = (long) (durationSeconds * sampleRate + 0.5f);
+                    return frameLength;
+                } finally {
+                    vorbisFile.close();
+                }
+            } catch (Exception ex) {
+                // Ignore and fallback
+            }
+        } else if (encoding.equals(Opus.OPUS_ENCODING)) {
+            OpusAudioFileReader reader = new OpusAudioFileReader();
+            AudioFileFormat opusFormat = reader.getAudioFileFormat(file);
+            /*
+             * Although the length is provided in AudioFileFormat.getFrameLength() as an 'int', it is
+             * also provided as a 'long' (that is less likely to overflow) in the properties.
+             */
+            Long frameDuration = (Long) opusFormat.getProperty(Opus.FRAME_LENGTH_PROPERTY);
+            if (frameDuration != null)
+                return frameDuration;
+        } else if (encoding instanceof MpegEncoding) {
+            MpegAudioFileReader reader = new MpegAudioFileReader();
+            AudioFileFormat mpegFormat = reader.getAudioFileFormat(file);
+            double sampleRate = mpegFormat.getFormat().getSampleRate();
+            /*
+             * The mp3 SPI reports the number of MP3 frames in 'getFrameLength()' rather than the number
+             * of PCM audio sample frames. It also supplies the average number of MP3 fraes per second
+             * in 'getFrameRate()', which allows us to calculate the duration.
+             */
+            int nbMpegFrames = mpegFormat.getFrameLength();
+            float mpegFramesPerSecond = mpegFormat.getFormat().getFrameRate();
+            if (nbMpegFrames > 0 && isSane(mpegFramesPerSecond)) {
+                double durationSeconds = (double) nbMpegFrames / (double) mpegFramesPerSecond;
+                long frameLength = (long) (durationSeconds * sampleRate + 0.5);
+                return frameLength;
+            }
+            // The m4a provider reports PCM encoding, so we have to check the file type
+        } else if (format.getType().equals(AACAudioFileReader.MP4)
+                || format.getType().equals(AACAudioFileReader.AAC)) {
+            final MP4Container cont = new MP4Container(new RandomAccessFile(file, "r"));
+            final Movie movie = cont.getMovie();
+            double durationSeconds = movie.getDuration();
+            double sampleRate = format.getFormat().getSampleRate();
+            if (isSane(durationSeconds) && isSane(sampleRate)) {
+                long frameLength = (long) (durationSeconds * sampleRate + 0.5);
+                return frameLength;
+            }
+        }
+        return format.getFrameLength();
+    }
+
+    private static boolean isSane(float value) {
+        return (value > 0.0f && !Float.isNaN(value) && !Float.isInfinite(value));
+    }
+
+    private static boolean isSane(double value) {
+        return (value > 0.0f && !Double.isNaN(value) && !Double.isInfinite(value));
+    }
+
+}
