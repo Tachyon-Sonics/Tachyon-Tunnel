@@ -1,6 +1,6 @@
 This is a provider for OPUS audio files, written 100% in Java.
 
-It adds OPUS audio file support to the JavaSound API, for reading/decoding only.
+It adds OPUS audio file support to the JavaSound API.
 
 You need to add the three following .jar files (available in the "lib" directory) to your project:
 - opus-spi-1.0.0.jar
