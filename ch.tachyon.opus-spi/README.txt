@@ -18,12 +18,12 @@ It is based on:
 Implementation note:
 A particularity of the OPUS format is that the length is not stored in any header.
 Computing the length requires iterating over all packets, and hence reading the entire file.
-At least this is how it is implemented here. Another method involves locating the last packet.
+At least this is how it is implemented here. Another method (not implemented) would involve locating the last packet.
 This is quite fast in terms of CPU because the packets themselves do not need to be decoded to compute the length.
 However, the entire file must be read, and this is not always desirable.
 
 For that reason:
-- The length is only computed and reported if AudioSystem.getAudioFileFormat() is used with a java.io.File argument
+- The length is only computed and reported if AudioSystem.getAudioFileFormat() is used with a java.io.File argument.
 - The length is NOT computed (and hence reported as AudioSystem.NOT_SPECIFIED) if used with a java.io.InputStream
   (including java.io.FileInputStream).
 
