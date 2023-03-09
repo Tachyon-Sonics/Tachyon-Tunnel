@@ -65,7 +65,7 @@ public class Alsa {
     /** Load the native library for alsa.
     
     This method actually does the loading of the library.  Unlike
-    {@link loadNativeLibrary() loadNativeLibrary()}, it does not
+    {@link #loadNativeLibrary() loadNativeLibrary()}, it does not
     check if the library is already loaded.
     
      */

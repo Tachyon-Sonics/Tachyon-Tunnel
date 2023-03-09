@@ -9,9 +9,9 @@ import ch.tachyon.tritonus.test.wave.WaveSuite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	AiffSuite.class,
-	AuSuite.class,
-    WaveSuite.class,
+        AiffSuite.class,
+        AuSuite.class,
+        WaveSuite.class,
 })
 public class RootSuite {
 

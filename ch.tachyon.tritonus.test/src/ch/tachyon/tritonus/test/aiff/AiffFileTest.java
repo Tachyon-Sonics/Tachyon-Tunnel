@@ -30,9 +30,9 @@ import ch.tachyon.tunnel.common.IMultiChanAudioSource;
 public class AiffFileTest {
 
     private static final int AUDIO_FRAME_LENGTH = 10000;
-	private final List<AudioFormat> formats;
+    private final List<AudioFormat> formats;
 
-	
+
     public AiffFileTest() {
         formats = new ArrayList<>();
         addFormat(2, 44100.0f, 16, Encoding.PCM_SIGNED);
@@ -60,7 +60,7 @@ public class AiffFileTest {
         for (AudioFormat format : formats) {
             System.out.println("  " + format.toString());
             if (format.getEncoding().equals(Encoding.PCM_SIGNED))
-            	doTestWriteAudioFile(AUDIO_FRAME_LENGTH, format, AudioFileFormat.Type.AIFF);
+                doTestWriteAudioFile(AUDIO_FRAME_LENGTH, format, AudioFileFormat.Type.AIFF);
             doTestWriteAudioFile(AUDIO_FRAME_LENGTH, format, AudioFileFormat.Type.AIFC);
         }
     }
@@ -148,7 +148,8 @@ public class AiffFileTest {
         Files.delete(outputFile.toPath());
     }
 
-    private void doTestWriteAudioFileUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type) throws IOException, UnsupportedAudioFileException {
+    private void doTestWriteAudioFileUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type)
+            throws IOException, UnsupportedAudioFileException {
         File outputFile = File.createTempFile("Output", ".aifc");
         {
             IMultiChanAudioSource audioSource = new TestAudioSource(length, format.getChannels(),
@@ -161,7 +162,8 @@ public class AiffFileTest {
         Files.delete(outputFile.toPath());
     }
 
-    private void doTestWriteAudioFileStreamUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type) throws IOException, UnsupportedAudioFileException {
+    private void doTestWriteAudioFileStreamUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type)
+            throws IOException, UnsupportedAudioFileException {
         File outputFile = File.createTempFile("Output", ".aifc");
         {
             IMultiChanAudioSource audioSource = new TestAudioSource(length, format.getChannels(),
@@ -176,7 +178,7 @@ public class AiffFileTest {
 
     private void checkResult(long length, AudioFormat expectedFormat, AudioFileFormat.Type type, File outputFile)
             throws IOException, UnsupportedAudioFileException, FileNotFoundException {
-    	// Check format
+        // Check format
         AudioFileFormatEx fileFormat = (AudioFileFormatEx) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
         AudioFormat format = fileFormat.getFormat();
         assert fileFormat.getFrameLengthLong() == length;
@@ -191,7 +193,7 @@ public class AiffFileTest {
         // Check content
         FileInputStream fInput = new FileInputStream(outputFile);
         DataInputStream input = new DataInputStream(fInput);
-        
+
         String formId = IffUtils.readChunkId(input);
         assert formId.equals("FORM");
         int fileLength = input.readInt();
@@ -199,20 +201,20 @@ public class AiffFileTest {
         String aiffId = IffUtils.readChunkId(input);
         assert aiffId.equals("AIFF") || aiffId.equals("AIFC");
         if (aiffId.equals("AIFC")) {
-        	String fverId = IffUtils.readChunkId(input);
-        	assert fverId.equals("FVER");
-        	int fverLength = input.readInt();
-        	assert fverLength == 4;
-        	assert input.readInt() == 0xA2805140;
+            String fverId = IffUtils.readChunkId(input);
+            assert fverId.equals("FVER");
+            int fverLength = input.readInt();
+            assert fverLength == 4;
+            assert input.readInt() == 0xA2805140;
         }
-        
+
         String commId = IffUtils.readChunkId(input);
         assert commId.equals("COMM");
         int commSize = input.readInt();
         if (aiffId.equals("AIFC"))
-        	assert commSize == 24;
+            assert commSize == 24;
         else
-        	assert commSize == 18;
+            assert commSize == 18;
         int nbChans = input.readShort();
         assert nbChans == expectedFormat.getChannels();
         int frameLength = input.readInt();
@@ -221,7 +223,7 @@ public class AiffFileTest {
         assert sizeInBits == expectedFormat.getSampleSizeInBits();
         input.skipBytes(10); // Skip sample rate
         if (aiffId.equals("AIFC")) {
-        	input.skipBytes(6); // Skip format code & name
+            input.skipBytes(6); // Skip format code & name
         }
         String ssndId = IffUtils.readChunkId(input);
         assert ssndId.equals("SSND");
@@ -232,7 +234,7 @@ public class AiffFileTest {
         int ssndBlockSize = input.readInt();
         assert ssndBlockSize == 0;
         input.close();
-        
+
         // Check with ffmpeg
         FfmpegAudioFileChecker.assertAudioFileSane(outputFile);
     }

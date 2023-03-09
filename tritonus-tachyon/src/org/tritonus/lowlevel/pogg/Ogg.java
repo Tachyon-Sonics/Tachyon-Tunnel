@@ -61,7 +61,7 @@ public class Ogg {
     /** Load the native library for ogg vorbis.
     
     This method actually does the loading of the library.  Unlike
-    {@link loadNativeLibrary() loadNativeLibrary()}, it does not
+    {@link #loadNativeLibrary() loadNativeLibrary()}, it does not
     check if the library is already loaded.
     
      */

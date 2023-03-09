@@ -14,11 +14,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-
 public class CommandLine {
-	
-	private final static boolean LOG_ENABLED = false;
-	
+
+    private final static boolean LOG_ENABLED = false;
+
 
     public static int runCommand(List<String> command) throws IOException {
         return runCommand(null, command);
@@ -29,8 +28,8 @@ public class CommandLine {
     }
 
     public static int runCommand(File location, List<String> command) throws IOException {
-    	if (LOG_ENABLED)
-    		System.out.println("Running: " + command2string(command));
+        if (LOG_ENABLED)
+            System.out.println("Running: " + command2string(command));
         ProcessBuilder builder = new ProcessBuilder(command);
         if (location != null)
             builder.directory(location);
@@ -38,17 +37,17 @@ public class CommandLine {
         builder.redirectError(Redirect.INHERIT);
         Process process = builder.start();
         try {
-			process.waitFor(1, TimeUnit.MINUTES);
-		} catch (InterruptedException ex) {
-			throw new IOException(ex);
-		}
+            process.waitFor(1, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            throw new IOException(ex);
+        }
         int exitCode = process.exitValue();
         return exitCode;
     }
 
     public static String runCommandReadError(File location, List<String> command) throws IOException {
-    	if (LOG_ENABLED)
-    		System.out.println("Running: " + command2string(command));
+        if (LOG_ENABLED)
+            System.out.println("Running: " + command2string(command));
         ProcessBuilder builder = new ProcessBuilder(command);
         if (location != null)
             builder.directory(location);
@@ -68,10 +67,10 @@ public class CommandLine {
         buffer.flush();
         byte[] output = buffer.toByteArray();
         try {
-			process.waitFor(1, TimeUnit.MINUTES);
-		} catch (InterruptedException ex) {
-			throw new IOException(ex);
-		}
+            process.waitFor(1, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            throw new IOException(ex);
+        }
         return new String(output, StandardCharsets.UTF_8);
     }
 

@@ -395,7 +395,6 @@ public class Complex implements java.io.Serializable, Cloneable {
      *	@param	t	The product x*y, computed without regard to NaN.
      *				The real and/or the imaginary part of t is
      *				expected to be NaN.
-     *	@return	The corrected product of x*y.
      */
     private static void timesNaN(Complex x, Complex y, Complex t) {
         boolean recalc = false;

@@ -64,26 +64,26 @@ public class LargeWaveFileTest {
             fileLength = output.getLength();
         }
         {
-        	// No need to zero pad here as we will not read past the initial headers
-        	AudioFileFormat fileFormat = AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
-        	AudioFormat format = fileFormat.getFormat();
-        	if (length > 0x7FFFFFFFL || fileFormat instanceof AudioFileFormatEx) {
-        		AudioFileFormatEx fileFormatEx = (AudioFileFormatEx) fileFormat;
-        		assert fileFormatEx.getFrameLengthLong() == length;
-        	}
-        	assert fileFormat.getFrameLength() == crop(length);
-        	assert fileFormat.getType() == type;
-        	assert format.getChannels() == nbChans;
-        	assert format.getSampleRate() == sampleRate;
-        	assert format.getFrameRate() == sampleRate;
-        	assert format.getEncoding().equals(encoding);
-        	assert format.getSampleSizeInBits() == bits;
+            // No need to zero pad here as we will not read past the initial headers
+            AudioFileFormat fileFormat = AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
+            AudioFormat format = fileFormat.getFormat();
+            if (length > 0x7FFFFFFFL || fileFormat instanceof AudioFileFormatEx) {
+                AudioFileFormatEx fileFormatEx = (AudioFileFormatEx) fileFormat;
+                assert fileFormatEx.getFrameLengthLong() == length;
+            }
+            assert fileFormat.getFrameLength() == crop(length);
+            assert fileFormat.getType() == type;
+            assert format.getChannels() == nbChans;
+            assert format.getSampleRate() == sampleRate;
+            assert format.getFrameRate() == sampleRate;
+            assert format.getEncoding().equals(encoding);
+            assert format.getSampleSizeInBits() == bits;
 
-        	WaveFileUtils.checkContent(outputFile, fileLength, length, extraChunk);
+            WaveFileUtils.checkContent(outputFile, fileLength, length, extraChunk);
         }
         Files.delete(outputFile.toPath());
     }
-    
+
     private static int crop(long length) {
         if (length > 0x7FFFFFFFL)
             return -1;

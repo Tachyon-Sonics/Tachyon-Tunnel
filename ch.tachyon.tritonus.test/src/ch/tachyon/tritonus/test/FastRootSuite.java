@@ -9,9 +9,9 @@ import ch.tachyon.tritonus.test.wave.FastWaveSuite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	AiffSuite.class,
-	FastAuSuite.class,
-    FastWaveSuite.class,
+        AiffSuite.class,
+        FastAuSuite.class,
+        FastWaveSuite.class,
 })
 public class FastRootSuite {
 

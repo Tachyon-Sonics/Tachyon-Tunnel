@@ -16,7 +16,8 @@ import ch.tachyon.tunnel.common.*;
 public class WaveFileTest {
 
     private static final int AUDIO_FRAME_LENGTH = 10000;
-	private final List<AudioFormat> formats;
+    private final List<AudioFormat> formats;
+
 
     public WaveFileTest() {
         formats = new ArrayList<>();
@@ -131,7 +132,8 @@ public class WaveFileTest {
         Files.delete(outputFile.toPath());
     }
 
-    private void doTestWriteAudioFileUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type) throws IOException, UnsupportedAudioFileException {
+    private void doTestWriteAudioFileUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type)
+            throws IOException, UnsupportedAudioFileException {
         File outputFile = File.createTempFile("Output", ".wav");
         {
             IMultiChanAudioSource audioSource = new TestAudioSource(length, format.getChannels(),
@@ -144,7 +146,8 @@ public class WaveFileTest {
         Files.delete(outputFile.toPath());
     }
 
-    private void doTestWriteAudioFileStreamUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type) throws IOException, UnsupportedAudioFileException {
+    private void doTestWriteAudioFileStreamUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type)
+            throws IOException, UnsupportedAudioFileException {
         File outputFile = File.createTempFile("Output", ".wav");
         {
             IMultiChanAudioSource audioSource = new TestAudioSource(length, format.getChannels(),
@@ -160,7 +163,7 @@ public class WaveFileTest {
     private void checkResult(long length, AudioFormat expectedFormat, AudioFileFormat.Type type,
             WaveExtraChunkType extraChunk, File outputFile)
             throws IOException, UnsupportedAudioFileException, FileNotFoundException {
-    	// Check format
+        // Check format
         AudioFileFormatEx fileFormat = (AudioFileFormatEx) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
         AudioFormat format = fileFormat.getFormat();
         assert fileFormat.getFrameLengthLong() == length;
@@ -174,7 +177,7 @@ public class WaveFileTest {
 
         // Check content
         WaveFileUtils.checkContent(outputFile, outputFile.length(), length, extraChunk);
-        
+
         // Check with ffmpeg
         FfmpegAudioFileChecker.assertAudioFileSane(outputFile);
     }

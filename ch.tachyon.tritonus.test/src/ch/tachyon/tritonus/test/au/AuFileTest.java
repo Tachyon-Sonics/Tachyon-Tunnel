@@ -33,7 +33,8 @@ public class AuFileTest {
 
 
     private static final int AUDIO_FRAME_LENGTH = 10000;
-	private final List<AudioFormat> formats;
+    private final List<AudioFormat> formats;
+
 
     public AuFileTest() {
         formats = new ArrayList<>();
@@ -162,7 +163,8 @@ public class AuFileTest {
         Files.delete(outputFile.toPath());
     }
 
-    private void doTestWriteAudioFileUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type) throws IOException, UnsupportedAudioFileException {
+    private void doTestWriteAudioFileUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type)
+            throws IOException, UnsupportedAudioFileException {
         File outputFile = File.createTempFile("Output", ".au");
         {
             IMultiChanAudioSource audioSource = new TestAudioSource(length, format.getChannels(),
@@ -175,7 +177,8 @@ public class AuFileTest {
         Files.delete(outputFile.toPath());
     }
 
-    private void doTestWriteAudioFileStreamUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type) throws IOException, UnsupportedAudioFileException {
+    private void doTestWriteAudioFileStreamUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type)
+            throws IOException, UnsupportedAudioFileException {
         File outputFile = File.createTempFile("Output", ".au");
         {
             IMultiChanAudioSource audioSource = new TestAudioSource(length, format.getChannels(),
@@ -188,7 +191,8 @@ public class AuFileTest {
         Files.delete(outputFile.toPath());
     }
 
-    private void doTestWriteAudioOtherStreamUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type) throws IOException, UnsupportedAudioFileException {
+    private void doTestWriteAudioOtherStreamUnknownLength(long length, AudioFormat format, AudioFileFormat.Type type)
+            throws IOException, UnsupportedAudioFileException {
         File outputFile = File.createTempFile("Output", ".au");
         {
             IMultiChanAudioSource audioSource = new TestAudioSource(length, format.getChannels(),
@@ -203,9 +207,9 @@ public class AuFileTest {
     }
 
     private void checkResult(long length, AudioFormat expectedFormat, AudioFileFormat.Type type, File outputFile,
-    		boolean unknownLength, String songTitle)
+            boolean unknownLength, String songTitle)
             throws IOException, UnsupportedAudioFileException, FileNotFoundException {
-    	// Check format
+        // Check format
         AudioFileFormatEx fileFormat = (AudioFileFormatEx) AudioFileTypes.instance().getAudioFileFormat(outputFile, false);
         AudioFormat format = fileFormat.getFormat();
         assert fileFormat.getFrameLengthLong() == length;
@@ -216,11 +220,11 @@ public class AuFileTest {
         assert format.getFrameRate() == expectedFormat.getFrameRate();
         assert format.getEncoding().equals(expectedFormat.getEncoding());
         assert format.getSampleSizeInBits() == expectedFormat.getSampleSizeInBits();
-        
+
         // Check content
         FileInputStream fInput = new FileInputStream(outputFile);
         DataInputStream input = new DataInputStream(fInput);
-        
+
         String fileId = IffUtils.readChunkId(input);
         assert fileId.equals(".snd");
         int dataOffset = input.readInt();
@@ -228,9 +232,9 @@ public class AuFileTest {
         long fileLength = outputFile.length();
         long dataLength = fileLength - dataOffset;
         if (dataLength <= 0x7FFFFFFFl && !unknownLength)
-        	assert fLength == dataLength;
+            assert fLength == dataLength;
         else
-        	assert fLength == AudioSystem.NOT_SPECIFIED;
+            assert fLength == AudioSystem.NOT_SPECIFIED;
         input.readInt(); // Format code
         int sampleRate = input.readInt();
         assert sampleRate == (int) format.getSampleRate();
@@ -239,14 +243,14 @@ public class AuFileTest {
         int toSkip = dataOffset - (int) fInput.getChannel().position();
         StringBuilder titleBuilder = new StringBuilder();
         for (int i = 0; i < toSkip - 1; i++) {
-        	int value = input.read();
-        	titleBuilder.append((char) value);
+            int value = input.read();
+            titleBuilder.append((char) value);
         }
         assert input.read() == 0; // null-terminated string
         assert titleBuilder.toString().equals(songTitle);
         assert fInput.getChannel().position() + dataLength == fileLength;
         input.close();
-        
+
         // Check with ffmpeg
         FfmpegAudioFileChecker.assertAudioFileSane(outputFile);
     }
