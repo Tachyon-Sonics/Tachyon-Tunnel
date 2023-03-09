@@ -14,7 +14,7 @@ tritonus-tachyon.jar only contains:
   - is has been tested and is compatible with the following library providers (and should work with any other provider that worked with tritonus-0.3.7.2):
     - jaad-0.8.4.jar (reading of Apple's *.m4a audio files)
     - jflac-codec-1.5.2.jar (reading of *.flac audio files)
-    - mp3spi1.9.5.jar (reading of *.mp3 audio files)
+    - mp3spi-1.9.5.4.jar (reading of *.mp3 audio files)
     - vorbisspi-1.0.3.3.jar (reading of *.ogg audio files)
 - support for WAVE, AIFF and AU file formats; with the improvements that follows.
 

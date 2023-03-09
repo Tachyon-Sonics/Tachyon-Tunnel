@@ -154,14 +154,14 @@ public class AudioFileTypes {
             Debug.warn(ex);
         }
 
-        // Complete ext2Types
-        for (String ext : ext2fileReader.keySet()) {
-            String type = ext2Type.get(ext);
-            if (type == null) {
-                type = ext.substring(1).toUpperCase();
-                ext2Type.put(ext, type);
-            }
-        }
+//        // Complete ext2Types
+//        for (String ext : ext2fileReader.keySet()) {
+//            String type = ext2Type.get(ext);
+//            if (type == null) {
+//                type = ext.substring(1).toUpperCase();
+//                ext2Type.put(ext, type);
+//            }
+//        }
 
         // Remove types without file reader
         for (Iterator<String> iter = ext2Type.keySet().iterator(); iter.hasNext(); ) {
