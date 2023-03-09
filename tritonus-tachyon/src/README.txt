@@ -15,7 +15,7 @@ tritonus-tachyon.jar only contains:
     - jaad-0.8.4.jar (reading of Apple's *.m4a audio files)
     - jflac-codec-1.5.2.jar (reading of *.flac audio files)
     - mp3spi1.9.5.jar (reading of *.mp3 audio files)
-    - vorbisspi1.0.3.jar (reading of *.ogg audio files)
+    - vorbisspi-1.0.3.3.jar (reading of *.ogg audio files)
 - support for WAVE, AIFF and AU file formats; with the improvements that follows.
 
 The .jar distribution files can be created from Eclipse using the .jardesc files.
