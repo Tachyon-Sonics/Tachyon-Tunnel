@@ -71,10 +71,12 @@ public class AudioFileTypes {
     private final static Lock readLock = new ReentrantLock(true); // Some providers are not thread safe
 
     // File extension -> Collection of class names
-    private Map<String, Collection<String>> ext2fileReader = new HashMap<String, Collection<String>>();
+    private Map<String, Collection<String>> ext2fileReader = new LinkedHashMap<String, Collection<String>>();
     private Map<String, String> ext2Type = new LinkedHashMap<String, String>();
     private Map<String, Type> ext2writeType = new LinkedHashMap<String, Type>();
     private Set<String> threadUnsafeProviders = new HashSet<>(); // Class name
+    
+    private boolean javaSoundFallback = true;
 
 
     private AudioFileTypes() {
@@ -98,12 +100,12 @@ public class AudioFileTypes {
             Enumeration<URL> metaInfs = cl.getResources(SERVICE_RESOURCE);
             while (metaInfs.hasMoreElements()) {
                 URL metaInf = metaInfs.nextElement();
-                final Map<Object, Object> props = new LinkedHashMap<Object, Object>();
+                final List<Pair<Object, Object>> props = new ArrayList<>();
                 Properties propParser = new Properties() {
 
                     @Override
                     public synchronized Object put(Object key, Object value) {
-                        props.put(key, value); // Copy in order-preserving map
+                        props.add(new Pair<>(key, value)); // Copy in order-preserving map
                         return super.put(key, value);
                     }
 
@@ -112,11 +114,11 @@ public class AudioFileTypes {
                     IOUtils.loadUtf8Properties(metaInf.openStream(), propParser);
                     boolean threadSafe = true;
                     Collection<String> foundClassNames = new ArrayList<>();
-                    for (Object key0 : props.keySet()) {
-                        String key = (String) key0;
+                    for (Pair<Object, Object> pair : props) {
+                        String key = (String) pair.getFirst();
                         if (key.startsWith("loader.")) {
                             String ext = key.substring("loader".length()).toLowerCase();
-                            String className = (String) props.get(key);
+                            String className = (String) pair.getSecond();
                             if (className != null && !"".equals(className.trim()) && !"".equals(ext.substring(1).trim())) {
                                 try {
                                     Class.forName(className, false, cl);
@@ -134,11 +136,11 @@ public class AudioFileTypes {
                             }
                         } else if (key.startsWith("type.")) {
                             String ext = key.substring("type".length()).toLowerCase();
-                            String type = (String) props.get(key);
+                            String type = (String) pair.getSecond();
                             if (type != null && !type.trim().equals("") && !ext.substring(1).trim().equals(""))
                                 ext2Type.put(ext, type);
                         } else if (key.equals("thread.safe")) {
-                            threadSafe = !"false".equalsIgnoreCase((String) props.get(key));
+                            threadSafe = !"false".equalsIgnoreCase((String) pair.getSecond());
                         }
                     }
                     if (!threadSafe)
@@ -208,8 +210,20 @@ public class AudioFileTypes {
             ext2writeType.put(".au", Type.AU);
     }
 
-    // File types support
+    public boolean isJavaSoundFallback() {
+        return javaSoundFallback;
+    }
 
+    /**
+     * Whether to fallback to JavaSound's content based detection if detection using the file extension failed.
+     * Default is true
+     */
+    public void setJavaSoundFallback(boolean javaSoundFallback) {
+        this.javaSoundFallback = javaSoundFallback;
+    }
+
+    // File types support
+    
     /**
      * Get the list of supported file audio file types for reading.
      * The results are not file extensions but rather small descriptions
@@ -347,7 +361,8 @@ public class AudioFileTypes {
 
     // Opening file
 
-    protected AudioFileReader getAudioFileReader(String fileName, AtomicBoolean threadSafe) throws IOException {
+    protected List<AudioFileReader> getAudioFileReaders(String fileName, AtomicBoolean threadSafe) throws IOException {
+        List<AudioFileReader> result = new ArrayList<>();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         int lastDot = fileName.lastIndexOf('.');
         if (lastDot >= 0) {
@@ -359,14 +374,14 @@ public class AudioFileTypes {
                         Class<?> clazz = Class.forName(fileReaderClassName, true, classLoader);
                         AudioFileReader reader = (AudioFileReader) clazz.newInstance();
                         threadSafe.set(!threadUnsafeProviders.contains(fileReaderClassName));
-                        return reader;
+                        result.add(reader);
                     } catch (Exception ex) {
                         Debug.error(ex);
                     }
                 }
             }
         }
-        return null;
+        return result;
     }
 
     /**
@@ -387,8 +402,7 @@ public class AudioFileTypes {
         AtomicBoolean threadSafe = new AtomicBoolean();
         // Try with the reader corresponding to the extension
         if (fileName != null) {
-            AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
-            if (reader != null) {
+            for (AudioFileReader reader : getAudioFileReaders(fileName, threadSafe)) {
                 try {
                     if (!threadSafe.get())
                         readLock.lock();
@@ -396,15 +410,16 @@ public class AudioFileTypes {
                 } catch (IOException ex) {
                     Debug.warn(ex);
                 } catch (UnsupportedAudioFileException ex) {
-                    // Maybe the extension is wrong
-                    if (!isJreSupportedFormat(fileName))
-                        Debug.warn(ex);
+                    // Continue with next
                 } finally {
                     if (!threadSafe.get())
                         readLock.unlock();
                 }
             }
         }
+
+        if (!javaSoundFallback)
+            throw new UnsupportedAudioFileException("Unknown audio file format");
 
 //        Debug.warn("Using JavaSound''s AudioSystem to open file {0}", fileName);
         // Failed. Fallback to JavaSound (try all readers)
@@ -590,8 +605,7 @@ public class AudioFileTypes {
         AtomicBoolean threadSafe = new AtomicBoolean();
         if (fileName != null) {
             // Try with the reader corresponding to the extension
-            AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
-            if (reader != null) {
+            for (AudioFileReader reader : getAudioFileReaders(fileName, threadSafe)) {
                 try {
                     if (!threadSafe.get())
                         readLock.lock();
@@ -599,18 +613,16 @@ public class AudioFileTypes {
                 } catch (IOException ex) {
                     Debug.warn(ex);
                 } catch (UnsupportedAudioFileException ex) {
-                    if (isJreSupportedFormat(fileName)) {
-                        // Ignore, we will continue with JavaSound fallback.
-                        // In particular, WaveExtensibleFileReader is only supported by JavaSound and not by tritonus (!)
-                    } else {
-                        throw ex;
-                    }
+                    // Continue with next
                 } finally {
                     if (!threadSafe.get())
                         readLock.unlock();
                 }
             }
         }
+        
+        if (!javaSoundFallback)
+            throw new UnsupportedAudioFileException("Unknown audio file format");
 
         // Failed. Fallback to JavaSound (try all readers)
         return AudioSystem.getAudioFileFormat(file);
@@ -620,8 +632,7 @@ public class AudioFileTypes {
         AtomicBoolean threadSafe = new AtomicBoolean();
         if (fileName != null) {
             // Try with the reader corresponding to the extension
-            AudioFileReader reader = getAudioFileReader(fileName, threadSafe);
-            if (reader != null) {
+            for (AudioFileReader reader : getAudioFileReaders(fileName, threadSafe)) {
                 try {
                     if (!threadSafe.get())
                         readLock.lock();
@@ -636,18 +647,16 @@ public class AudioFileTypes {
                 } catch (IOException ex) {
                     Debug.warn(ex);
                 } catch (UnsupportedAudioFileException ex) {
-                    if (isJreSupportedFormat(fileName)) {
-                        // Ignore, we will continue with JavaSound fallback.
-                        // In particular, WaveExtensibleFileReader is only supported by JavaSound and not by tritonus (!)
-                    } else {
-                        throw ex;
-                    }
+                    // Continue with next
                 } finally {
                     if (!threadSafe.get())
                         readLock.unlock();
                 }
             }
         }
+
+//        if (!javaSoundFallback)
+//            throw new UnsupportedAudioFileException("Unknown audio file format");
 
         // Failed. Fallback to JavaSound (try all readers)
         AudioFileFormat result = AudioSystem.getAudioFileFormat(fileInput);
@@ -660,7 +669,7 @@ public class AudioFileTypes {
         return result;
     }
     
-    private static boolean isJreSupportedFormat(String fileName) {
+    public static boolean isJreSupportedFormat(String fileName) {
         int lastDot = fileName.lastIndexOf('.');
         if (lastDot >= 0) {
             String extension = fileName.substring(lastDot).toLowerCase();

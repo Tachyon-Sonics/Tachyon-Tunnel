@@ -16,6 +16,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.tritonus.share.sampled.file.RandomFileInputStream;
 
+import com.beatofthedrum.alacdecoder.Alac;
 import com.jcraft.jorbis.VorbisFile;
 
 import ch.tachyon.opus.spi.Opus;
@@ -23,16 +24,23 @@ import ch.tachyon.opus.spi.OpusAudioFileReader;
 import ch.tachyon.tunnel.audio.file.AudioFileTypes;
 import ch.tachyon.tunnel.audio.file.IFileFormatDetector;
 import ch.tachyon.tunnel.audio.file.RandomFileProgressInputStream;
+import davaguine.jmac.info.APEFileInfo;
+import davaguine.jmac.info.APEHeader;
+import davaguine.jmac.spi.APEEncoding;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 import javazoom.spi.mpeg.sampled.file.MpegEncoding;
 import javazoom.spi.vorbis.sampled.file.VorbisEncoding;
 import net.sourceforge.jaad.mp4.MP4Container;
 import net.sourceforge.jaad.mp4.api.Movie;
 import net.sourceforge.jaad.spi.javasound.AACAudioFileReader;
+import vavi.sound.sampled.alac.AlacEncoding;
 
 /**
  * This is an exemple {@link IFileFormatDetector} implementation that knows and improves on various providers:
- * opus (ch.tachyon.opus.spi), ogg (javazoom.spi.vorbis), mp3 (javazoom.spi.mpeg) and m4a (net.sourceforge.jaad).
+ * opus (ch.tachyon.opus.spi), ogg (javazoom.spi.vorbis), mp3 (javazoom.spi.mpeg), m4a/aac (net.sourceforge.jaad),
+ * m4a/alac (vavi.sound.sampled.alac) and ape (Monkey Audio - davaguine.jmac).
+ * <p>
+ * Note that length is already properly detected on PCM wav, aiff and au files, and on FLAC (org.jflac).
  * <p>
  * Why does this class even exist?
  * <p>
@@ -56,7 +64,7 @@ import net.sourceforge.jaad.spi.javasound.AACAudioFileReader;
  * </ul>
  * Then add the following problems:
  * <ul>
- * <li>Some provider do not report the length at all, although they have a specific API to retrieve it</li>
+ * <li>Most providers do never report the length at all, although they have a specific API to retrieve it</li>
  * <li>Sometimes, the specific API to retrieve the length allows us to get a length as <tt>long</tt>, whereas
  * {@link AudioFileFormat} is limited to <tt>int</tt>.</li>
  * <li>The m4a provider is special: it does not even report channel count and sample rate until the audio stream
@@ -121,7 +129,7 @@ public class FileFormatDetector implements IFileFormatDetector {
              * Although the length is provided in AudioFileFormat.getFrameLength() as an 'int', it is
              * also provided as a 'long' (that is less likely to overflow) in the properties.
              */
-            Long frameDuration = (Long) opusFormat.getProperty(Opus.FRAME_LENGTH_PROPERTY);
+            Long frameDuration = (Long) opusFormat.getProperty(Opus.FRAME_LENGTH_KEY);
             if (frameDuration != null)
                 return frameDuration;
         } else if (encoding instanceof MpegEncoding) {
@@ -143,6 +151,7 @@ public class FileFormatDetector implements IFileFormatDetector {
             // The m4a provider reports PCM encoding, so we have to check the file type
         } else if (format.getType().equals(AACAudioFileReader.MP4)
                 || format.getType().equals(AACAudioFileReader.AAC)) {
+            // Use API directly to get duration in seconds
             final MP4Container cont = new MP4Container(new RandomAccessFile(file, "r"));
             final Movie movie = cont.getMovie();
             double durationSeconds = movie.getDuration();
@@ -150,6 +159,27 @@ public class FileFormatDetector implements IFileFormatDetector {
             if (isSane(durationSeconds) && isSane(sampleRate)) {
                 long frameLength = (long) (durationSeconds * sampleRate + 0.5);
                 return frameLength;
+            }
+        } else if (encoding.equals(AlacEncoding.ALAC)) {
+            // Use API directly
+            InputStream input = new RandomFileInputStream(file);
+            try {
+                Alac alac = new Alac(input);
+                long frameLength = alac.getNumSamples();
+                return frameLength;
+            } finally {
+                input.close();
+            }
+        } else if (encoding.equals(APEEncoding.APE)) {
+            davaguine.jmac.tools.RandomAccessFile jraf = new davaguine.jmac.tools.RandomAccessFile(file, "r");
+            try {
+                APEHeader header = new APEHeader(jraf);
+                APEFileInfo fileInfo = new APEFileInfo();
+                header.Analyze(fileInfo);
+                long frameLength = fileInfo.nTotalBlocks;
+                return frameLength;
+            } finally {
+                jraf.close();
             }
         }
         return format.getFrameLength();
