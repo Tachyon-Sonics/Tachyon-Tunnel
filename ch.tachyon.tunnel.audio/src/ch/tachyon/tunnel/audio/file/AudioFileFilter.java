@@ -24,6 +24,14 @@ public class AudioFileFilter extends FileFilter implements java.io.FileFilter {
             readInstance = new AudioFileFilter(false);
         return readInstance;
     }
+    
+    /**
+     * @param additionalExtensions additional file extensions that are allowed in the "All supported audio files"
+     * choice.
+     */
+    public static AudioFileFilter readInstance(Collection<String> additionalExtensions) {
+        return new AudioFileFilter(false, additionalExtensions);
+    }
 
     /**
      * Get an instance that accept any recognized audio format for writing
@@ -55,6 +63,15 @@ public class AudioFileFilter extends FileFilter implements java.io.FileFilter {
     protected AudioFileFilter(boolean writing) {
         AudioFileTypes afs = AudioFileTypes.instance();
         this.extensions = (writing ? afs.getSupportedWriteExtensions() : afs.getSupportedReadExtensions());
+        this.mainExtension = null;
+        this.label = "All Supported Audio Files";
+    }
+
+    protected AudioFileFilter(boolean writing, Collection<String> additionalExtensions) {
+        AudioFileTypes afs = AudioFileTypes.instance();
+        this.extensions = new HashSet<>();
+        this.extensions.addAll(writing ? afs.getSupportedWriteExtensions() : afs.getSupportedReadExtensions());
+        this.extensions.addAll(additionalExtensions);
         this.mainExtension = null;
         this.label = "All Supported Audio Files";
     }

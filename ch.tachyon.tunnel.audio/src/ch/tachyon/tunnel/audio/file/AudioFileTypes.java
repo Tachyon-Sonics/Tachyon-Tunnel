@@ -538,6 +538,21 @@ public class AudioFileTypes {
         return result;
     }
 
+    /**
+     * Get the audio file format for the given file, with the exact length.
+     * <p>
+     * The exact length is computed by decoding the entire audio file.
+     */
+    public AudioFileFormatEx getAudioFileFormatExactLength(File file, IProgressMonitor progress) throws IOException, UnsupportedAudioFileException {
+        // Get base format
+        InputStream fileInput = new RandomFileProgressInputStream(file, progress);
+        AudioFileFormat result = getAudioFileFormat(file.getName(), fileInput);
+        fileInput.close();
+        // Compute exact length
+        result = forceComputeLength(file, progress, result);
+        return (AudioFileFormatEx) result;
+    }
+
     private AudioFileFormat applyDetector(File file, IFileFormatDetector detector, AudioFileFormat fileFormat)
             throws IOException, UnsupportedAudioFileException {
         // Detect channel & sample rate if unkown
