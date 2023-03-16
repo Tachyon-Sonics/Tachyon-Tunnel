@@ -1,6 +1,7 @@
 package ch.tachyon.tunnel.audio.file;
 
 import java.io.*;
+import java.util.*;
 
 import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFormat.Encoding;
@@ -82,23 +83,57 @@ class AudioInputStreamSource implements IMultiChanAudioSource, Closeable {
      */
     private static AudioInputStream convertToLinear(AudioInputStream stream) {
         AudioFormat sourceFormat = stream.getFormat();
-        Encoding encoding = Encoding.PCM_SIGNED;
-        if (sourceFormat.getSampleSizeInBits() == 8 && sourceFormat.getEncoding().equals(Encoding.PCM_UNSIGNED))
-            encoding = Encoding.PCM_UNSIGNED;
-        else if (sourceFormat.getEncoding().equals(Encodings.PCM_IEEE_FLOAT))
-            encoding = Encodings.PCM_IEEE_FLOAT;
-        int sampleSizeInBits = sourceFormat.getSampleSizeInBits();
-        if (sampleSizeInBits == AudioSystem.NOT_SPECIFIED)
-            sampleSizeInBits = 16;
-        AudioFormat targetFormat = new AudioFormat(
-                encoding,
-                sourceFormat.getSampleRate(),
-                sampleSizeInBits,
-                sourceFormat.getChannels(),
-                sourceFormat.getChannels() * sampleSizeInBits / 8,
-                sourceFormat.getSampleRate(),
-                sourceFormat.isBigEndian());
-        AudioInputStream result = AudioSystem.getAudioInputStream(targetFormat, stream);
+        AudioInputStream result = null;
+        try {
+            // First try with "standard" format: match everything but encoding:
+            Encoding encoding = Encoding.PCM_SIGNED;
+            if (sourceFormat.getSampleSizeInBits() == 8 && sourceFormat.getEncoding().equals(Encoding.PCM_UNSIGNED))
+                encoding = Encoding.PCM_UNSIGNED;
+            else if (sourceFormat.getEncoding().equals(Encodings.PCM_IEEE_FLOAT))
+                encoding = Encodings.PCM_IEEE_FLOAT;
+            int sampleSizeInBits = sourceFormat.getSampleSizeInBits();
+            if (sampleSizeInBits == AudioSystem.NOT_SPECIFIED)
+                sampleSizeInBits = 16;
+            AudioFormat targetFormat = new AudioFormat(
+                    encoding,
+                    sourceFormat.getSampleRate(),
+                    sampleSizeInBits,
+                    sourceFormat.getChannels(),
+                    sourceFormat.getChannels() * sampleSizeInBits / 8,
+                    sourceFormat.getSampleRate(),
+                    sourceFormat.isBigEndian());
+            result = AudioSystem.getAudioInputStream(targetFormat, stream);
+        } catch (IllegalArgumentException ex) {
+            // Then ask for the supported target formats and try each one
+            // (necessary for ALAC that does endianness change)
+            for (AudioFormat targetFormat : getPcmFormatsFor(sourceFormat)) {
+                try {
+                    result = AudioSystem.getAudioInputStream(targetFormat, stream);
+                    break;
+                } catch (IllegalArgumentException ex2) {
+                    // Continue with next...
+                }
+            }
+            if (result == null)
+                throw ex;
+        }
+        return result;
+    }
+    
+    private static List<AudioFormat> getPcmFormatsFor(AudioFormat sourceFormat) {
+        List<AudioFormat> result = new ArrayList<>();
+        AudioFormat[] targetFormatArr = AudioSystem.getTargetFormats(Encoding.PCM_SIGNED, sourceFormat);
+        if (targetFormatArr != null) {
+            result.addAll(Arrays.asList(targetFormatArr));
+        }
+        targetFormatArr = AudioSystem.getTargetFormats(Encoding.PCM_UNSIGNED, sourceFormat);
+        if (targetFormatArr != null) {
+            result.addAll(Arrays.asList(targetFormatArr));
+        }
+        targetFormatArr = AudioSystem.getTargetFormats(Encoding.PCM_FLOAT, sourceFormat);
+        if (targetFormatArr != null) {
+            result.addAll(Arrays.asList(targetFormatArr));
+        }
         return result;
     }
 

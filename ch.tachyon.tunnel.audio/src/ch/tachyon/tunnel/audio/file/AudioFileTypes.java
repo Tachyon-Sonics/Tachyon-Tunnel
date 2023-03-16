@@ -655,8 +655,8 @@ public class AudioFileTypes {
             }
         }
 
-//        if (!javaSoundFallback)
-//            throw new UnsupportedAudioFileException("Unknown audio file format");
+        if (!javaSoundFallback)
+            throw new UnsupportedAudioFileException("Unknown audio file format");
 
         // Failed. Fallback to JavaSound (try all readers)
         AudioFileFormat result = AudioSystem.getAudioFileFormat(fileInput);
