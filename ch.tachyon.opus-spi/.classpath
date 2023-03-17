@@ -3,7 +3,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/concentus.jar" sourcepath="lib/concentus-src.jar"/>
-	<classpathentry kind="lib" path="/ch.tachyon.tritonus.test/lib/junit-4.8.2.jar"/>
+	<classpathentry kind="lib" path="/ch.tachyon.tritonus.test/lib/junit-4.8.2.jar" sourcepath="/ch.tachyon.tunnel.test/lib/junit-4.8.2-src.jar"/>
 	<classpathentry kind="lib" path="lib/vorbis-java-core-0.8b.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
