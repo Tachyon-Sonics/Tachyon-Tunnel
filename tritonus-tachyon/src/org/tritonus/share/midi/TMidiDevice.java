@@ -199,8 +199,6 @@ public abstract class TMidiDevice
     /**	Returns whether to handle input.
     	If this is true, retrieving Transmitters is possible
     	and input from the physical port is passed to them.
-    
-    	@see #getUseOut
      */
     protected boolean getUseTransmitter() {
         return m_bUseTransmitter;

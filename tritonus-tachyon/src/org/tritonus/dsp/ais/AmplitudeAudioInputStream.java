@@ -60,7 +60,7 @@ public class AmplitudeAudioInputStream
         The value passed here is the value the samples are
         multiplied with. So 1.0F means no change in amplitude. 2.0F
         doubles the amplitude. 0.5F cuts it to half, and so on.
-        This is in contrast to {@link #setAmplitudeLog() setAmplitudeLog},
+        This is in contrast to {@link #setAmplitudeLog(float) setAmplitudeLog},
         where you can pass the amplitude change as dB values.
     */
     public void setAmplitudeLinear(float fAmplitude) {
