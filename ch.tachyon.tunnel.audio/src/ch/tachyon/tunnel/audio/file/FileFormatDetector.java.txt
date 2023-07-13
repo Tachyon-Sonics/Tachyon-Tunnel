@@ -36,7 +36,7 @@ import net.sourceforge.jaad.spi.javasound.AACAudioFileReader;
 import vavi.sound.sampled.alac.AlacEncoding;
 
 /**
- * This is an exemple {@link IFileFormatDetector} implementation that knows and improves on various providers:
+ * This is an example {@link IFileFormatDetector} implementation that knows and improves on various providers:
  * opus (ch.tachyon.opus.spi), ogg (javazoom.spi.vorbis), mp3 (javazoom.spi.mpeg), m4a/aac (net.sourceforge.jaad),
  * m4a/alac (vavi.sound.sampled.alac) and ape (Monkey Audio - davaguine.jmac).
  * <p>
@@ -53,7 +53,7 @@ import vavi.sound.sampled.alac.AlacEncoding;
  * <p>
  * Unfortunately, using a <tt>File</tt> also comes with problems:
  * <ul>
- * <li>Many provider just wrap the <tt>File</tt> into a {@link FileInputStream} and a {@link BufferedInputStream}
+ * <li>Many providers just wrap the <tt>File</tt> into a {@link FileInputStream} and a {@link BufferedInputStream}
  * and delegate to the code based on <tt>InputStream</tt>. The problem is that identifying the format using
  * an <tt>InputStream</tt> relies on {@link InputStream#mark(int)} and {@link InputStream#reset()}. Some providers
  * just read past the mark limit in some case and thus fail to load some files (an old version of the mp3 provider
@@ -73,7 +73,7 @@ import vavi.sound.sampled.alac.AlacEncoding;
  * For all these reasons:
  * <ul>
  * <li>{@link AudioFileTypes#getAudioFileFormat(File, boolean) AudioFileTypes#getAudioFileFormat()} methods use
- * a {@link RandomFileInputStream} behind the scene. This is an {@link InputStream} implementation that not only supports
+ * a {@link RandomFileInputStream} behind the scene. This is an {@link InputStream} implementation that not only support
  * {@link InputStream#mark(int)} and {@link InputStream#reset()}, but it never invalidates the mark, even if reading
  * past it.</li>
  * <li>If the length, the channel count or the sample rate is reported as unknown, and an {@link IFileFormatDetector}
@@ -138,7 +138,7 @@ public class FileFormatDetector implements IFileFormatDetector {
             double sampleRate = mpegFormat.getFormat().getSampleRate();
             /*
              * The mp3 SPI reports the number of MP3 frames in 'getFrameLength()' rather than the number
-             * of PCM audio sample frames. It also supplies the average number of MP3 fraes per second
+             * of PCM audio sample frames. It also supplies the average number of MP3 frames per second
              * in 'getFrameRate()', which allows us to calculate the duration.
              */
             int nbMpegFrames = mpegFormat.getFrameLength();
