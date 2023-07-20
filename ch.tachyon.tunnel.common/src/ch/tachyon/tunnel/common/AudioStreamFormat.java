@@ -33,7 +33,7 @@ public class AudioStreamFormat {
     /**
      * @return sample rate in Hz
      */
-    public float getSampleRate() {
+    public float getSampleRate() { // TODO [ta] consider using double
         return sampleRate;
     }
 
