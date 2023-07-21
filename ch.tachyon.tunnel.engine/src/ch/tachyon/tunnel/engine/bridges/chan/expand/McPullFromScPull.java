@@ -106,7 +106,7 @@ public class McPullFromScPull extends McFromScBase<IPullEffect, ISingleChanPullE
         this.tasks = new ProcessOneChanTask[2][nbChans];
         this.inputs = new ArrayList<Queue<float[]>>(nbChans);
         this.offsets = new int[nbChans];
-        AudioStreamFormat format = new AudioStreamFormat((float) info.getSampleRate(), nbChans, info.getQuantization());
+        AudioStreamFormat format = new AudioStreamFormat(info.getSampleRate(), nbChans, info.getQuantization());
         for (int chan = 0; chan < nbChans; chan++) {
             sources[chan] = new CollectingSource(format, chan);
             tasks[0][chan] = new ProcessOneChanTask(chan);

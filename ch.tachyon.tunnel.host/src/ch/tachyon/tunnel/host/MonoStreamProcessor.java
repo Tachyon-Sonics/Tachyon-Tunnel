@@ -120,7 +120,7 @@ public class MonoStreamProcessor implements IProcessingInfo {
             }
 
             public AudioStreamFormat getAudioFormat() {
-                return new AudioStreamFormat((float) sampleRate, 1, 32);
+                return new AudioStreamFormat(sampleRate, 1, 32);
             }
 
             public void close() {

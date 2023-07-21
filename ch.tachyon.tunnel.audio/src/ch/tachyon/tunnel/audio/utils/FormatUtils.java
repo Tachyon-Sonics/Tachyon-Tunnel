@@ -24,11 +24,11 @@ public class FormatUtils {
             return (AudioFormat) sFormat.getAudioFormat();
         return new AudioFormat(
                 Encoding.PCM_FLOAT, 
-                sFormat.getSampleRate(), 
+                (float) sFormat.getSampleRate(), 
                 sFormat.getQuantization(), 
                 sFormat.getChannels(), 
                 (sFormat.getQuantization() + 7) / 8 * sFormat.getChannels(), 
-                sFormat.getSampleRate(),
+                (float) sFormat.getSampleRate(),
                 false);
     }
 

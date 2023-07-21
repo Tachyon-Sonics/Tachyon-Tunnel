@@ -12,7 +12,7 @@ package ch.tachyon.tunnel.common;
  */
 public class AudioStreamFormat {
 
-    private final float sampleRate;
+    private final double sampleRate;
     private final int channels;
     private final int quantization;
     private Object audioFormat;
@@ -24,7 +24,7 @@ public class AudioStreamFormat {
      * @param quantization precision in bits, for instance <tt>16</tt> for 16 bit. Use 32 for IEEE floats.
      * This is a hint based on the original source, even when only 32 bit <tt>float</tt>s are used internally for processing
      */
-    public AudioStreamFormat(float sampleRate, int nbChans, int quantization) {
+    public AudioStreamFormat(double sampleRate, int nbChans, int quantization) {
         this.sampleRate = sampleRate;
         this.channels = nbChans;
         this.quantization = quantization;
@@ -33,7 +33,7 @@ public class AudioStreamFormat {
     /**
      * @return sample rate in Hz
      */
-    public float getSampleRate() { // TODO [ta] consider using double
+    public double getSampleRate() {
         return sampleRate;
     }
 

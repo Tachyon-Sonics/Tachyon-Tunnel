@@ -118,7 +118,7 @@ public class ProcessingInfo implements IProcessingInfo, Cloneable, java.io.Seria
     }
     
     public static AudioStreamFormat toAudioFormat(IProcessingInfo info) {
-        return new AudioStreamFormat((float) info.getSampleRate(), info.getNumberOfChannels(), info.getQuantization());
+        return new AudioStreamFormat(info.getSampleRate(), info.getNumberOfChannels(), info.getQuantization());
     }
 
 

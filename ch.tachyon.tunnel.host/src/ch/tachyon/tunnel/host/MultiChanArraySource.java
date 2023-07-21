@@ -18,7 +18,7 @@ public class MultiChanArraySource implements IMultiChanAudioSource {
     
     public MultiChanArraySource(float[][] array, double sampleRate, int precision) {
         this.array = array;
-        this.format = new AudioStreamFormat((float) sampleRate, array.length, precision);
+        this.format = new AudioStreamFormat(sampleRate, array.length, precision);
         int nbFrames = 0;
         for (int chan = 0; chan < nbFrames; chan++) {
             if (chan == 0)
