@@ -112,7 +112,7 @@ public class AudioFileIO {
     /**
      * Save an audio source to a file. This method will fully read the given source, encode using the given format and write the result to the
      * specified file.
-     * @param audioSource the audio data
+     * @param audioSource the audio data - it will be closed when this method returns
      * @param outputFile the destination file
      * @param saveFormat the output audio format
      * @param progress an optional {@link IProgressMonitor} implementation to monitor progress (and eventually interrupt the saving process)
