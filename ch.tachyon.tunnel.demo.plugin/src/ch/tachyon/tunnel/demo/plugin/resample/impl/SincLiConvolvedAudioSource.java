@@ -31,7 +31,7 @@ public class SincLiConvolvedAudioSource implements IAudioSource, IResetable {
     /**
      * @param source the audio source to upsample and convolve with a sinc
      * between every sample before convolving
-     * @param nbSamplesPerZeroCross numbre of sample between zero crossing for the sinc function
+     * @param nbSamplesPerZeroCross number of sample between zero crossing for the sinc function
      * @param nbZeroCross number of zero cross (on one side) for the sinc function
      * @param stretch the amount by which the sinc function must be stretched.
      * @param bufferSize the number of sample to read from the source at once
