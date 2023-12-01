@@ -38,11 +38,11 @@ public class ZeroPaddedRandomInputStream extends RandomFileInputStream {
     public int read(byte[] b, int off, int len) throws IOException {
         int result = 0;
         for (int i = 0; i < len; i++) {
-            int value = read();
+            int value = read(); // increments 'position'
             if (value < 0)
                 return (result == 0 ? -1 : result);
             b[off + i] = (byte) value;
-            position++;
+            result++;
         }
         return result;
     }
