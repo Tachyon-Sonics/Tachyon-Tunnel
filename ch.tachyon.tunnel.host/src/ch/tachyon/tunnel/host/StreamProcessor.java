@@ -188,8 +188,10 @@ public class StreamProcessor {
         toProcess += additionalInputFrames;
         
         long processed = 0;
-        for (IPullEffect effect : effects)
-            processed += effect.getProcessedFrames();
+        for (int i = 0; i < effects.size(); i++)
+            processed += effects.get(i).getProcessedFrames();
+//        for (IPullEffect effect : effects)
+//            processed += effect.getProcessedFrames();
         processed /= effects.size();
         
         return (double) processed * 100.0 / (double) toProcess;
