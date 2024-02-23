@@ -62,7 +62,7 @@ public class MtContext implements IMtContext {
                     long maxMemMb = (Runtime.getRuntime().maxMemory() >> 20) - 96; // Assume base of 96 Mb
                     int maxSupportedCores = (int) Math.max(1, maxMemMb / 10); // Assume 10Mb required per core
                     if (defaultNbThreads > maxSupportedCores) {
-                        Debug.warn("Using only {0} of {1} cores as the allocated memory is limited", maxSupportedCores, defaultNbThreads);
+//                        Debug.warn("Using only {0} of {1} cores as the allocated memory is limited", maxSupportedCores, defaultNbThreads);
                         defaultNbThreads = maxSupportedCores;
                     }
                 }
