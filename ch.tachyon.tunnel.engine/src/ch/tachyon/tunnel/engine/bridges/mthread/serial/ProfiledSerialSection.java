@@ -15,7 +15,7 @@ public class ProfiledSerialSection implements ISerialSectionExt {
     private final int queueSize;
     private final long mask;
 
-    protected final ThreadLocal<Long> threadClocks = new ThreadLocal<Long>();
+    protected final ThreadLocal<Long> threadClocks = new ThreadLocal<>();
     protected final String name;
     protected final Object userData;
 
@@ -51,7 +51,7 @@ public class ProfiledSerialSection implements ISerialSectionExt {
         this.mask = qs - 1;
         this.waiters = new AtomicReference[queueSize];
         for (int i = 0; i < waiters.length; i++)
-            waiters[i] = new AtomicReference<Thread>(null);
+            waiters[i] = new AtomicReference<>(null);
 }
 
     public String getName() {

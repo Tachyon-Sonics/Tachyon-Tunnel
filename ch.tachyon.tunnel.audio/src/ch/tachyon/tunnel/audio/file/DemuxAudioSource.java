@@ -81,9 +81,11 @@ public class DemuxAudioSource implements IMultiChanAudioSource, Closeable {
         this.audioSources = null;
         int nbChannels = mcAudioSource.getAudioFormat().getChannels();
         this.resultSources = new ISingleChanAudioSource[nbChannels];
-        this.channelQueues = new ArrayList<Queue<float[]>>(nbChannels);
-        for (int i = 0; i < nbChannels; i++)
-            channelQueues.add(new LinkedList<float[]>());
+        this.channelQueues = new ArrayList<>(nbChannels);
+        for (int i = 0; i < nbChannels; i++) {
+            Queue<float[]> emptyList = new LinkedList<>();
+            channelQueues.add(emptyList);
+        }
         this.channelIndex = new int[nbChannels];
     }
 

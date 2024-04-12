@@ -21,7 +21,7 @@ public class MemoryLeakTest extends TestCase {
     protected void runTest() throws Throwable {
         System.out.println("[Memory leak test]");
         for (WeakReference<Class<?>> classRef : classRefs) {
-            Set<Class<?>> displayed = new HashSet<Class<?>>();
+            Set<Class<?>> displayed = new HashSet<>();
             int count = 0;
             while (classRef.get() != null) {
                 if (count % 3 == 0)

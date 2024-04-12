@@ -22,7 +22,7 @@ public class GcUtils {
      */
     public static void forceGC() {
         // Create a SoftReference, as these are freed later than garbage and WeakReferences.
-        SoftReference<Object> tester = new SoftReference<Object>(new Object());
+        SoftReference<Object> tester = new SoftReference<>(new Object());
         try {
             int amount = (int) (Math.min(Integer.MAX_VALUE, Runtime.getRuntime().maxMemory() / 8 + 1));
             // This should fail as we allocate more than the available memory
@@ -50,7 +50,7 @@ public class GcUtils {
     public static void fillHeap() {
         System.gc();
         final int MIN_SIZE = 4096;
-        List<byte[]> filler = new ArrayList<byte[]>();
+        List<byte[]> filler = new ArrayList<>();
         int size = MIN_SIZE;
         // Fill with increasing size
         while (true) {
@@ -82,7 +82,7 @@ public class GcUtils {
     }
 
     public static boolean assertGC(Reference<?> ref) {
-        List<byte[]> alloc = new ArrayList<byte[]>();
+        List<byte[]> alloc = new ArrayList<>();
         int size = 100000;
         for (int i = 0; i < 50; i++) {
             if (ref.get() == null) {

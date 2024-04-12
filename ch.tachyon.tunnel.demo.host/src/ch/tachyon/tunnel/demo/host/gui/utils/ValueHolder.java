@@ -10,7 +10,7 @@ import ch.tachyon.tunnel.common.utils.*;
 public class ValueHolder<E> {
     
     private E value;
-    private final List<Runnable> listeners = new ArrayList<Runnable>();
+    private final List<Runnable> listeners = new ArrayList<>();
 
     
     public E getValue() {

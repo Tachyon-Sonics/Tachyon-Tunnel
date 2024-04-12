@@ -13,7 +13,7 @@ public class MtContext implements IMtContext {
     private int nbThreads;
     private int defaultNbThreads;
     
-    private Map<Object, ThreadPool> pools = new HashMap<Object, ThreadPool>();
+    private Map<Object, ThreadPool> pools = new HashMap<>();
 
 
     synchronized ThreadPool setupPool(Object owner, int chanDivider) {

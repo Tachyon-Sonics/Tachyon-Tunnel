@@ -75,13 +75,13 @@ public class PluginsImpl {
      * Single chan to multi chan conversion, and multi-threading wrappers are not included as they are done in separate steps
      */
     private final static Map<Pair<Class<? extends IPlugin>, Class<? extends IEffect>>, Class<? extends IEffect>> bridges =
-        new HashMap<Pair<Class<? extends IPlugin>,Class<? extends IEffect>>, Class<? extends IEffect>>();
+        new HashMap<>();
     
     /**
      * For each bridge in 'bridges', itw priority. Bridges of higher (smaller) priority are preferred. Higher priority
      * means less complexity in the conversion process
      */
-    private final static Map<Class<? extends IEffect>, Integer> bridgePriorities = new HashMap<Class<? extends IEffect>, Integer>();
+    private final static Map<Class<? extends IEffect>, Integer> bridgePriorities = new HashMap<>();
     
     /**
      * Single chan to multi chan converters. This is done after the plugin interface is bridged to the host interface.
@@ -98,7 +98,7 @@ public class PluginsImpl {
     /**
      * Set of host interfaces that correspond to multi chan interfaces
      */
-    private final static Set<Class<? extends IEffect>> multiChanInterfaces = new HashSet<Class<? extends IEffect>>();
+    private final static Set<Class<? extends IEffect>> multiChanInterfaces = new HashSet<>();
 
     /**
      * Initialize all the bridges. A bridge allows a plugin interface to be accessed using a host
@@ -173,16 +173,19 @@ public class PluginsImpl {
 
     private static <P extends IPlugin, H extends IEffect> void addBridge(Class<P> pluginInterface, Class<H> hostInterface, Class<? extends H> bridgeType,
             int priority) {
-        bridges.put(new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(pluginInterface, hostInterface), bridgeType);
+        Pair<Class<? extends IPlugin>, Class<? extends IEffect>> key = new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(pluginInterface, hostInterface);
+        bridges.put(key, bridgeType);
         bridgePriorities.put(bridgeType, priority);
     }
     
     private static <S extends IEffect, M extends IEffect, C extends McFromScBase<M, S>> void addSingleToMultiConverter(Class<S> singleInterface, Class<M> multiInterface, Class<C> converter) {
-        singleToMultiConverters.put(multiInterface, new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>(singleInterface, converter));
+        Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> value = new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>(singleInterface, converter);
+        singleToMultiConverters.put(multiInterface, value);
     }
     
     private static <M extends IEffect, S extends IEffect, C extends ScFromMcBase<S, M>> void addMultiToSIngleConverter(Class<M> multiInterface, Class<S> singleInterface, Class<C> converter) {
-        multiToSingleConverters.put(singleInterface, new Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?,?>>>(multiInterface, converter));
+        Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?, ?>>> value = new Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?,?>>>(multiInterface, converter);
+        multiToSingleConverters.put(singleInterface, value);
     }
 
     /**
@@ -191,7 +194,7 @@ public class PluginsImpl {
      * explicitely referenced in a <tt>META-INF/services/ch.tachyon.tunnel.Plugins</tt> file are considered.
      */
     public static List<IEffect> loadAllPlugins(ClassLoader classLoader, MtContext mtContext, List<Class<? extends IEffect>> hostInterfaces) throws IOException {
-        List<IEffect> plugins = new ArrayList<IEffect>();
+        List<IEffect> plugins = new ArrayList<>();
         Enumeration<URL> pluginLists = classLoader.getResources(PLUGINS_RESOURCE);
         while (pluginLists.hasMoreElements()) {
             URL pluginList = pluginLists.nextElement();
@@ -220,7 +223,7 @@ public class PluginsImpl {
     }
 
     public static <E extends IEffect> E loadPlugin(ClassLoader classLoader, MtContext mtContext, Class<E> type, String className) {
-        List<Class<? extends IEffect>> singleton = new ArrayList<Class<? extends IEffect>>(1);
+        List<Class<? extends IEffect>> singleton = new ArrayList<>(1);
         singleton.add(type);
         @SuppressWarnings("unchecked")
         E result = (E) loadEffect(classLoader, singleton, className, mtContext);
@@ -309,7 +312,8 @@ public class PluginsImpl {
         // adding single chan to multi chan conversion
         List<Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>> targetMcInterfaces = new ArrayList<>();
         for (Class<? extends IEffect> hostInterface : hostInterfaces) {
-            targetMcInterfaces.add(new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?,?>>>(hostInterface, null)); // No conversion
+            Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> p = new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?,?>>>(hostInterface, null);
+            targetMcInterfaces.add(p); // No conversion
             if (singleToMultiConverters.containsKey(hostInterface)) { // Multi chan can be converted
                 Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair = singleToMultiConverters.get(hostInterface);
                 targetMcInterfaces.add(pair); // Add corresponding single chan, and converter type
@@ -474,7 +478,7 @@ public class PluginsImpl {
      * Get the first {@link IPlugin} interface implemented by the given plugin type
      */
     private static List<Class<? extends IPlugin>> getEffectInterfaces(Class<? extends IPlugin> effectType) {
-        List<Class<? extends IPlugin>> result = new ArrayList<Class<? extends IPlugin>>();
+        List<Class<? extends IPlugin>> result = new ArrayList<>();
         Class<?> currentType = effectType;
         do {
             Class<?>[] interfaces = currentType.getInterfaces();
@@ -561,7 +565,7 @@ public class PluginsImpl {
      * @return the requested plugin, wrapped in the requested interface
      */
     public static <I extends IEffect, E extends IPlugin> I getPlugin(Class<I> commIntf, Class<E> pluginClass, MtContext mtContext) {
-        List<Class<? extends IEffect>> singleton = new ArrayList<Class<? extends IEffect>>(1);
+        List<Class<? extends IEffect>> singleton = new ArrayList<>(1);
         singleton.add(commIntf);
         try {
             @SuppressWarnings("unchecked")

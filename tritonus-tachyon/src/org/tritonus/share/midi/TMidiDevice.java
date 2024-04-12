@@ -112,8 +112,8 @@ public abstract class TMidiDevice
         m_bUseTransmitter = bUseTransmitter;
         m_bUseReceiver = bUseReceiver;
         m_bDeviceOpen = false;
-        m_receivers = new ArrayList<Receiver>();
-        m_transmitters = new ArrayList<Transmitter>();
+        m_receivers = new ArrayList<>();
+        m_transmitters = new ArrayList<>();
     }
 
 

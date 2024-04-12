@@ -127,7 +127,7 @@ public class MonoStreamProcessor implements IProcessingInfo {
                 // Nothing to do as we are reading from an array
             }
         };
-        final List<float[]> outputs = new ArrayList<float[]>();
+        final List<float[]> outputs = new ArrayList<>();
         ISingleChanAudioSink sink = new ISingleChanAudioSink() {
             
             public void writeSamples(float[] samples) {

@@ -9,7 +9,7 @@ public class SerialSectionPool implements ISerialSectionPool {
 
     private final IProcessingInfo info;
     private final IMtContext mtContext;
-    private final Map<String, ISerialSection> serialSections = new LinkedHashMap<String, ISerialSection>();
+    private final Map<String, ISerialSection> serialSections = new LinkedHashMap<>();
     private int threadIndex;
 
 

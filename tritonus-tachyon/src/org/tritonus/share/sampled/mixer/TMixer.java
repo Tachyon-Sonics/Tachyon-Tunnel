@@ -72,10 +72,10 @@ public abstract class TMixer
             Line.Info lineInfo) {
         this(mixerInfo,
                 lineInfo,
-                new ArrayList<AudioFormat>(),
-                new ArrayList<AudioFormat>(),
-                new ArrayList<Line.Info>(),
-                new ArrayList<Line.Info>());
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>());
     }
 
 
@@ -98,8 +98,8 @@ public abstract class TMixer
                 supportedTargetFormats,
                 supportedSourceLineInfos,
                 supportedTargetLineInfos);
-        m_openSourceDataLines = new ArraySet<SourceDataLine>();
-        m_openTargetDataLines = new ArraySet<TargetDataLine>();
+        m_openSourceDataLines = new ArraySet<>();
+        m_openTargetDataLines = new ArraySet<>();
         if (TDebug.TraceMixer) {
             TDebug.out("TMixer.<init>(): end");
         }

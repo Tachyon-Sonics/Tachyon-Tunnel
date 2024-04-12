@@ -116,7 +116,7 @@ public abstract class TSequencer
         super(info);
         m_bRunning = false;
         m_sequence = null;
-        m_metaListeners = new ArraySet<MetaEventListener>();
+        m_metaListeners = new ArraySet<>();
         m_aControllerListeners = (Set<ControllerEventListener>[]) new Set[128];
         setTempoFactor(1.0F);
         setTempoInMPQ(500000);
@@ -437,7 +437,7 @@ public abstract class TSequencer
     private void addControllerListener(int i,
             ControllerEventListener listener) {
         if (m_aControllerListeners[i] == null) {
-            m_aControllerListeners[i] = new ArraySet<ControllerEventListener>();
+            m_aControllerListeners[i] = new ArraySet<>();
         }
         m_aControllerListeners[i].add(listener);
     }

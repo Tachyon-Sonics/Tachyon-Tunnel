@@ -11,7 +11,7 @@ import ch.tachyon.tunnel.plugin.opt.thread.*;
  */
 public class SerialSectionImpl extends SerialSection implements ISerialSectionExt {
 
-    private final ThreadLocal<LongReference> clock = new ThreadLocal<LongReference>();
+    private final ThreadLocal<LongReference> clock = new ThreadLocal<>();
     private final String name;
     private final Object userData;
 

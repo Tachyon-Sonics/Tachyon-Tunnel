@@ -10,7 +10,7 @@ import ch.tachyon.tunnel.common.*;
  */
 public class MultiChanArraySink implements IMultiChanAudioSink {
     
-    private final List<float[][]> data = new ArrayList<float[][]>();
+    private final List<float[][]> data = new ArrayList<>();
     private int nbChannels;
     private int length;
 

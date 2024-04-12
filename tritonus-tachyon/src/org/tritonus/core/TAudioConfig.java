@@ -132,7 +132,7 @@ public class TAudioConfig {
 
     private static synchronized Set<AudioFileReader> getAudioFileReadersImpl() {
         if (sm_audioFileReaders == null) {
-            sm_audioFileReaders = new ArraySet<AudioFileReader>();
+            sm_audioFileReaders = new ArraySet<>();
             registerAudioFileReaders();
         }
         return sm_audioFileReaders;
@@ -156,7 +156,7 @@ public class TAudioConfig {
 
     private static synchronized Set<AudioFileWriter> getAudioFileWritersImpl() {
         if (sm_audioFileWriters == null) {
-            sm_audioFileWriters = new ArraySet<AudioFileWriter>();
+            sm_audioFileWriters = new ArraySet<>();
             registerAudioFileWriters();
         }
         return sm_audioFileWriters;
@@ -180,7 +180,7 @@ public class TAudioConfig {
 
     private static synchronized Set<FormatConversionProvider> getFormatConversionProvidersImpl() {
         if (sm_formatConversionProviders == null) {
-            sm_formatConversionProviders = new ArraySet<FormatConversionProvider>();
+            sm_formatConversionProviders = new ArraySet<>();
             registerFormatConversionProviders();
         }
         return sm_formatConversionProviders;
@@ -204,7 +204,7 @@ public class TAudioConfig {
 
     private static synchronized Set<MixerProvider> getMixerProvidersImpl() {
         if (sm_mixerProviders == null) {
-            sm_mixerProviders = new ArraySet<MixerProvider>();
+            sm_mixerProviders = new ArraySet<>();
             registerMixerProviders();
         }
         return sm_mixerProviders;

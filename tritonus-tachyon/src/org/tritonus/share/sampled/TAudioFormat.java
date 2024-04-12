@@ -110,7 +110,7 @@ public class TAudioFormat
         /* Here, we make a shallow copy of the map. It's unclear if this
            is sufficient (or if a deep copy should be made).
         */
-        m_properties = new HashMap<String, Object>();
+        m_properties = new HashMap<>();
         if (properties != null) {
             m_properties.putAll(properties);
         }

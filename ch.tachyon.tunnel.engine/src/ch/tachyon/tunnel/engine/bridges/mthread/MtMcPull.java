@@ -45,7 +45,7 @@ public class MtMcPull extends MtBase<IMultiChanPullEffect> implements IMultiChan
     public void startProcessing(IProcessingInfo info) {
         super.startProcessing(info);
         int capacity = mtContext.getSerialRunningMaxSkew();
-        queue = new ClockedAsynchronousQueue<float[][]>(capacity);
+        queue = new ClockedAsynchronousQueue<>(capacity);
         curBuffer = null;
         srcIndex = 0;
         producerClock.set(0);

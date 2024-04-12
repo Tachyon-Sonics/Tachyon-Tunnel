@@ -27,7 +27,7 @@ public class NoNewThreadTest extends TestCase {
     private static Set<Long> getThreads() {
         ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
         long[] ids = threadMxBean.getAllThreadIds();
-        Set<Long> threadIds = new HashSet<Long>();
+        Set<Long> threadIds = new HashSet<>();
         for (long id : ids)
             threadIds.add(id);
         return threadIds;

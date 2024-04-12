@@ -46,7 +46,7 @@ public abstract class TMixerProvider
         extends MixerProvider {
     private static final Mixer.Info[] EMPTY_MIXER_INFO_ARRAY = new Mixer.Info[0];
 
-    private static Map<Class<?>, MixerProviderStruct> sm_mixerProviderStructs = new HashMap<Class<?>, MixerProviderStruct>();
+    private static Map<Class<?>, MixerProviderStruct> sm_mixerProviderStructs = new HashMap<>();
 
     private boolean m_bDisabled = false;
 
@@ -203,7 +203,7 @@ public abstract class TMixerProvider
         if (TDebug.TraceMixerProvider) {
             TDebug.out("TMixerProvider.getMixerInfo(): begin");
         }
-        Set<Mixer.Info> mixerInfos = new HashSet<Mixer.Info>();
+        Set<Mixer.Info> mixerInfos = new HashSet<>();
         MixerProviderStruct struct = getMixerProviderStruct();
         synchronized (struct) {
             Iterator<Mixer> mixers = struct.m_mixers.iterator();
@@ -225,7 +225,7 @@ public abstract class TMixerProvider
 
 
         public MixerProviderStruct() {
-            m_mixers = new ArrayList<Mixer>();
+            m_mixers = new ArrayList<>();
             m_defaultMixer = null;
         }
     }

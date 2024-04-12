@@ -60,7 +60,7 @@ public class AlsaMidiDeviceProvider
         }
         synchronized (AlsaMidiDeviceProvider.class) {
             if (m_devices == null) {
-                m_devices = new ArrayList<MidiDevice>();
+                m_devices = new ArrayList<>();
                 if (TDebug.TraceMidiDeviceProvider) {
                     TDebug.out("AlsaMidiDeviceProvider.<init>(): creating AlsaSeq...");
                 }
@@ -84,7 +84,7 @@ public class AlsaMidiDeviceProvider
         if (TDebug.TraceMidiDeviceProvider) {
             TDebug.out("AlsaMidiDeviceProvider.getDeviceInfo(): begin");
         }
-        List<MidiDevice.Info> infoList = new ArrayList<MidiDevice.Info>();
+        List<MidiDevice.Info> infoList = new ArrayList<>();
         Iterator<MidiDevice> iterator = m_devices.iterator();
         while (iterator.hasNext()) {
             MidiDevice device = iterator.next();

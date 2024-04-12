@@ -6,8 +6,8 @@ import org.w3c.dom.*;
 
 class RunningCache {
     
-    private final IdentityHashMap<Object, Long> objectKeys = new IdentityHashMap<Object, Long>();
-    private final IdentityHashMap<Object, Element> objectNodes = new IdentityHashMap<Object, Element>();
+    private final IdentityHashMap<Object, Long> objectKeys = new IdentityHashMap<>();
+    private final IdentityHashMap<Object, Element> objectNodes = new IdentityHashMap<>();
     private long counter = 0;
     
     

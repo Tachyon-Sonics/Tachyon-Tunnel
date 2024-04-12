@@ -8,7 +8,7 @@ public class ParameterDefinition<P, T> { // WAIT unit test for correctness, also
     private final Class<T> type;
     private final String name; // English display name
 
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPED = new HashMap<Class<?>, Class<?>>();
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPED = new HashMap<>();
 
     static {
         PRIMITIVE_TO_WRAPPED.put(boolean.class, Boolean.class);

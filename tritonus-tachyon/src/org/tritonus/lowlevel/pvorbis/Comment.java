@@ -65,7 +65,7 @@ public class Comment
      */
     public void init() {
         m_vendor = null;
-        m_comments = new ArrayList<String>();
+        m_comments = new ArrayList<>();
     }
 
 

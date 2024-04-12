@@ -15,7 +15,7 @@ public class ThreadPool {
     private volatile boolean active = true;
 
     private List<TaskFactory> taskFactories;
-    private ThreadLocal<TaskFactory> curFactory = new ThreadLocal<TaskFactory>();
+    private ThreadLocal<TaskFactory> curFactory = new ThreadLocal<>();
     
     private List<Queue<Task>> executeByEachQueue;
 
@@ -30,10 +30,12 @@ public class ThreadPool {
             nbThreads = Runtime.getRuntime().availableProcessors();
         poolSize = (nbThreads > 1 ? nbThreads : 0);
         queueSize = getDefaultQueueSize(nbThreads);
-        taskQueue = new ConcurrentLinkedBlockingQueue<Task>(queueSize, false);
-        executeByEachQueue = new ArrayList<Queue<Task>>(poolSize);
-        for (int i = 0; i < poolSize; i++)
-            executeByEachQueue.add(new ConcurrentLinkedQueue<Task>());
+        taskQueue = new ConcurrentLinkedBlockingQueue<>(queueSize, false);
+        executeByEachQueue = new ArrayList<>(poolSize);
+        for (int i = 0; i < poolSize; i++) {
+            Queue<Task> emptyQueue = new ConcurrentLinkedQueue<>();
+            executeByEachQueue.add(emptyQueue);
+        }
         poolThreads = new Thread[poolSize];
         for (int i = 0; i < poolThreads.length; i++) {
             Thread t = new PoolThread(i, this);
@@ -66,7 +68,7 @@ public class ThreadPool {
             throw new IllegalStateException("Task factories are not supported when only one CPU core is used");
         synchronized (this) {
             if (taskFactories == null)
-                taskFactories = new CopyOnWriteArrayList<TaskFactory>();
+                taskFactories = new CopyOnWriteArrayList<>();
             taskFactories.add(new TaskFactory(task));
         }
         processFactories();
@@ -418,7 +420,7 @@ public class ThreadPool {
         if (poolSize == 0)
             return Collections.singleton(Thread.currentThread());
         else
-            return new HashSet<Thread>(Arrays.asList(poolThreads));
+            return new HashSet<>(Arrays.asList(poolThreads));
     }
 
     /**

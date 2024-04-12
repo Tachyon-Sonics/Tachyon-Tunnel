@@ -91,7 +91,7 @@ public class GSMAudioFileReader
         // [fb] not specifying it causes Sun's Wave file writer to write rubbish
         int nByteSize = AudioSystem.NOT_SPECIFIED;
         int nFrameSize = AudioSystem.NOT_SPECIFIED;
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         if (lFileSizeInBytes != AudioSystem.NOT_SPECIFIED) {
             // the number of GSM frames
             long lFrameSize = lFileSizeInBytes / 33;
@@ -104,7 +104,7 @@ public class GSMAudioFileReader
             }
         }
 
-        Map<String, Object> afProperties = new HashMap<String, Object>();
+        Map<String, Object> afProperties = new HashMap<>();
         afProperties.put("bitrate", 13200L);
         AudioFormat format = new AudioFormat(
                 new AudioFormat.Encoding("GSM0610"),

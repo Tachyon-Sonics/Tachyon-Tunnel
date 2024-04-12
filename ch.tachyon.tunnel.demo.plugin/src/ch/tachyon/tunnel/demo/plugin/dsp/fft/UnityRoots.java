@@ -8,7 +8,7 @@ import java.util.*;
 public class UnityRoots {
 
     private static UnityRoots generator;
-    private Map<Integer, Cmplx[]> nToRoots = new WeakHashMap<Integer, Cmplx[]>();
+    private Map<Integer, Cmplx[]> nToRoots = new WeakHashMap<>();
 
     /**
      * This class is a singleton. Use static method getGenerator to get this

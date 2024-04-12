@@ -66,7 +66,7 @@ public class AlsaSynthesizer
                         GlobalInfo.getVersion()),
                 nClient, nPort, false, true);
         m_nVoices = nVoices;
-        m_channels = new ArrayList<MidiChannel>();
+        m_channels = new ArrayList<>();
     }
 
 

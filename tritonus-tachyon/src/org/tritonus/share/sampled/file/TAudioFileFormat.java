@@ -113,7 +113,7 @@ public class TAudioFileFormat
         /* Here, we make a shallow copy of the map. It's unclear if this
            is sufficient (of if a deep copy should be made).
         */
-        m_properties = new HashMap<String, Object>();
+        m_properties = new HashMap<>();
         m_properties.putAll(properties);
         m_unmodifiableProperties = Collections.unmodifiableMap(m_properties);
     }

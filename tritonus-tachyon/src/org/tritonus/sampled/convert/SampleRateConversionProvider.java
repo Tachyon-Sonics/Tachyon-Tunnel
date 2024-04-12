@@ -159,7 +159,7 @@ public class SampleRateConversionProvider extends
         sourceFormat = replaceSampleRate(sourceFormat,
                 AudioSystem.NOT_SPECIFIED);
         if (isConversionSupported(targetEncoding, sourceFormat)) {
-            ArraySet<AudioFormat> result = new ArraySet<AudioFormat>();
+            ArraySet<AudioFormat> result = new ArraySet<>();
             Iterator<AudioFormat> iterator = getCollectionTargetFormats().iterator();
             while (iterator.hasNext()) {
                 AudioFormat targetFormat = iterator.next();

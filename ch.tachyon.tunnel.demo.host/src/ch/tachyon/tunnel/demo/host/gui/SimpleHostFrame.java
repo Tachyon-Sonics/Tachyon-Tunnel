@@ -16,11 +16,11 @@ import ch.tachyon.tunnel.host.engine.*;
 
 public class SimpleHostFrame extends JFrame {
     
-    private ValueHolder<File> srcFileRef = new ValueHolder<File>();
-    private ValueHolder<File> bundleFileRef = new ValueHolder<File>();
-    private ValueHolder<IPluginBundle> bundleRef = new ValueHolder<IPluginBundle>();
-    private ValueHolder<String> pluginClassRef = new ValueHolder<String>();
-    private ValueHolder<File> dstFileRef = new ValueHolder<File>();
+    private ValueHolder<File> srcFileRef = new ValueHolder<>();
+    private ValueHolder<File> bundleFileRef = new ValueHolder<>();
+    private ValueHolder<IPluginBundle> bundleRef = new ValueHolder<>();
+    private ValueHolder<String> pluginClassRef = new ValueHolder<>();
+    private ValueHolder<File> dstFileRef = new ValueHolder<>();
     
     
     static enum FileFilterType {
@@ -245,7 +245,7 @@ public class SimpleHostFrame extends JFrame {
         label.setToolTipText(tooltip);
         target.add(label);
 
-        final JComboBox<EffectDescriptor> selector = new JComboBox<EffectDescriptor>();
+        final JComboBox<EffectDescriptor> selector = new JComboBox<>();
         target.add(selector, sgbc);
         
         selector.addActionListener(new ActionListener() {
@@ -324,7 +324,7 @@ public class SimpleHostFrame extends JFrame {
             return;
         }
         if (effects == null || effects.isEmpty()) {
-            selector.setModel(new DefaultComboBoxModel<EffectDescriptor>(new EffectDescriptor[0]));
+            selector.setModel(new DefaultComboBoxModel<>(new EffectDescriptor[0]));
             return;
         }
         
@@ -339,7 +339,7 @@ public class SimpleHostFrame extends JFrame {
          * and the classloader. We can still instanciate the effect later unsing the bundle.
          */
         EffectDescriptor[] descriptors = Controller.gatherPluginDescriptions(effects);
-        selector.setModel(new DefaultComboBoxModel<EffectDescriptor>(descriptors));
+        selector.setModel(new DefaultComboBoxModel<>(descriptors));
         Controller.releaseBundleLoader(form.getBundle());
 
         // Select the first plugin automatically

@@ -12,7 +12,7 @@ public class TableLayout extends GridBagLayout {
     private GridBagConstraints dfltConstraint = new GridBagConstraints();
     private int x = 0;
     private int y = 0;
-    private List<BitSet> reservedColumns = new ArrayList<BitSet>();
+    private List<BitSet> reservedColumns = new ArrayList<>();
 
 
     /**

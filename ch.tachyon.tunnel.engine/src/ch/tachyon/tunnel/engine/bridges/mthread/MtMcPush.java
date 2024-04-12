@@ -113,7 +113,7 @@ public class MtMcPush extends MtBase<IMultiChanPushEffect> implements IMultiChan
         private long clock;
         private IMultiChanAudioSink sink;
 
-        private final List<float[][]> outputs = new ArrayList<float[][]>();
+        private final List<float[][]> outputs = new ArrayList<>();
 
 
         /**

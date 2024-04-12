@@ -32,7 +32,7 @@ public abstract class MtBase<E extends IPlugin> implements IPlugin, IStartStop, 
     private final boolean needsReadSection;
     protected final MtContext mtContext;
 
-    private final Map<Thread, E> pool = new ConcurrentHashMap<Thread, E>(8, 0.75f, 1);
+    private final Map<Thread, E> pool = new ConcurrentHashMap<>(8, 0.75f, 1);
     private int poolSize;
     private int minInputPoolSize = 0;
     protected ThreadPool threadPool;

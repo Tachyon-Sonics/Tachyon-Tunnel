@@ -11,7 +11,7 @@ import ch.tachyon.tunnel.engine.utils.concurrent.*;
  */
 public class DebugSerialSection extends SerialSection implements ISerialSectionExt {
 
-    private final ThreadLocal<Long> clock = new ThreadLocal<Long>();
+    private final ThreadLocal<Long> clock = new ThreadLocal<>();
     private final String name;
     private final Object userData;
 
@@ -38,7 +38,7 @@ public class DebugSerialSection extends SerialSection implements ISerialSectionE
 
     };
     private final AtomicBoolean entered = new AtomicBoolean(false);
-    private final static ThreadLocal<DebugSerialSection> previousSection = new ThreadLocal<DebugSerialSection>();
+    private final static ThreadLocal<DebugSerialSection> previousSection = new ThreadLocal<>();
     private DebugSerialSection commonPreviousSection = null;
 
 

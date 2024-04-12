@@ -62,7 +62,7 @@ public class TAudioInputStream
             AudioFormat audioFormat,
             long lLengthInFrames) {
         super(inputStream, audioFormat, lLengthInFrames);
-        initMaps(new HashMap<String, Object>());
+        initMaps(new HashMap<>());
     }
 
 

@@ -198,7 +198,7 @@ public class TMidiConfig {
 
     private static synchronized Set<MidiDeviceProvider> getMidiDeviceProvidersImpl() {
         if (sm_midiDeviceProviders == null) {
-            sm_midiDeviceProviders = new ArraySet<MidiDeviceProvider>();
+            sm_midiDeviceProviders = new ArraySet<>();
             registerMidiDeviceProviders();
         }
         return sm_midiDeviceProviders;
@@ -226,7 +226,7 @@ public class TMidiConfig {
 
     private static synchronized Set<MidiFileReader> getMidiFileReadersImpl() {
         if (sm_midiFileReaders == null) {
-            sm_midiFileReaders = new ArraySet<MidiFileReader>();
+            sm_midiFileReaders = new ArraySet<>();
             registerMidiFileReaders();
         }
         return sm_midiFileReaders;
@@ -250,7 +250,7 @@ public class TMidiConfig {
 
     private static synchronized Set<MidiFileWriter> getMidiFileWritersImpl() {
         if (sm_midiFileWriters == null) {
-            sm_midiFileWriters = new ArraySet<MidiFileWriter>();
+            sm_midiFileWriters = new ArraySet<>();
             registerMidiFileWriters();
         }
         return sm_midiFileWriters;
@@ -274,7 +274,7 @@ public class TMidiConfig {
 
     private static synchronized Set<SoundbankReader> getSoundbankReadersImpl() {
         if (sm_soundbankReaders == null) {
-            sm_soundbankReaders = new ArraySet<SoundbankReader>();
+            sm_soundbankReaders = new ArraySet<>();
             registerSoundbankReaders();
         }
         return sm_soundbankReaders;

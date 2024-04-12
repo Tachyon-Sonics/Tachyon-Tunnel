@@ -29,7 +29,7 @@ import ch.tachyon.tunnel.common.utils.*;
 public class OutputStreamSaveAudioSink implements IMultiChanAudioSink, Closeable {
 
     private final Thread writer;
-    private final Exchanger<float[][]> exchanger = new Exchanger<float[][]>();
+    private final Exchanger<float[][]> exchanger = new Exchanger<>();
     private float[][] dstBuffer1;
     private float[][] dstBuffer2;
     private float[][] srcBuffer;

@@ -16,9 +16,9 @@ import ch.tachyon.tunnel.plugin.param.*;
 @Description("Change the speed, affecting both the pitch and tempo")
 public class Resample implements IPullEffect, IStartStop, ILatency, IAudioSource {
 
-    public final static ParameterDefinition<Resample, Double> RATIO = new ParameterDefinition<Resample, Double>(Resample.class, Double.class, "ratio");
-    public final static ParameterDefinition<Resample, Integer> QUALITY = new ParameterDefinition<Resample, Integer>(Resample.class, Integer.class, "accuracy");
-    public final static ParameterDefinition<Resample, Boolean> LOW_LATENCY = new ParameterDefinition<Resample, Boolean>(Resample.class, Boolean.class, "lowLatency");
+    public final static ParameterDefinition<Resample, Double> RATIO = new ParameterDefinition<>(Resample.class, Double.class, "ratio");
+    public final static ParameterDefinition<Resample, Integer> QUALITY = new ParameterDefinition<>(Resample.class, Integer.class, "accuracy");
+    public final static ParameterDefinition<Resample, Boolean> LOW_LATENCY = new ParameterDefinition<>(Resample.class, Boolean.class, "lowLatency");
 
     private final static int BUFFER_SIZE_STD = 8192;
     private final static int BUFFER_SIZE_LOW_LATENCY = 128;

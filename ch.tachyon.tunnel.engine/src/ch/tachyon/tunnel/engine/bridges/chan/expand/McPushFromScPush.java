@@ -19,7 +19,7 @@ public class McPushFromScPush extends McFromScBase<IPushEffect, ISingleChanPushE
     private CollectingSink[] sinks;
     private volatile IMultiChanAudioSink mcSink;
     private final Object processLock = new Monitor("McPushFromScPush#process");
-    private final AtomicReference<RuntimeException> exRef = new AtomicReference<RuntimeException>();
+    private final AtomicReference<RuntimeException> exRef = new AtomicReference<>();
     private Queue<float[]> freePool;
     
     private transient float[][] nextBlock;
@@ -112,14 +112,15 @@ public class McPushFromScPush extends McFromScBase<IPushEffect, ISingleChanPushE
         super.startProcessing(info);
         sinks = new CollectingSink[nbChans];
         tasks = new ProcessOnChanTask[2][nbChans];
-        outputs = new ArrayList<Queue<float[]>>(nbChans);
-        freePool = new ConcurrentLinkedQueue<float[]>();
+        outputs = new ArrayList<>(nbChans);
+        freePool = new ConcurrentLinkedQueue<>();
         offsets = new int[nbChans];
         for (int chan = 0; chan < nbChans; chan++) {
             sinks[chan] = new CollectingSink(chan);
             tasks[0][chan] = new ProcessOnChanTask(chan);
             tasks[1][chan] = new ProcessOnChanTask(chan);
-            outputs.add(new LinkedList<float[]>());
+            Queue<float[]> emptyList = new LinkedList<>();
+            outputs.add(emptyList);
         }
         if (pool != null)
             work = new float[2][][];

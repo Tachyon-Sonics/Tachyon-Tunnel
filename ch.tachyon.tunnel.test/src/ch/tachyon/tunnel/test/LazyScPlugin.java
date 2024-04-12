@@ -43,7 +43,8 @@ public class LazyScPlugin {
             if (plugin != null && classRefs != null) {
                 try {
                     Class<?> pluginClass = Class.forName(plugin.getClassName(), true, bundle.getClassLoader(false));
-                    classRefs.add(new WeakReference<Class<?>>(pluginClass));
+                    WeakReference<Class<?>> ref = new WeakReference<Class<?>>(pluginClass);
+                    classRefs.add(ref);
                 } catch (ClassNotFoundException ex) {
                     throw new RuntimeException(ex);
                 }

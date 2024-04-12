@@ -89,7 +89,7 @@ public class SerialSection {
         this.mask = qs - 1;
         this.waiters = new AtomicReference[queueSize];
         for (int i = 0; i < waiters.length; i++)
-            waiters[i] = new AtomicReference<Thread>(null);
+            waiters[i] = new AtomicReference<>(null);
     }
 
     /**

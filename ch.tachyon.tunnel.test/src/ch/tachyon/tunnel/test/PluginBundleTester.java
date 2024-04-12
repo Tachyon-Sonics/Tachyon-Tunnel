@@ -56,10 +56,10 @@ public class PluginBundleTester {
         }
 
         // Load bundle
-        Set<Long> threadIds = new HashSet<Long>();
+        Set<Long> threadIds = new HashSet<>();
         List<String> effectNames = getAllPlugins(bundleUrl);
         effectNames.removeAll(exclusions);
-        List<WeakReference<Class<?>>> classRefs = new ArrayList<WeakReference<Class<?>>>();
+        List<WeakReference<Class<?>>> classRefs = new ArrayList<>();
         
         // Create the suite
         IPluginBundle bundle = Loader.loadPluginBundle(bundleUrl, true);
@@ -75,9 +75,9 @@ public class PluginBundleTester {
     }
 
     private List<String> getAllPlugins(URL bundleUrl) throws IOException {
-        List<String> effectNames = new ArrayList<String>();
+        List<String> effectNames = new ArrayList<>();
         IPluginBundle bundle = Loader.loadPluginBundle(bundleUrl, true);
-        List<Class<? extends IEffect>> hostInterfaces = new ArrayList<Class<? extends IEffect>>();
+        List<Class<? extends IEffect>> hostInterfaces = new ArrayList<>();
         hostInterfaces.add(ISingleChanPushEffect.class);
         hostInterfaces.add(IPushEffect.class);
         for (IEffect effect : bundle.loadAllPlugins(hostInterfaces))

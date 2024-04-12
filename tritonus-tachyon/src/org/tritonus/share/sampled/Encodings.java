@@ -73,7 +73,7 @@ public class Encodings extends AudioFormat.Encoding {
     public static final AudioFormat.Encoding PCM_IEEE_FLOAT = new AudioFormat.Encoding("PCM_FLOAT");
 
     /** contains all known encodings */
-    private static StringHashedSet<AudioFormat.Encoding> encodings = new StringHashedSet<AudioFormat.Encoding>();
+    private static StringHashedSet<AudioFormat.Encoding> encodings = new StringHashedSet<>();
 
     // initially add the standard encodings
     static {
@@ -156,8 +156,8 @@ public class Encodings extends AudioFormat.Encoding {
      * of file readers and file writers cannot be retrieved.
      */
     public static AudioFormat.Encoding[] getEncodings() {
-        StringHashedSet<AudioFormat.Encoding> iteratedSources = new StringHashedSet<AudioFormat.Encoding>();
-        StringHashedSet<AudioFormat.Encoding> retrievedTargets = new StringHashedSet<AudioFormat.Encoding>();
+        StringHashedSet<AudioFormat.Encoding> iteratedSources = new StringHashedSet<>();
+        StringHashedSet<AudioFormat.Encoding> retrievedTargets = new StringHashedSet<>();
         Iterator<AudioFormat.Encoding> sourceFormats = encodings.iterator();
         while (sourceFormats.hasNext()) {
             AudioFormat.Encoding source = sourceFormats.next();

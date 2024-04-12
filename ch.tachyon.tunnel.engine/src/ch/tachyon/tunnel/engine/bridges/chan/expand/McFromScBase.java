@@ -119,7 +119,7 @@ public abstract class McFromScBase<MC extends IEffect, SC extends IEffect> imple
         this.nbChans = info.getNumberOfChannels();
         if (nbChans <= 0)
             throw new IllegalArgumentException("Invalid number of channels: " + nbChans);
-        this.targets = new ArrayList<SC>(nbChans); 
+        this.targets = new ArrayList<>(nbChans); 
         targets.add(descTarget);
         for (int chan = 1; chan < nbChans; chan++) {
             SC chanTarget = scFactory.create(descTarget, info);

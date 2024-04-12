@@ -12,7 +12,7 @@ public class ClassInfo {
 
 
     public ClassInfo(Class<?> type) {
-        this.members = new LinkedHashMap<String, MemberInfo>();
+        this.members = new LinkedHashMap<>();
         for (Method method : type.getMethods()) {
             if (method.getReturnType() != null && !method.getReturnType().equals(Void.TYPE)
                     && method.getParameterTypes().length == 0 && !method.isSynthetic()

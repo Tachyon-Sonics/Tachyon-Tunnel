@@ -67,13 +67,13 @@ public class AudioFileTypes {
 
     private static final String SERVICE_RESOURCE = "META-INF/services/tachyon.tunnel.audio.file.FileReader";
 
-    private final static ThreadLocal<AudioFileTypes> instances = new ThreadLocal<AudioFileTypes>();
+    private final static ThreadLocal<AudioFileTypes> instances = new ThreadLocal<>();
     private final static Lock readLock = new ReentrantLock(true); // Some providers are not thread safe
 
     // File extension -> Collection of class names
-    private Map<String, Collection<String>> ext2fileReader = new LinkedHashMap<String, Collection<String>>();
-    private Map<String, String> ext2Type = new LinkedHashMap<String, String>();
-    private Map<String, Type> ext2writeType = new LinkedHashMap<String, Type>();
+    private Map<String, Collection<String>> ext2fileReader = new LinkedHashMap<>();
+    private Map<String, String> ext2Type = new LinkedHashMap<>();
+    private Map<String, Type> ext2writeType = new LinkedHashMap<>();
     private Set<String> threadUnsafeProviders = new HashSet<>(); // Class name
     
     private boolean javaSoundFallback = true;
@@ -124,7 +124,7 @@ public class AudioFileTypes {
                                     Class.forName(className, false, cl);
                                     Collection<String> classNames = ext2fileReader.get(ext);
                                     if (classNames == null) {
-                                        classNames = new ArrayList<String>();
+                                        classNames = new ArrayList<>();
                                         ext2fileReader.put(ext, classNames);
                                     }
                                     classNames.add(className);
@@ -230,7 +230,7 @@ public class AudioFileTypes {
      * such as AIFF/AIFC, RIFF/WAVE, etc.
      */
     public Collection<String> getSupportedReadTypes() {
-        return new TreeSet<String>(ext2Type.values());
+        return new TreeSet<>(ext2Type.values());
     }
 
     /**
@@ -239,7 +239,7 @@ public class AudioFileTypes {
      * such as AIFF/AIFC, RIFF/WAVE, etc.
      */
     public Collection<String> getSupportedWriteTypes() {
-        Collection<String> result = new TreeSet<String>();
+        Collection<String> result = new TreeSet<>();
         for (String ext : ext2writeType.keySet()) {
             String type = ext2Type.get(ext);
             if (type == null)
@@ -255,7 +255,7 @@ public class AudioFileTypes {
      * @param type an audio file type as returned by {@link #getSupportedReadTypes()}
      */
     public Collection<String> getExtensionsForType(String type) {
-        Collection<String> result = new ArrayList<String>();
+        Collection<String> result = new ArrayList<>();
         for (String ext : ext2Type.keySet()) {
             String extType = ext2Type.get(ext);
             if (extType.equals(type))
@@ -613,7 +613,7 @@ public class AudioFileTypes {
         }
         // Patch for .m4a: format is only determined when reading from the file
         AudioFormat sourceFormat = ((AudioInputStreamSource) source).getBaseFormat();
-        return new Pair<AudioFormat, Long>(sourceFormat, nbFrames);
+        return new Pair<>(sourceFormat, nbFrames);
     }
 
     public AudioFileFormat getAudioFileFormat(String fileName, File file) throws IOException, UnsupportedAudioFileException {

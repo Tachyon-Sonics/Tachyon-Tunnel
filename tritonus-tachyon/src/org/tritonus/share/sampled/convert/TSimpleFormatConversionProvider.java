@@ -69,13 +69,13 @@ public abstract class TSimpleFormatConversionProvider
     protected TSimpleFormatConversionProvider(
             Collection<AudioFormat> sourceFormats,
             Collection<AudioFormat> targetFormats) {
-        m_sourceEncodings = new ArraySet<AudioFormat.Encoding>();
-        m_targetEncodings = new ArraySet<AudioFormat.Encoding>();
+        m_sourceEncodings = new ArraySet<>();
+        m_targetEncodings = new ArraySet<>();
         if (sourceFormats == null) {
-            sourceFormats = new ArraySet<AudioFormat>();
+            sourceFormats = new ArraySet<>();
         }
         if (targetFormats == null) {
-            targetFormats = new ArraySet<AudioFormat>();
+            targetFormats = new ArraySet<>();
         }
         m_sourceFormats = sourceFormats;
         m_targetFormats = targetFormats;
@@ -92,10 +92,10 @@ public abstract class TSimpleFormatConversionProvider
         if (TDebug.TraceAudioConverter) {
             TDebug.out("TSimpleFormatConversionProvider.disable(): disabling " + getClass().getName());
         }
-        m_sourceEncodings = new ArraySet<AudioFormat.Encoding>();
-        m_targetEncodings = new ArraySet<AudioFormat.Encoding>();
-        m_sourceFormats = new ArraySet<AudioFormat>();
-        m_targetFormats = new ArraySet<AudioFormat>();
+        m_sourceEncodings = new ArraySet<>();
+        m_targetEncodings = new ArraySet<>();
+        m_sourceFormats = new ArraySet<>();
+        m_targetFormats = new ArraySet<>();
     }
 
 

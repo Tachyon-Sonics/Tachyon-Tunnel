@@ -49,7 +49,7 @@ public class TNotifier
 
         public NotifyEntry(EventObject event, Collection<LineListener> listeners) {
             m_event = event;
-            m_listeners = new ArrayList<LineListener>(listeners);
+            m_listeners = new ArrayList<>(listeners);
         }
 
 
@@ -81,7 +81,7 @@ public class TNotifier
 
     public TNotifier() {
         super("Tritonus Notifier");
-        m_entries = new ArrayList<NotifyEntry>();
+        m_entries = new ArrayList<>();
     }
 
 

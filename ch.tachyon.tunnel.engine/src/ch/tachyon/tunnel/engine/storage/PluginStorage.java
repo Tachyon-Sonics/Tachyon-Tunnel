@@ -8,8 +8,8 @@ import ch.tachyon.tunnel.plugin.*;
 
 public class PluginStorage implements IStorage {
 
-    private final static Map<String, Object> hostSessionMap = new HashMap<String, Object>();
-    private final Map<String, Object> pluginSessionMap = new HashMap<String, Object>();
+    private final static Map<String, Object> hostSessionMap = new HashMap<>();
+    private final Map<String, Object> pluginSessionMap = new HashMap<>();
     private Map<String, Object> channelProcessMap;
 
     private final Class<?> pluginClass;
@@ -34,7 +34,7 @@ public class PluginStorage implements IStorage {
     }
 
     public void createChannelStorage() {
-        channelProcessMap = new HashMap<String, Object>();
+        channelProcessMap = new HashMap<>();
     }
 
     public void destroyChannelStorage() {
@@ -125,7 +125,7 @@ public class PluginStorage implements IStorage {
         else if (dataType.equals(byte[].class))
             return prefs.getByteArray(key, null);
         try {
-            Set<String> keys = new HashSet<String>(Arrays.asList(prefs.keys()));
+            Set<String> keys = new HashSet<>(Arrays.asList(prefs.keys()));
             if (!keys.contains(key))
                 return null;
         } catch (BackingStoreException ex) {

@@ -104,7 +104,7 @@ public abstract class TEncodingFormatConversionProvider
         }
         if (isConversionSupported(targetEncoding, sourceFormat)) {
             // todo: check that no duplicates may occur...
-            ArraySet<AudioFormat> result = new ArraySet<AudioFormat>();
+            ArraySet<AudioFormat> result = new ArraySet<>();
             Iterator<AudioFormat> iterator = getCollectionTargetFormats().iterator();
             while (iterator.hasNext()) {
                 AudioFormat targetFormat = iterator.next();

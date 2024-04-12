@@ -116,7 +116,7 @@ public class MtScPush extends MtBase<IPushEffect> implements IPushEffect {
         private int historySizeToCrop;
         private ISingleChanAudioSink sink;
 
-        private final List<float[]> outputs = new ArrayList<float[]>();
+        private final List<float[]> outputs = new ArrayList<>();
 
 
         /**

@@ -31,9 +31,9 @@ public class ClockedAsynchronousQueue<E> {
 
     public ClockedAsynchronousQueue(int capacity) {
         this.capacity = capacity;
-        buffers = new AtomicReferenceArray<E>(capacity);
-        parkedProducers = new AtomicReferenceArray<Thread>(capacity);
-        parkedConsumers = new AtomicReferenceArray<Thread>(capacity);
+        buffers = new AtomicReferenceArray<>(capacity);
+        parkedProducers = new AtomicReferenceArray<>(capacity);
+        parkedConsumers = new AtomicReferenceArray<>(capacity);
     }
 
     /**

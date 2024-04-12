@@ -27,7 +27,7 @@ import ch.tachyon.tunnel.host.engine.*;
 public class StorageImpl implements IStorage {
 
     public void storeParameterValues(Collection<IParameter> parameters, OutputStream output) throws IOException, InvocationTargetException {
-        Map<String, Object> values = new LinkedHashMap<String, Object>();
+        Map<String, Object> values = new LinkedHashMap<>();
         for (IParameter param : parameters)
             values.put(param.getDisplayName(), param.getInternalValue());
         BinaryStorage.save(values, "values", output);
@@ -46,7 +46,7 @@ public class StorageImpl implements IStorage {
         }
     }
 
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPED = new HashMap<Class<?>, Class<?>>();
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPED = new HashMap<>();
 
     static {
         PRIMITIVE_TO_WRAPPED.put(Boolean.TYPE, Boolean.class);

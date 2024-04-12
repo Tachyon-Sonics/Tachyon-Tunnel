@@ -86,7 +86,7 @@ public class SmartFormatConversionProvider
 
 
     public SmartFormatConversionProvider() {
-        m_blockedThreads = new HashSet<Thread>();
+        m_blockedThreads = new HashSet<>();
     }
 
 

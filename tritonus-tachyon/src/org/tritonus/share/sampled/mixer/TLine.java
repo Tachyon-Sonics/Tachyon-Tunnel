@@ -65,8 +65,8 @@ public abstract class TLine
             Line.Info info) {
         setLineInfo(info);
         setOpen(false);
-        m_controls = new ArrayList<Control>();
-        m_lineListeners = new HashSet<LineListener>();
+        m_controls = new ArrayList<>();
+        m_lineListeners = new HashSet<>();
         m_mixer = mixer;
     }
 
@@ -265,7 +265,7 @@ public abstract class TLine
 
     private Set<LineListener> getLineListeners() {
         synchronized (m_lineListeners) {
-            return new HashSet<LineListener>(m_lineListeners);
+            return new HashSet<>(m_lineListeners);
         }
     }
 

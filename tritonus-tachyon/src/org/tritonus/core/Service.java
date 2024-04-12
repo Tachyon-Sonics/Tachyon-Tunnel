@@ -83,7 +83,7 @@ public class Service {
         if (TDebug.TraceService) {
             TDebug.out("Service.createInstancesList(): begin");
         }
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         Iterator<String> classNames = createClassNames(strFullName);
         if (classNames != null) {
             while (classNames.hasNext()) {
@@ -132,7 +132,7 @@ public class Service {
     private static Iterator<String> createClassNames(String strFullName) {
         if (TDebug.TraceService)
             TDebug.out("Service.createClassNames(): begin");
-        Set<String> providers = new ArraySet<String>();
+        Set<String> providers = new ArraySet<>();
         Enumeration<URL> configs = null;
         try {
             configs = ClassLoader.getSystemResources(strFullName);

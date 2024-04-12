@@ -34,7 +34,8 @@ public class XmlReader extends XmlCommon {
         if (className == null)
             return null;
         Class<?> type = Class.forName(className, true, classLoader);
-        return fromXml(type, root, new HashMap<String, Object>());
+        Map<String, Object> cache = new HashMap<>();
+        return fromXml(type, root, cache);
     }
 
     private Object fromXml(Class<?> type, Element elt, Map<String, Object> cache)
@@ -207,7 +208,7 @@ public class XmlReader extends XmlCommon {
 
     private Object[] arrayFromXml(Class<?> type, Element elt, Map<String, Object> cache) throws IllegalAccessException,
             InstantiationException, ClassNotFoundException, InvocationTargetException {
-        List<?> result = new ArrayList<Object>();
+        List<?> result = new ArrayList<>();
         Class<?> itemsType = type.getComponentType();
         NodeList nodes = elt.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {

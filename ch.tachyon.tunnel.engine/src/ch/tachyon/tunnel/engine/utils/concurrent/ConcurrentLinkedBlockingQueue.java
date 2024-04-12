@@ -11,7 +11,7 @@ import java.util.concurrent.locks.*;
 public class ConcurrentLinkedBlockingQueue<E> {
 
     private final int capacity;
-    private final ConcurrentLinkedQueue<E> target = new ConcurrentLinkedQueue<E>();
+    private final ConcurrentLinkedQueue<E> target = new ConcurrentLinkedQueue<>();
     private final Lock lock;
     private final Condition notFull;
     private final Condition notEmpty;

@@ -151,18 +151,18 @@ public abstract class PluginToHostWrapper<P extends IPlugin> implements IEffect 
     }
 
     private List<IParameter> getParameters(IPlugin target) {
-        List<IParameter> result = new ArrayList<IParameter>();
+        List<IParameter> result = new ArrayList<>();
         if (target instanceof IDynamicMetaData) {
             @SuppressWarnings("unchecked")
             List<ParameterInfo<IPlugin>> pInfos = ((IDynamicMetaData<IPlugin>) target).getParameters();
             for (ParameterInfo<IPlugin> pInfo : pInfos) {
-                ParameterInfoParameter<IPlugin> param = new ParameterInfoParameter<IPlugin>(target, pInfo);
+                ParameterInfoParameter<IPlugin> param = new ParameterInfoParameter<>(target, pInfo);
                 result.add(param);
             }
         } else {
             ClassInfo info = new ClassInfo(target.getClass());
             for (MemberInfo property : info.getMembers()) {
-                PropertyParameter<IPlugin> param = new PropertyParameter<IPlugin>(target, property, properties, property.getName());
+                PropertyParameter<IPlugin> param = new PropertyParameter<>(target, property, properties, property.getName());
                 result.add(param);
             }
             Collections.sort(result, new Comparator<IParameter>() {

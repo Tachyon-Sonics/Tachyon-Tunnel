@@ -7,7 +7,7 @@ import ch.tachyon.tunnel.plugin.*;
 public class DummySerialSectionManager implements ISerialSectionFactory, ISerialSectionPool {
 
     private final IProcessingInfo info;
-    private final Map<String, ISerialSection> pool = new HashMap<String, ISerialSection>();
+    private final Map<String, ISerialSection> pool = new HashMap<>();
 
     public DummySerialSectionManager(IProcessingInfo info) {
         this.info = info;

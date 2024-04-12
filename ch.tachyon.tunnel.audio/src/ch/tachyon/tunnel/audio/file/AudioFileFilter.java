@@ -46,7 +46,7 @@ public class AudioFileFilter extends FileFilter implements java.io.FileFilter {
      * Get a list of instance. Each instance accepts one of the supported audio types
      */
     public static Collection<AudioFileFilter> individualInstances(boolean writing) {
-        Collection<AudioFileFilter> result = new ArrayList<AudioFileFilter>();
+        Collection<AudioFileFilter> result = new ArrayList<>();
         AudioFileTypes afs = AudioFileTypes.instance();
         Collection<String> types = (writing ? afs.getSupportedWriteTypes() : afs.getSupportedReadTypes());
         for (String fileType : types) {

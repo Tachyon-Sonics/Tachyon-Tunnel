@@ -450,7 +450,7 @@ public class Lame {
      */
     public AudioFormat getEffectiveFormat() {
         // first gather properties
-        HashMap<String, Object> map = new HashMap<String, Object>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put(P_QUALITY, getEffectiveQuality());
         map.put(P_BITRATE, getEffectiveBitRate());
         map.put(P_CHMODE, chmode2string(getEffectiveChannelMode()));

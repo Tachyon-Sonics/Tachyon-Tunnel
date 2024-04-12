@@ -127,7 +127,7 @@ public abstract class TAudioFileWriter
         // $$fb 2000-08-16: rewrote this method. We need to check for *each*
         // file type, whether the format is supported !
         AudioFormat format = audioInputStream.getFormat();
-        ArraySet<AudioFileFormat.Type> res = new ArraySet<AudioFileFormat.Type>();
+        ArraySet<AudioFileFormat.Type> res = new ArraySet<>();
         Iterator<AudioFileFormat.Type> it = m_audioFileTypes.iterator();
         while (it.hasNext()) {
             AudioFileFormat.Type thisType = it.next();

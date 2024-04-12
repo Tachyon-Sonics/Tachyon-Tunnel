@@ -40,7 +40,7 @@ public class PluginBundleImpl implements IPluginBundle {
     private ClassLoader classLoader;
     private String bundleName;
 
-    private static Map<String, WeakReference<ClassLoader>> classLoaderCache = new HashMap<String, WeakReference<ClassLoader>>();
+    private static Map<String, WeakReference<ClassLoader>> classLoaderCache = new HashMap<>();
 
 
     /**
@@ -107,7 +107,7 @@ public class PluginBundleImpl implements IPluginBundle {
                 // Create a new one
                 Debug.debug("[New ClassLoader created]");
                 classLoader = new ParentLastUrlClassLoader(new URL[] {url}, external);
-                classLoaderRef = new WeakReference<ClassLoader>(classLoader);
+                classLoaderRef = new WeakReference<>(classLoader);
                 classLoaderCache.put(url.toExternalForm(), classLoaderRef);
             }
         }
@@ -160,7 +160,7 @@ public class PluginBundleImpl implements IPluginBundle {
     }
 
     public <E extends IEffect> List<E> loadAllPlugins(Class<E> hostInterface) throws IOException {
-        List<Class<? extends IEffect>> singleTonIntf = new ArrayList<Class<? extends IEffect>>(1);
+        List<Class<? extends IEffect>> singleTonIntf = new ArrayList<>(1);
         singleTonIntf.add(hostInterface);
         List<IEffect> result0 = loadAllPlugins(singleTonIntf);
         for (IEffect effect : result0)

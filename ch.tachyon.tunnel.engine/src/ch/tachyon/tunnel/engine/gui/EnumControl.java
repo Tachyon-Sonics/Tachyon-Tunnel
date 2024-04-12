@@ -27,7 +27,7 @@ public class EnumControl extends JPanel {
             values = subRange;
         }
         setLayout(new BorderLayout());
-        comboBox = new JComboBox<Object>(values);
+        comboBox = new JComboBox<>(values);
         add(comboBox, BorderLayout.CENTER);
         comboBox.setSelectedItem(parameter.getInternalValue());
         if (parameter.getDescription() != null) {
