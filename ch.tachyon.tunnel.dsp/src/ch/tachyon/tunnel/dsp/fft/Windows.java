@@ -1,4 +1,6 @@
-package ch.tachyon.tunnel.demo.plugin.dsp.fft;
+package ch.tachyon.tunnel.dsp.fft;
+
+import java.util.*;
 
 
 public class Windows {
@@ -10,8 +12,7 @@ public class Windows {
     public final static float[] FlatTopCoefs = { 0.25f, -0.24125f, 0.16125f, -0.04225f, 0.004f };
 
 
-    public static void fillWindow(float[] window, float[] coefs) {
-        int size = window.length;
+    public static void fillWindow(float[] window, int size, float[] coefs) {
         for (int i = 0; i < size; i++) {
             double x = Math.PI * 2.0 * (double) i / (double) size;
             double val = coefs[0];
@@ -21,33 +22,115 @@ public class Windows {
         }
     }
 
+    public static void fillSymmetricWindow(float[] window, int size, float[] coefs) {
+        for (int i = 0; i < size; i++) {
+            double x = Math.PI * 2.0 * (double) (i + 1) / (double) (size + 1);
+            double val = coefs[0];
+            for (int c = 1; c < coefs.length; c++)
+                val += (coefs[c] * 2.0f * Math.cos(x * (double) c));
+            window[i] = (float) val;
+        }
+    }
+
+    public static void fillHannWindow(float[] window, int size) {
+        fillWindow(window, size, HannCoefs);
+    }
+
+    public static void fillSymmetricHannWindow(float[] window, int size) {
+        fillSymmetricWindow(window, size, HannCoefs);
+    }
+
     public static void fillHannWindow(float[] window) {
-        fillWindow(window, HannCoefs);
+        fillHannWindow(window, window.length);
+    }
+
+    public static void fillSymmetricHannWindow(float[] window) {
+        fillSymmetricHannWindow(window, window.length);
     }
 
     public static void fillHammingWindow(float[] window, int size) {
-        fillWindow(window, HammingCoefs);
+        fillWindow(window, size, HammingCoefs);
+    }
+
+    public static void fillHammingWindow(float[] window) {
+        fillHammingWindow(window, window.length);
     }
 
     public static void fillBlackmanWindow(float[] window, int size) {
-        fillWindow(window, BlackmanCoefs);
+        fillWindow(window, size, BlackmanCoefs);
+    }
+
+    public static void fillBlackmanWindow(float[] window) {
+        fillBlackmanWindow(window, window.length);
     }
 
     public static void fillNutallWindow(float[] window, int size) {
-        fillWindow(window, NutallCoefs);
+        fillWindow(window, size, NutallCoefs);
+    }
+
+    public static void fillNutallWindow(float[] window) {
+        fillNutallWindow(window, window.length);
     }
 
     public static void fillFlatTopWindow(float[] window, int size) {
-        fillWindow(window, FlatTopCoefs);
+        fillWindow(window, size, FlatTopCoefs);
     }
 
-    public static void fillTriangularWindow(float[] window) {
-        int half = window.length / 2;
+    public static void fillFlatTopWindow(float[] window) {
+        fillNutallWindow(window, window.length);
+    }
+
+    /**
+     * Fill a "shrunk" (or zero padded) window.
+     * <p>
+     * The window size is reduced be the given <code>shrink</code> factor and centered.
+     * The array is filled with zero on both sides of the shrunk window.
+     */
+    public static void fillShrunkWindow(float[] window, float[] coefs, float shrink) {
+        fillShrunkWindow(window, coefs, shrink, true);
+    }
+
+    /**
+     * Fill a "shrunk" (or zero padded) window.
+     * <p>
+     * The window size is reduced be the given <code>shrink</code> factor and centered.
+     * The array is filled with zero on both sides of the shrunk window.
+     * @param energyCorrection whether to multiply the coefficients so that the resulting window
+     * has the same energy as the unshrunk (normal) version of the window
+     */
+    public static void fillShrunkWindow(float[] window, float[] coefs, float shrink, boolean energyCorrection) {
+        int shrunkSize = (int) ((float) window.length / shrink + 0.5f);
+        Windows.fillWindow(window, shrunkSize, coefs);
+        if (shrink != 1.0f) {
+            int start = (window.length - shrunkSize) / 2;
+            int stop = start + shrunkSize;
+            System.arraycopy(window, 0, window, start, shrunkSize);
+            if (energyCorrection) {
+                float correction = (float) Math.sqrt(shrink);
+                for (int i = start; i < stop; i++)
+                    window[i] *= correction;
+            }
+            Arrays.fill(window, 0, start, 0.0f);
+            Arrays.fill(window, stop, window.length, 0.0f);
+        }
+    }
+
+    /**
+     * Create a triangular window in a pre-allocated array.
+     * @param window the window, filled by this call
+     * @param size the size of the window
+     */
+    public static void fillTriangularWindow(float[] window, int size) {
+        int half = size / 2;
         for (int i = 0; i < half; i++) {
             float value = (float) i / (float) half;
             window[i] = value;
             window[i + half] = 1.0f - value;
         }
+    }
+
+    public static void fillTriangularWindow(float[] window) {
+        fillTriangularWindow(window, window.length);
     }
 
     private static double iZero(double x) {
@@ -70,7 +153,8 @@ public class Windows {
     }
 
     /**
-     * Get the beta value to pass to {@link #fillKaiserWindow(float[], double)} in order to have the given average side lobes attenuation
+     * Get the beta value to pass to {@link #fillKaiserWindow(float[], int, double)} in order to have
+     * the given average side lobes attenuation
      * @param db average side lobes attenuation, in db, positive
      */
     public static double getKaiserBeta(double db) {
@@ -85,12 +169,14 @@ public class Windows {
     }
 
     /**
-     * Create the parametrable Kaiser window in a preallocated array. The Kaiser window maximizes the ratio of the energy of the main lobe by the energy of the side lobes, with a given minimum side lobes attenuation.
+     * Create the parametrable Kaiser window in a preallocated array. The Kaiser
+     * window maximizes the ratio of the energy of the main lobe by the energy
+     * of the side lobes, with a given minimum side lobes attenuation.
      * @param window the window to fill
+     * @param size the size of the window
      * @param beta proportional to main lobe width
      */
-    public static void fillKaiserWindow(float[] window, double beta) {
-        int size = window.length;
+    public static void fillKaiserWindow(float[] window, int size, double beta) {
         double ibeta = 1.0 / iZero(beta);
         double p = (double) size / 2.0;
         for (int i = 0; i < size; i++) {
@@ -100,15 +186,22 @@ public class Windows {
         }
     }
 
-    public static void fillGaussianWindow(float[] window, float sigma) {
+    public static void fillKaiserWindow(float[] window, double beta) {
+        fillKaiserWindow(window, window.length, beta);
+    }
+
+    public static void fillGaussianWindow(float[] window, int size, float sigma) {
         if (sigma <= 0.0f || sigma > 0.5f)
             throw new IllegalArgumentException("'sigma' must be between 0 and 0.5");
-        int size = window.length;
-        float half = (float) (size - 1) / 2.0f;
+        float half = (float)(size - 1) / 2.0f;
         for (int i = 0; i < size; i++) {
-            double x = ((double) i - half) / (sigma * half);
-            window[i] = (float) Math.exp(-0.5 * x * x);
+            double x = ((double)i - half) / (sigma * half);
+            window[i] = (float)Math.exp(-0.5 * x * x);
         }
+    }
+
+    public static void fillGaussianWindow(float[] window, float sigma) {
+        fillGaussianWindow(window, window.length, sigma);
     }
 
     private static double acosh(double arg) {
@@ -151,7 +244,8 @@ public class Windows {
     }
 
     /**
-     * Get the 'xu' parameter that can be passed to {@link #fillUltrasphericalWindow(float[], double, double, BooFFT)}, given an average side lobes attenuation
+     * Get the 'xu' parameter that can be passed to {@link #fillUltrasphericalWindow(float[], double, double, BooFFT)},
+     * given an average side lobes attenuation
      * @param attenuationDb average side lobe attenuation, in dB, positive
      * @param u side lobe rolloff shape. 0 = no rolloff (horizontal), 1 = 6dB/octave, 2 = 12dB/octave, etc
      * @param size window size
@@ -211,30 +305,59 @@ public class Windows {
      */
     public static void fillChebyshevWindow(float[] window, double attenuationDb, BooFFT fft) {
         /*
-         * While there is a specific formula for the Chebyshev window, it shows to be less stable than using the ultraspherical window with u=0.
+         * While there is a specific formula for the Chebyshev window, it shows to be less stable than using
+         * the ultraspherical window with u=0.
          */
         double xu = getXu(attenuationDb, 0.0, window.length);
         fillUltrasphericalWindow(window, xu, 0.0, fft);
     }
 
+    public static void shrink(float[] window, float shrink) {
+        shrink(window, shrink, true);
+    }
+
+    public static void shrink(float[] window, float shrink, boolean energyCorrection) {
+        int shrunkSize = (int) ((float) window.length / shrink + 0.5f);
+        // Build shrink version in [0..shrunkSize[
+        for (int i = 0; i < shrunkSize; i++)
+            window[i] = window[Math.min((int) (i * shrink + 0.5f), window.length - 1)];
+        int start = (window.length - shrunkSize) / 2;
+        int stop = start + shrunkSize;
+        // Move to center
+        System.arraycopy(window, 0, window, start, shrunkSize);
+        // Apply energy correction
+        if (shrink != 1.0f && energyCorrection) {
+            float correction = (float) Math.sqrt(shrink);
+            for (int i = start; i < stop; i++)
+                window[i] *= correction;
+        }
+        // Zero sides
+        Arrays.fill(window, 0, start, 0.0f);
+        Arrays.fill(window, stop, window.length, 0.0f);
+    }
+
     /**
-     * Create a correction window, given pre and post window and overlaping info. Note that the number of overlaping samples must be an integral divisor of the window size.
+     * Create a correction window, given pre and post window and overlaping
+     * info. Note that the number of overlaping samples must be an integral
+     * divisor of the window size.
      * @param preWindow the pre-analysis window
      * @param postWindow the post-analysis window
      * @param inverse the correction window, filled by this call
-     * @param windowSize the size of the pre and post windows
-     * @param shift the number of overlapping samples, and also the size of the inverse window.
-     * @return Whether the correction window could be created. <tt>false</tt> if an overflow (result > 20) occured.
+     * @param blockSize the size of the pre and post windows
+     * @param hopSize the number of overlapping samples, and also the size of the
+     * inverse window.
+     * @return Whether the correction window could be created. <tt>false</tt>
+     * if an overflow (result > 20) occured.
      */
-    public static boolean fillInverseWindow(float[] preWindow, float[] postWindow, float[] inverse, int windowSize, int shift) {
+    public static boolean fillInverseWindow(float[] preWindow, float[] postWindow, float[] inverse, int blockSize, int hopSize) {
         boolean success = true;
-        int nbSteps = windowSize / shift;
-        for (int i = 0; i < shift; i++) {
+        int nbSteps = blockSize / hopSize;
+        for (int i = 0; i < hopSize; i++) {
             float sum = 0.0f;
             int j = i;
             for (int s = 0; s < nbSteps; s++) {
                 sum += preWindow[j] * postWindow[j];
-                j = j + shift;
+                j = j + hopSize;
             }
             if (sum > 0.05f) {
                 inverse[i] = 1.0f / sum;
@@ -246,12 +369,76 @@ public class Windows {
         return success;
     }
 
+    public static boolean fillInverseWindowNoise(float[] preWindow, float[] postWindow, float[] inverse, int blockSize, int hopSize) {
+        boolean success = true;
+        int nbSteps = blockSize / hopSize;
+        for (int i = 0; i < hopSize; i++) {
+            float sum = 0.0f;
+            int j = i;
+            for (int s = 0; s < nbSteps; s++) {
+                sum += preWindow[j] * preWindow[j] * postWindow[j] * postWindow[j];
+                j = j + hopSize;
+            }
+            if (sum > 0.05f) {
+                inverse[i] = 1.0f / (float) Math.sqrt(sum);
+            } else {
+                inverse[i] = 0.0f; // Do not put Infinite, it's just slowing down the shit
+                success = false;
+            }
+        }
+        return success;
+    }
+
+    public static float getStdEnergy(int length) {
+        float result = 0.25f * (float)length;
+        return (float)Math.sqrt(result);
+    }
+
+    public static float getPostEnergy(float[] preWindow, float[] postWindow) {
+        assert preWindow.length == postWindow.length;
+        float result = 0.0f;
+        for (int i = 0; i < preWindow.length; i++) {
+            float prod = preWindow[i] * postWindow[i];
+            result += prod * prod;
+        }
+        return (float)Math.sqrt(result);
+    }
+
+    public static boolean fillInverseWindow(float[][] preWindows, int preIndex,
+            float[] energies, float[] postWindow, float[] inverse, int windowSize,
+            int overlapShift) {
+        int nbSteps = windowSize / overlapShift;
+        float std = getStdEnergy(postWindow.length);
+        boolean success = true;
+        for (int i = 0; i < overlapShift; i++) {
+            float sum = 0.0f;
+            int j = i;
+            int winNum = preIndex; // Start with current window
+            for (int s = 0; s < nbSteps; s++) {
+                sum += preWindows[winNum][j] * (std / energies[winNum]) * postWindow[j];
+                j = j + overlapShift;
+                winNum = winNum - 1;
+                if (winNum < 0)
+                    winNum+= preWindows.length;
+            }
+            if (sum > 0.05f) {
+                inverse[i] = 1.0f / sum;
+            } else {
+                inverse[i] = 0.0f;
+                success = false;
+            }
+        }
+        return success;
+    }
+
     /**
-     * Get the constant-valued inverse window when Hann analysis and/or synthesis window is used
+     * Get the constant-valued inverse window when Hann analysis and/or synthesis
+     * window is used
      * @param overlapping the overlapping factor
      * @param count the number of Hann window used (1=analysis only or synthesis only; 2=analysis and synthesis)
      * @return the constant-valued inverse window
-     * @throws IllegalArgumentException if <code>overlapping &lt;= count</code>, in which case the windows do not sum to a constant.
+     * @throws IllegalArgumentException if <code>overlapping &lt;= count</code>, in which case
+     * the windows do not sum to a constant.
      */
     public static float getHannCorrection(int overlapping, int count) {
         if (overlapping <= count)
@@ -260,10 +447,14 @@ public class Windows {
     }
 
     /**
-     * Convolve a real spectrum in place with the symmetric mask (c1, c0, c1) centered on c0. This can be used to do post-FFT windowing with Hanning and Hamming windows in O(n) time. It may even be faster than point-by-point multiplication
-     * in the time domain which either need to read a secondary array or to compute sines and cosines on the fly.
+     * Convolve a real spectrum in place with the symmetric mask (c1, c0, c1)
+     * centered on c0. This can be used to do post-FFT windowing with Hanning
+     * and Hamming windows in O(n) time. It may even be faster than
+     * point-by-point multiplication in the time domain which either need to
+     * read a secondary array or to compute sines and cosines on the fly.
      *
-     * @param f the spectrum to convolve (dc and nyquist should not be combined in one complex number)
+     * @param f the spectrum to convolve (dc and nyquist should not be combined
+     * in one complex number)
      * @param c0 the first (center) term of the mask
      * @param c1 the second (side) term of the mask
      */
@@ -289,11 +480,9 @@ public class Windows {
 
     /**
      * Same as
-     * 
      * <pre>
      * convolve2(f, HannCoefs[0], HannCoefs[1]);
      * </pre>
-     * 
      * but slightly faster as the coefficients are hard-coded.
      */
     public static void convolveHann(Cmplx[] f) {
@@ -315,114 +504,15 @@ public class Windows {
         f[size].re = f[size].re * 0.5f - pre * 0.5f;
     }
 
-    /**
-     * Convolve a real spectrum in place with the symmetric mask (c2, c1, c0, c1, c2) centered on c0. This can be used to do post-FFT windowing with Blackmann-Haris windows in O(n) time.
-     * @param f the spectrum to convolve (dc and nyquist should not be combined in one complex number)
-     * @param c0 the first (center) term of the mask
-     * @param c1 the second term of the mask
-     * @param c2 the third term of the mask
-     */
-    public static void convolve3(Cmplx[] f, float c0, float c1, float c2) {
-        float pre2 = f[0].re;
-        float pim2 = f[0].im;
-        float pre1 = f[1].re;
-        float pim1 = f[1].im;
-        // dc and f1
-        f[0].re = f[0].re * c0 + f[1].re * c1 * 2.0f + f[2].re * c2 * 2.0f;
-        // f[0].im = f[0].im * c0;
-        f[1].re = f[1].re * c0 + (pre2 + f[2].re) * c1 + (f[1].re + f[3].re) * c2;
-        f[1].im = f[1].im * c0 + (pim2 + f[2].im) * c1 + (-f[1].im + f[3].im) * c2;
-        // freqs
-        for (int i = 2; i < f.length - 2; i++) {
-            float re = f[i].re * c0 + (pre1 + f[i + 1].re) * c1 + (pre2 + f[i + 2].re) * c2;
-            float im = f[i].im * c0 + (pim1 + f[i + 1].im) * c1 + (pim2 + f[i + 2].im) * c2;
-            pre2 = pre1;
-            pim2 = pim1;
-            pre1 = f[i].re;
-            pim1 = f[i].im;
-            f[i].re = re;
-            f[i].im = im;
-        }
-        // Nyquist -1 & -0
-        int nq1 = f.length - 2;
-        int nq0 = f.length - 1;
-        float nq1re = f[nq1].re;
-        f[nq1].re = f[nq1].re * c0 + (pre1 + f[nq0].re) * c1 + (pre2 + f[nq1].re) * c2;
-        f[nq1].im = f[nq1].im * c0 + (pim1 + f[nq0].im) * c1 + (pim2 - f[nq1].im) * c2;
-        f[nq0].re = f[nq0].re * c0 + nq1re * c1 * 2.0f + pre1 * c2 * 2.0f;
-        // f[nq0].im = f[nq0].im * c0;
-    }
-
-    /**
-     * Convolve a real spectrum in place with a symmetric mask centered on the term of index 0. The mask must be smaller than half of the size of f. If the length of the coefficient array is 2 or 3, this method calls convolve2 or convolve3.
-     * @param f the spectrum to convolve (dc and nyquist should not be combined in one complex number)
-     * @param c the mask to use
-     */
-    public static void convolveX(Cmplx[] f, float[] c) {
-        if (c.length == 2) {
-            convolve2(f, c[0], c[1]);
-            return;
-        } else if (c.length == 3) {
-            convolve3(f, c[0], c[1], c[2]);
-            return;
-        }
-        Cmplx[] b = Cmplx.newArray(c.length);
-        for (int i = 0; i < c.length; i++)
-            b[i].copyFrom(f[i]);
-        for (int i = 0; i < c.length; i++) {
-            float re = f[i].re * c[0];
-            float im = f[i].im * c[0];
-            for (int j = 1; j < c.length; j++) {
-                int k = (j > i ? j - i : i - j);
-                float s = (j > i ? -1.0f : 1.0f);
-                re += (b[k].re + f[i + j].re) * c[j];
-                im += (b[k].im * s + f[i + j].im) * c[j];
-            }
-            f[i].set(re, im);
-        }
-        int bi = c.length - 1;
-        for (int i = c.length; i < f.length - c.length; i++) {
-            bi = (bi + 1) % c.length;
-            float re = f[i].re * c[0];
-            float im = f[i].im * c[0];
-            for (int j = 1; j < c.length; j++) {
-                int k = (bi + c.length - j) % c.length;
-                re += (b[k].re + f[i + j].re) * c[j];
-                im += (b[k].im + f[i + j].im) * c[j];
-            }
-            b[bi].copyFrom(f[i]);
-            f[i].set(re, im);
-        }
-        for (int i = f.length - c.length; i < f.length; i++) {
-            bi = (bi + 1) % c.length;
-            float re = f[i].re * c[0];
-            float im = f[i].im * c[0];
-            for (int j = 1; j < c.length; j++) {
-                int k = (bi + c.length - j) % c.length;
-                int r = i + j;
-                float s = 1.0f;
-                if (r >= f.length) {
-                    r = (f.length - 1) * 2 - r;
-                    s = -1.0f; // negate imaginary part
-                }
-                re += (b[k].re + f[r].re) * c[j];
-                im += (b[k].im + f[r].im * s) * c[j];
-            }
-            b[bi].copyFrom(f[i]);
-            f[i].set(re, im);
-        }
-        b = null;
-    }
-
     public static void main(String[] args) {
         final int Size = 32;
         float[] window = new float[Size];
-        BooFFT fft = new BooFFT(Size / 2);
+        BooFFT fft = new BooFFT(Size);
         for (int db = 20; db <= 200; db += 10) {
             System.out.println();
             System.out.println("*** sidelobe level (db): -" + db);
             Windows.fillChebyshevWindow(window, (float) db, fft);
-            for (int i = 0; i < Size; i += Size / 32) {
+            for (int i = 0; i < Size; i+= Size / 32) {
                 int c = (int) (window[i] * 64.0f + 0.5f);
                 for (int j = 0; j < c; j++)
                     System.out.print("H");

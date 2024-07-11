@@ -1,6 +1,7 @@
-package ch.tachyon.tunnel.demo.plugin.dsp.fft;
+package ch.tachyon.tunnel.dsp.fft;
 
-import java.util.*;
+import ch.tachyon.tunnel.dsp.utils.SimpleCacheMap;
+
 
 /**
  * Singleton class for getting complex roots of the unity.
@@ -8,7 +9,7 @@ import java.util.*;
 public class UnityRoots {
 
     private static UnityRoots generator;
-    private Map<Integer, Cmplx[]> nToRoots = new WeakHashMap<>();
+    private SimpleCacheMap<Integer, Cmplx[]> nToRoots = new SimpleCacheMap<>();
 
     /**
      * This class is a singleton. Use static method getGenerator to get this
@@ -48,7 +49,7 @@ public class UnityRoots {
      * {@link Cmplx} objects
      */
     public synchronized Cmplx[] getRoots(int div, int count) {
-        Cmplx[] roots = nToRoots.get(div);
+        Cmplx[] roots = nToRoots.getItem(div);
         if (roots == null) {
             roots = Cmplx.newArray(count);
             double cosInc = Math.cos(Math.PI * 2.0 / div);
@@ -68,7 +69,7 @@ public class UnityRoots {
                 lim = im;
                 roots[i].set((float) re, (float) im);
             }
-            nToRoots.put(div, roots);
+            nToRoots.putItem(div, roots);
         } else if (roots.length < count) {
             Cmplx[] nroots = Cmplx.newArray(count);
             /* Copy available roots */
@@ -85,7 +86,7 @@ public class UnityRoots {
                 lim = im;
                 nroots[i].set((float) re, (float) im);
             }
-            nToRoots.put(div, nroots);
+            nToRoots.putItem(div, nroots);
             roots = nroots;
         }
         return roots;

@@ -1,8 +1,8 @@
 package ch.tachyon.tunnel.demo.plugin.ffteq;
 
 import ch.tachyon.tunnel.common.*;
-import ch.tachyon.tunnel.demo.plugin.dsp.*;
-import ch.tachyon.tunnel.demo.plugin.dsp.fft.*;
+import ch.tachyon.tunnel.dsp.*;
+import ch.tachyon.tunnel.dsp.fft.*;
 import ch.tachyon.tunnel.plugin.*;
 import ch.tachyon.tunnel.plugin.opt.callback.*;
 import ch.tachyon.tunnel.plugin.opt.doc.*;

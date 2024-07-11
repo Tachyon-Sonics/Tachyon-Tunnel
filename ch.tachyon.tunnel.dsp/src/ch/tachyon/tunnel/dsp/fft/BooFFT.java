@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.demo.plugin.dsp.fft;
+package ch.tachyon.tunnel.dsp.fft;
 
 
 /**

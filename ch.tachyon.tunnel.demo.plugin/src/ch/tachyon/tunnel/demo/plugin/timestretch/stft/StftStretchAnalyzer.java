@@ -1,7 +1,7 @@
 package ch.tachyon.tunnel.demo.plugin.timestretch.stft;
 
 import ch.tachyon.tunnel.common.*;
-import ch.tachyon.tunnel.demo.plugin.dsp.fft.*;
+import ch.tachyon.tunnel.dsp.fft.*;
 
 /**
  * Short-time Fourier transform, analysis part.

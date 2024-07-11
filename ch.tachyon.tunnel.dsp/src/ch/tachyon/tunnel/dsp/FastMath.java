@@ -1,4 +1,4 @@
-package ch.tachyon.tunnel.demo.plugin.dsp;
+package ch.tachyon.tunnel.dsp;
 
 /**
  * Fast approximations of various math functions.
@@ -28,6 +28,7 @@ public class FastMath {
     /**
      * Fast sine approximation
      * @param theta the argument, assumed to be in the [-2&pi;..2&pi;] range
+     * @param theta the argument
      * @return sin(theta)
      */
     public static double fastSin(double theta) {
@@ -126,7 +127,7 @@ public class FastMath {
     public static double pow(final double a, final double b) {
         final int x = (int) (Double.doubleToLongBits(a) >> 32);
         final int y = (int) (b * (x - 1072632447) + 1072632447);
-        return Double.longBitsToDouble(((long)y) << 32);
+        return Double.longBitsToDouble(((long) y) << 32);
     }
 
     public static float floor(float value) {

@@ -1,6 +1,6 @@
 package ch.tachyon.tunnel.demo.plugin.timestretch.stft;
 
-import ch.tachyon.tunnel.demo.plugin.dsp.fft.*;
+import ch.tachyon.tunnel.dsp.fft.*;
 
 /**
  * Short-time Fourier transform, synthesis. Uses fixed, power-of-two block size and hop size.

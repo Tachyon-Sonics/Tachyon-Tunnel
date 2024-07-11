@@ -1,9 +1,9 @@
 package ch.tachyon.tunnel.demo.plugin.timestretch;
 
 import ch.tachyon.tunnel.common.*;
-import ch.tachyon.tunnel.demo.plugin.dsp.fft.*;
 import ch.tachyon.tunnel.demo.plugin.timestretch.stft.*;
 import ch.tachyon.tunnel.demo.plugin.timestretch.stft.StftEngine.*;
+import ch.tachyon.tunnel.dsp.fft.*;
 import ch.tachyon.tunnel.plugin.*;
 import ch.tachyon.tunnel.plugin.opt.callback.*;
 import ch.tachyon.tunnel.plugin.opt.doc.*;

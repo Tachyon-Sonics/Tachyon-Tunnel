@@ -1,6 +1,6 @@
-package ch.tachyon.tunnel.demo.plugin.dsp.fft;
+package ch.tachyon.tunnel.dsp.fft;
 
-import ch.tachyon.tunnel.demo.plugin.dsp.FastMath;
+import ch.tachyon.tunnel.dsp.FastMath;
 
 /**
  * Mutable complex number using the float data type.
@@ -11,7 +11,7 @@ import ch.tachyon.tunnel.demo.plugin.dsp.FastMath;
  * The idea of this class is that you create as few instances as
  * possible and that you reuse existing instances.
  * <p>
- * <b><font color="red">WARNING - WARNING</font></b><br>
+ * <b>WARNING - WARNING</b><br>
  *  A <tt>Cmplx</tt> variable is a <i>reference</i> to
  * a <tt>Cmplx</tt> instance (as with any Java object). It means that if <code>c1</code> and <code>c2</code>
  * are two <code>Cmplx</code> instances, and you do
@@ -19,9 +19,7 @@ import ch.tachyon.tunnel.demo.plugin.dsp.FastMath;
  * you are <b>most likely doing something wrong</b> as it will not copy the value of
  * <code>c2</code> into <code>c1</code>, but the <i>reference</i> <code>c2</code> into
  * <code>c1</code>. This means that now <code>c2</code> and <code>c1</code> refer to the
- * same instance, and changes to one will affect the other.
- * <p>
- * To copy the value, use
+ * same instance, and changes to one will affect the other. To copy the value, use
  * <pre>c1.set(c2);</pre>
  * <p>
  * <b>Warning</b>: Several advanced trigonometric functions have not been tested yet.
@@ -183,12 +181,12 @@ public final class Cmplx implements Cloneable, java.io.Serializable {
      * @param other the complex number to swap this complex number with
      */
     public void swapWith(Cmplx other) {
-        float tmp = this.re;
+        float tmpRe = this.re;
         this.re = other.re;
-        other.re = tmp;
-        tmp = this.im;
+        other.re = tmpRe;
+        float tmpIm = this.im;
         this.im = other.im;
-        other.im = tmp;
+        other.im = tmpIm;
     }
 
     /**

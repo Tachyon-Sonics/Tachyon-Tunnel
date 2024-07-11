@@ -1,6 +1,6 @@
 package ch.tachyon.tunnel.demo.plugin.timestretch;
 
-import ch.tachyon.tunnel.demo.plugin.dsp.fft.*;
+import ch.tachyon.tunnel.dsp.fft.*;
 import ch.tachyon.tunnel.plugin.*;
 import ch.tachyon.tunnel.plugin.opt.callback.*;
 import ch.tachyon.tunnel.plugin.opt.doc.*;

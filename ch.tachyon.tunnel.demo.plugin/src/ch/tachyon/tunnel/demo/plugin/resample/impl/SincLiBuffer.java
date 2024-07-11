@@ -1,6 +1,6 @@
 package ch.tachyon.tunnel.demo.plugin.resample.impl;
 
-import ch.tachyon.tunnel.demo.plugin.dsp.fft.*;
+import ch.tachyon.tunnel.dsp.fft.*;
 
 /**
  * {@link LinearInterpolatedBuffer} filled with the sinc function. The buffer

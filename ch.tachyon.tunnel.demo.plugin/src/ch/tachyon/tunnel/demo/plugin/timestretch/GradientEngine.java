@@ -2,8 +2,8 @@ package ch.tachyon.tunnel.demo.plugin.timestretch;
 
 import java.util.*;
 
-import ch.tachyon.tunnel.demo.plugin.dsp.*;
-import ch.tachyon.tunnel.demo.plugin.dsp.fft.*;
+import ch.tachyon.tunnel.dsp.*;
+import ch.tachyon.tunnel.dsp.fft.*;
 import ch.tachyon.tunnel.plugin.*;
 
 /**
