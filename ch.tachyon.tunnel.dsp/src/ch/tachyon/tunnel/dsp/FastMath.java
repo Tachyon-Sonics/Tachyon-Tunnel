@@ -28,7 +28,6 @@ public class FastMath {
     /**
      * Fast sine approximation
      * @param theta the argument, assumed to be in the [-2&pi;..2&pi;] range
-     * @param theta the argument
      * @return sin(theta)
      */
     public static double fastSin(double theta) {
