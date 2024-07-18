@@ -75,7 +75,7 @@ public class SimpleHostFrame extends JFrame {
         addFileSelection("Plugin Bundle", "Choose a plugin bundle (.jar file)", bundleFileRef, form.getBundleAutoFile(), false, main, FileFilterType.OPEN_BUNDLE);
         addPluginSelector("Audio Effect", "Choose a plugin from the bundle to transform the audio file", bundleRef, pluginClassRef, main, gbc1, form);
         
-        addFileSelection("Save As (optional)", "Choose where to save the transformed file", dstFileRef, form.getDstAutoFile(), true, main, FileFilterType.SAVE_AUDIO);
+        addFileSelection("Save As", "Choose where to save the transformed file", dstFileRef, form.getDstAutoFile(), true, main, FileFilterType.SAVE_AUDIO);
         
         JPanel buttonsPanel = new JPanel();
         getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
@@ -85,7 +85,7 @@ public class SimpleHostFrame extends JFrame {
         buttonsPanel.setLayout(new TableLayout(2, gbc2));
         
         final JButton btnTransform = new JButton("Transform...");
-        btnTransform.setToolTipText("<html><body>Transform the source audio file using the selected plugin,<p />and optionally save the result to the selected 'Save As' file."
+        btnTransform.setToolTipText("<html><body>Transform the source audio file using the selected plugin,<p />and save the result to the selected 'Save As' file."
                 + "<p /><p />A dialog will be opened to choose the effect parameters</body></html>");
         buttonsPanel.add(btnTransform);
         btnTransform.addActionListener(new ActionListener() {
@@ -95,10 +95,10 @@ public class SimpleHostFrame extends JFrame {
             }
         });
         
-        JButton btnPlayResult = new JButton("Play Result");
-        btnPlayResult.setToolTipText("You must Transform the audio file first");
-        btnPlayResult.setEnabled(false);
-        buttonsPanel.add(btnPlayResult);
+//        JButton btnPlayResult = new JButton("Play Result");
+//        btnPlayResult.setToolTipText("You must Transform the audio file first");
+//        btnPlayResult.setEnabled(false);
+//        buttonsPanel.add(btnPlayResult);
         
         pack();
         getRootPane().setDefaultButton(btnTransform);
@@ -364,6 +364,10 @@ public class SimpleHostFrame extends JFrame {
         }
         if (bundleFileRef.getValue() == null || !bundleFileRef.getValue().isFile()) {
             JOptionPane.showMessageDialog(btnTransform, "Please choose a plugin bundle", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (dstFileRef.getValue() == null) {
+            JOptionPane.showMessageDialog(btnTransform, "Please choose an output (save as) audio file", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
