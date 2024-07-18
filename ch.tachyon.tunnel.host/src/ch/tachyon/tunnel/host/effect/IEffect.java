@@ -9,6 +9,7 @@ import ch.tachyon.tunnel.host.*;
 import ch.tachyon.tunnel.host.engine.*;
 import ch.tachyon.tunnel.plugin.opt.callback.*;
 import ch.tachyon.tunnel.plugin.opt.doc.*;
+import ch.tachyon.tunnel.plugin.opt.spec.*;
 import ch.tachyon.tunnel.plugin.param.*;
 
 // todo continue with all stuff from all possible interfaces
@@ -204,6 +205,10 @@ public interface IEffect {
      * <p>
      * This method can only be invoked after the parameters have been set, and after {@link IStartStop#startProcessing(ch.tachyon.tunnel.plugin.IProcessingInfo)}
      * has been invoked. The result can depend on the parameters values.
+     * <p>
+     * Note: behind the scene, the time change is inferred by using {@link ILatency#getLatency(IoDirection)}
+     * with {@link IoDirection#OUTPUT} and with {@link IoDirection#INPUT}, and dividing the two results.
+     * Hence time-changing plugins must properly implement {@link ILatency#getLatency(IoDirection)}.
      * @return output length / input length
      */
     public double getTimeChange();
