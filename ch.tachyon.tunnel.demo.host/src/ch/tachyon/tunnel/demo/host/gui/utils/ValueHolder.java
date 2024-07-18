@@ -1,6 +1,8 @@
 package ch.tachyon.tunnel.demo.host.gui.utils;
 
 import java.util.*;
+import java.util.function.*;
+
 import ch.tachyon.tunnel.common.utils.*;
 
 /**
@@ -10,7 +12,7 @@ import ch.tachyon.tunnel.common.utils.*;
 public class ValueHolder<E> {
     
     private E value;
-    private final List<Runnable> listeners = new ArrayList<>();
+    private final List<Consumer<E>> listeners = new ArrayList<>();
 
     
     public E getValue() {
@@ -21,17 +23,17 @@ public class ValueHolder<E> {
         E previous = this.value;
         this.value = value;
         if (!Utils.eq(previous, value)) {
-            for (Runnable listener : listeners)
-                listener.run();
+            for (Consumer<E> listener : listeners)
+                listener.accept(value);
         }
     }
 
-    public void addValueChangeListener(Runnable runnable) {
-        listeners.add(runnable);
+    public void addValueChangeListener(Consumer<E> listener) {
+        listeners.add(listener);
     }
     
-    public void removeValueChangeListener(Runnable runnable) {
-        listeners.remove(runnable);
+    public void removeValueChangeListener(Consumer<E> listener) {
+        listeners.remove(listener);
     }
 
     @Override

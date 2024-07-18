@@ -32,12 +32,7 @@ public class ProgressDialog extends JDialog implements IProgressMonitor {
         btnAbort.setToolTipText("Abort the processing");
         gdc.weightx = 0.0;
         add(btnAbort, gdc);
-        btnAbort.addActionListener(new ActionListener() {
-            
-            public void actionPerformed(ActionEvent e) {
-                aborted = true;
-            }
-        });
+        btnAbort.addActionListener(this::abort);
         addWindowListener(new WindowAdapter() {
 
             @Override
@@ -50,6 +45,10 @@ public class ProgressDialog extends JDialog implements IProgressMonitor {
         
         pack();
     }
+    
+    private void abort(ActionEvent e) {
+        aborted = true;
+    }
 
     public void setProgress(double current, double total) throws OperationAbortedException {
         if (aborted)
@@ -58,15 +57,11 @@ public class ProgressDialog extends JDialog implements IProgressMonitor {
         final int percent = (int) (current * 100.0 / total + 0.5);
         if (percent != lastPercent) {
             lastPercent = percent;
-            SwingUtilities.invokeLater(new Runnable() {
-                
-                public void run() {
-                    progress.setIndeterminate(false);
-                    progress.setValue(percent);
-                }
+            SwingUtilities.invokeLater(() -> {
+                progress.setIndeterminate(false);
+                progress.setValue(percent);
             });
         }
-
     }
-
+    
 }

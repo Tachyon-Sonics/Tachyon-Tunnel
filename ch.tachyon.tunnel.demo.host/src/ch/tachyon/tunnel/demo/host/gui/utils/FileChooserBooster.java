@@ -26,12 +26,7 @@ public class FileChooserBooster implements Runnable {
             prepareFileChooser();
         } catch (Throwable ex) {
             // Some look and feel do not allow JFileChooser creation outside of EDT and throw crap
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    prepareFileChooser();
-                }
-            });
+            SwingUtilities.invokeLater(this::prepareFileChooser);
         }
     }
 

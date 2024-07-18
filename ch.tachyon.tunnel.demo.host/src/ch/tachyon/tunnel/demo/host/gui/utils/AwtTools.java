@@ -1,7 +1,6 @@
 package ch.tachyon.tunnel.demo.host.gui.utils;
 
 import java.awt.*;
-import java.lang.reflect.*;
 
 import javax.swing.*;
 import javax.swing.UIManager.*;
@@ -20,20 +19,6 @@ public class AwtTools {
         
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("linux")) {
-            // Patch for an utterly stupid menu bug; see https://netbeans.org/bugzilla/show_bug.cgi?id=198639
-            try {
-                Class<?> xwm = Class.forName("sun.awt.X11.XWM");
-                Field awt_wmgr = xwm.getDeclaredField("awt_wmgr");
-                awt_wmgr.setAccessible(true);
-                Field metacity_wm = xwm.getDeclaredField("METACITY_WM");
-                metacity_wm.setAccessible(true);
-                awt_wmgr.set(null, metacity_wm.get(null));
-                awt_wmgr.setAccessible(false);
-                metacity_wm.setAccessible(false);
-            }
-            catch (Throwable x) {
-                x.printStackTrace();
-            }
             /*
              * GTK always display the current value (as integer!) over sliders.
              * This is almost always useless and stupid. Disable this behavior globally:
@@ -73,14 +58,11 @@ public class AwtTools {
     private static void setLookAndFeel(final String name) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         if (!SwingUtilities.isEventDispatchThread()) { // Fix for Mac OS X: always use EDT
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    public void run() {
-                        try {
-                            setLookAndFeel(name);
-                        } catch (Throwable ex) { // OS/2 may throw NoClassDefFoundError (!)
-                            ex.printStackTrace();
-                        }
+                SwingUtilities.invokeAndWait(() -> {
+                    try {
+                        setLookAndFeel(name);
+                    } catch (Throwable ex) { // OS/2 may throw NoClassDefFoundError (!)
+                        ex.printStackTrace();
                     }
                 });
             } catch (Exception ex) {

@@ -16,11 +16,17 @@ import ch.tachyon.tunnel.host.engine.*;
 
 public class SimpleHostFrame extends JFrame {
     
+    private final FormData form;
+    
     private ValueHolder<File> srcFileRef = new ValueHolder<>();
     private ValueHolder<File> bundleFileRef = new ValueHolder<>();
     private ValueHolder<IPluginBundle> bundleRef = new ValueHolder<>();
     private ValueHolder<String> pluginClassRef = new ValueHolder<>();
     private ValueHolder<File> dstFileRef = new ValueHolder<>();
+    
+    private JComboBox<EffectDescriptor> selector;
+    private JButton btnTransform;
+    private ProgressDialog progressDialog;
     
     
     static enum FileFilterType {
@@ -31,6 +37,7 @@ public class SimpleHostFrame extends JFrame {
     
     public SimpleHostFrame(final FormData form) {
         super("Tachyon Tunnel - Simple Demo Host Application");
+        this.form = form;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Set defaults
@@ -38,27 +45,11 @@ public class SimpleHostFrame extends JFrame {
         dstFileRef.setValue(form.getDstFile());
         bundleFileRef.setValue(form.getBundleFile());
 
-        // Bind values to the model. Ok, maybe here Java 8's lambdas might help?
-        srcFileRef.addValueChangeListener(new Runnable() {
-            public void run() {
-                form.setSrcFile(srcFileRef.getValue());
-            }
-        });
-        dstFileRef.addValueChangeListener(new Runnable() {
-            public void run() {
-                form.setDstFile(dstFileRef.getValue());
-            }
-        });
-        bundleRef.addValueChangeListener(new Runnable() {
-            public void run() {
-                form.setBundle(bundleRef.getValue());
-            }
-        });
-        pluginClassRef.addValueChangeListener(new Runnable() {
-            public void run() {
-                form.setEffectClassName(pluginClassRef.getValue());
-            }
-        });
+        // Bind values to the model.
+        srcFileRef.addValueChangeListener(form::setSrcFile);
+        dstFileRef.addValueChangeListener(form::setDstFile);
+        bundleRef.addValueChangeListener(form::setBundle);
+        pluginClassRef.addValueChangeListener(form::setEffectClassName);
         
         // Create UI
         setLayout(new BorderLayout());
@@ -84,41 +75,21 @@ public class SimpleHostFrame extends JFrame {
         gbc2.insets = new Insets(8, 8, 8, 8);
         buttonsPanel.setLayout(new TableLayout(2, gbc2));
         
-        final JButton btnTransform = new JButton("Transform...");
+        btnTransform = new JButton("Transform...");
         btnTransform.setToolTipText("<html><body>Transform the source audio file using the selected plugin,<p />and save the result to the selected 'Save As' file."
                 + "<p /><p />A dialog will be opened to choose the effect parameters</body></html>");
         buttonsPanel.add(btnTransform);
-        btnTransform.addActionListener(new ActionListener() {
-            
-            public void actionPerformed(ActionEvent e) {
-                transform(btnTransform, form);
-            }
-        });
-        
-//        JButton btnPlayResult = new JButton("Play Result");
-//        btnPlayResult.setToolTipText("You must Transform the audio file first");
-//        btnPlayResult.setEnabled(false);
-//        buttonsPanel.add(btnPlayResult);
+        btnTransform.addActionListener(this::transform);
         
         pack();
         getRootPane().setDefaultButton(btnTransform);
         
         // Load bundle now if a bundle file is specified
         if (bundleFileRef.getValue() != null && bundleFileRef.getValue().isFile()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                
-                public void run() {
-                    loadBundle(form);
-                }
-            });
+            SwingUtilities.invokeLater(this::loadBundle);
         }
         // Load bundle whenever bundle file is changed
-        bundleFileRef.addValueChangeListener(new Runnable() {
-            
-            public void run() {
-                loadBundle(form);
-            }
-        });
+        bundleFileRef.addValueChangeListener(file -> loadBundle());
     }
     
     // UI Creation parts
@@ -151,24 +122,16 @@ public class SimpleHostFrame extends JFrame {
         if (file != null && (file.exists() || saveMode))
             textField.setText(file.getPath());
         panel.add(textField, BorderLayout.CENTER);
-        textField.addActionListener(new ActionListener() {
-            
-            public void actionPerformed(ActionEvent e) {
-                String text = textField.getText();
-                File file = new File(text);
-                fileRef.setValue(file);
-            }
+        textField.addActionListener(e -> {
+            String text1 = textField.getText();
+            File file1 = new File(text1);
+            fileRef.setValue(file1);
         });
         
         final JButton btnChoose = new JButton("...");
         btnChoose.setToolTipText("Choose a file...");
         panel.add(btnChoose, BorderLayout.EAST);
-        btnChoose.addActionListener(new ActionListener() {
-            
-            public void actionPerformed(ActionEvent e) {
-                chooseFile(fileRef, autoFile, saveMode, textField, btnChoose, fileFilterType);
-            }
-        });
+        btnChoose.addActionListener(e -> chooseFile(fileRef, autoFile, saveMode, textField, btnChoose, fileFilterType));
     }
     
     private void chooseFile(final ValueHolder<File> fileRef, final File autoFile, final boolean saveMode, final JTextField textField, final JButton btnChoose, FileFilterType fileFilterType) {
@@ -245,30 +208,19 @@ public class SimpleHostFrame extends JFrame {
         label.setToolTipText(tooltip);
         target.add(label);
 
-        final JComboBox<EffectDescriptor> selector = new JComboBox<>();
+        selector = new JComboBox<>();
         target.add(selector, sgbc);
         
-        selector.addActionListener(new ActionListener() {
-            
-            public void actionPerformed(ActionEvent e) {
-                effectUpdated(form, selector);
-            }
-        });
+        selector.addActionListener(this::effectUpdated);
         
         if (bundleRef.getValue() != null) {
-            fillChooserWithAvailablePlugins(form, selector);
+            fillChooserWithAvailablePlugins(bundleRef.getValue());
         } else {
             selector.setEnabled(false);
             selector.setToolTipText("Please choosen a plugin bundle first");
         }
         
-        bundleRef.addValueChangeListener(new Runnable() {
-            
-            public void run() {
-                if (bundleRef.getValue() != null)
-                    fillChooserWithAvailablePlugins(form, selector);
-            }
-        });
+        bundleRef.addValueChangeListener(this::fillChooserWithAvailablePlugins);
     }
     
     // Actions
@@ -278,7 +230,7 @@ public class SimpleHostFrame extends JFrame {
      * <p>
      * Invoked when a plugin file is specified
      */
-    private void loadBundle(final FormData form) {
+    private void loadBundle() {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         setEnabled(false);
         form.setBundleFile(bundleFileRef.getValue());
@@ -311,7 +263,9 @@ public class SimpleHostFrame extends JFrame {
      * Invoked when a new plugin bundle is specified
      * @param selector the plugin selector to fill
      */
-    private void fillChooserWithAvailablePlugins(FormData form, JComboBox<EffectDescriptor> selector) {
+    private void fillChooserWithAvailablePlugins(IPluginBundle unused) {
+        if (form.getBundle() == null)
+            return;
         selector.setEnabled(false);
         selector.setToolTipText("Please choosen a plugin bundle first");
 
@@ -343,10 +297,10 @@ public class SimpleHostFrame extends JFrame {
         Controller.releaseBundleLoader(form.getBundle());
 
         // Select the first plugin automatically
-        effectUpdated(form, selector);
+        effectUpdated(null);
     }
     
-    private void effectUpdated(FormData form, JComboBox<EffectDescriptor> selector) {
+    private void effectUpdated(ActionEvent e) {
         EffectDescriptor descr = (EffectDescriptor) selector.getSelectedItem();
         pluginClassRef.setValue(descr.getClassName());
         form.setEffectParameters(null);
@@ -357,7 +311,7 @@ public class SimpleHostFrame extends JFrame {
      * <p>
      * The work is delegated to the {@link Controller}, which uses {@link ApplyPlugin}
      */
-    private void transform(JButton btnTransform, final FormData form) {
+    private void transform(ActionEvent e) {
         if (srcFileRef.getValue() == null || !srcFileRef.getValue().isFile()) {
             JOptionPane.showMessageDialog(btnTransform, "Please choose a source audio file", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -382,29 +336,12 @@ public class SimpleHostFrame extends JFrame {
         
         // Create a progress dialog
         String title = "Applying " + form.getEffectClassName();
-        final ProgressDialog progressDialog = new ProgressDialog(this, title);
+        progressDialog = new ProgressDialog(this, title);
         progressDialog.setLocationRelativeTo(this);
         handleProcessingStart(progressDialog);
         
         // Start processing using a new thread
-        Thread processingThread = new Thread("Processing Thread") {
-            @Override
-            public void run() {
-                try {
-                    /*********************************
-                     * Processing takes place here:  *
-                     *********************************/
-                    Controller.applyTransform(form.getSrcFile(), form.getBundle(), form.getEffectClassName(), form.getEffectParameters(), form.getDstFile(), progressDialog);
-                } finally {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        
-                        public void run() {
-                            handleProcessingStop(progressDialog);
-                        }
-                    });
-                }
-            }
-        };
+        Thread processingThread = new Thread(this::process, "Processing Thread");
         processingThread.start();
     }
 
@@ -412,6 +349,17 @@ public class SimpleHostFrame extends JFrame {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         progressDialog.setVisible(true);
         setEnabled(false);
+    }
+    
+    private void process() {
+        try {
+            /*********************************
+             * Processing takes place here:  *
+             *********************************/
+            Controller.applyTransform(form.getSrcFile(), form.getBundle(), form.getEffectClassName(), form.getEffectParameters(), form.getDstFile(), progressDialog);
+        } finally {
+            SwingUtilities.invokeLater(() -> handleProcessingStop(progressDialog));
+        }
     }
     
     private void handleProcessingStop(final ProgressDialog progressDialog) {
