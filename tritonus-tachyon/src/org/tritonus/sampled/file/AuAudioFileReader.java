@@ -169,7 +169,7 @@ public class AuAudioFileReader extends TAudioFileReader {
         String desc = readDescription(dataInputStream, nDataOffset - AuTool.DATA_OFFSET);
         // add the description to the file format's properties
         Map<String, Object> properties = new HashMap<>();
-        if (desc != "") {
+        if (!desc.equals("")) {
             properties.put("title", desc);
         }
         
