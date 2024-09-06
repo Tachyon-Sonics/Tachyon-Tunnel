@@ -32,6 +32,8 @@
 package org.tritonus.sampled.file;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import org.tritonus.share.TDebug;
@@ -58,7 +60,7 @@ public class AuAudioOutputStream extends TAudioOutputStream {
     */
     protected static void writeText(TDataOutputStream dos, String s) throws IOException {
         if (s.length() > 0) {
-            dos.writeBytes(s);
+            dos.write(s.getBytes(StandardCharsets.UTF_8));
             dos.writeByte(0); // pour terminer le texte
             if ((s.length() % 2) == 0) {
                 // ajout d'un zero pour faire la longeur pair
@@ -68,13 +70,13 @@ public class AuAudioOutputStream extends TAudioOutputStream {
     }
 
     /**
-    * Returns number of bytes that have to written for string s (with alignment)
-    */
+     * Returns number of bytes that have to written for string s (with alignment)
+     */
     protected static int getTextLength(String s) {
         if (s.length() == 0) {
             return 0;
         } else {
-            return (s.length() + 2) & 0xFFFFFFFE;
+            return (s.getBytes(StandardCharsets.UTF_8).length + 2) & 0xFFFFFFFE;
         }
     }
 
