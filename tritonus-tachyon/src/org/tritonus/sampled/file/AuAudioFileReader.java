@@ -31,9 +31,11 @@
 
 package org.tritonus.sampled.file;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 
 import java.util.*;
@@ -64,16 +66,17 @@ public class AuAudioFileReader extends TAudioFileReader {
 
 
     private static String readDescription(DataInputStream dis, int len) throws IOException {
-        byte c = -1;
-        String ret = "";
-        while (len > 0 && (c = dis.readByte()) != 0) {
-            ret = ret + (char) c;
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        byte b = -1;
+        while (len > 0 && (b = dis.readByte()) != 0) {
+            bytes.write(b);
             len--;
         }
-        if (len > 1 && c == 0) {
+        if (len > 1 && b == 0) {
             dis.skip(len - 1);
         }
-        return ret;
+        bytes.flush();
+        return new String(bytes.toByteArray(), StandardCharsets.UTF_8);
     }
 
 
