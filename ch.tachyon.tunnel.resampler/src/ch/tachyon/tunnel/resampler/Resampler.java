@@ -140,7 +140,7 @@ public class Resampler {
          * an OutputStream, you can only save to a File (or you must use the AU file format which supports unspecified length).
          */
         AudioFileFormat format = new AudioFileFormat(AudioFileFormat.Type.WAVE,
-                new AudioFormat(inputFormat.getFormat().getSampleRate(), 16, inputFormat.getFormat().getChannels(), true, true),
+                new AudioFormat(inputFormat.getFormat().getSampleRate(), 16, inputFormat.getFormat().getChannels(), true, false),
                 (int) processor.getOutputLength());
 
         /*
