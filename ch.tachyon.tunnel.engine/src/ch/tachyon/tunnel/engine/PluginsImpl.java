@@ -173,18 +173,18 @@ public class PluginsImpl {
 
     private static <P extends IPlugin, H extends IEffect> void addBridge(Class<P> pluginInterface, Class<H> hostInterface, Class<? extends H> bridgeType,
             int priority) {
-        Pair<Class<? extends IPlugin>, Class<? extends IEffect>> key = new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(pluginInterface, hostInterface);
+        Pair<Class<? extends IPlugin>, Class<? extends IEffect>> key = new Pair<>(pluginInterface, hostInterface);
         bridges.put(key, bridgeType);
         bridgePriorities.put(bridgeType, priority);
     }
     
     private static <S extends IEffect, M extends IEffect, C extends McFromScBase<M, S>> void addSingleToMultiConverter(Class<S> singleInterface, Class<M> multiInterface, Class<C> converter) {
-        Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> value = new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>(singleInterface, converter);
+        Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> value = new Pair<>(singleInterface, converter);
         singleToMultiConverters.put(multiInterface, value);
     }
     
     private static <M extends IEffect, S extends IEffect, C extends ScFromMcBase<S, M>> void addMultiToSIngleConverter(Class<M> multiInterface, Class<S> singleInterface, Class<C> converter) {
-        Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?, ?>>> value = new Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?,?>>>(multiInterface, converter);
+        Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?, ?>>> value = new Pair<>(multiInterface, converter);
         multiToSingleConverters.put(singleInterface, value);
     }
 
@@ -312,7 +312,7 @@ public class PluginsImpl {
         // adding single chan to multi chan conversion
         List<Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>>> targetMcInterfaces = new ArrayList<>();
         for (Class<? extends IEffect> hostInterface : hostInterfaces) {
-            Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> p = new Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?,?>>>(hostInterface, null);
+            Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> p = new Pair<>(hostInterface, null);
             targetMcInterfaces.add(p); // No conversion
             if (singleToMultiConverters.containsKey(hostInterface)) { // Multi chan can be converted
                 Pair<Class<? extends IEffect>, Class<? extends McFromScBase<?, ?>>> pair = singleToMultiConverters.get(hostInterface);
@@ -389,7 +389,7 @@ public class PluginsImpl {
             boolean isWorthMultithreading = !isParallelizingChans || mtContext.getNbThreads() > 2;
             Class<? extends IPlugin> pluginInterface = (isWorthMultithreading && isMultiThreadable ? mtEffectInterface : effectInterface);
             ConversionInfo conversionInfo = new ConversionInfo(pluginInterface, hostInterface, pair.getSecond(), null, isWorthMultithreading);
-            Pair<Class<? extends IPlugin>,Class<? extends IEffect>> conversion = new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(pluginInterface, hostInterface);
+            Pair<Class<? extends IPlugin>,Class<? extends IEffect>> conversion = new Pair<>(pluginInterface, hostInterface);
             if (bridges.containsKey(conversion)) {
                 // This effect can be bridged to the target type
                 @SuppressWarnings("unchecked")
@@ -412,7 +412,7 @@ public class PluginsImpl {
             for (Pair<Class<? extends IEffect>, Class<? extends ScFromMcBase<?, ?>>> pair : targetScInterfaces) {
                 Class<? extends IEffect> hostInterface = pair.getFirst();
                 ConversionInfo conversionInfo = new ConversionInfo(effectInterface, hostInterface, null, pair.getSecond(), false);
-                Pair<Class<? extends IPlugin>,Class<? extends IEffect>> conversion = new Pair<Class<? extends IPlugin>, Class<? extends IEffect>>(effectInterface, hostInterface);
+                Pair<Class<? extends IPlugin>,Class<? extends IEffect>> conversion = new Pair<>(effectInterface, hostInterface);
                 if (bridges.containsKey(conversion)) {
                     // This effect can be bridged to the target type
                     @SuppressWarnings("unchecked")

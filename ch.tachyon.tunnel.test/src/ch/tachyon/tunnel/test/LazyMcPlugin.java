@@ -49,7 +49,7 @@ public class LazyMcPlugin {
             if (plugin != null && classRefs != null) {
                 try {
                     Class<?> pluginClass = Class.forName(plugin.getClassName(), true, bundle.getClassLoader(false));
-                    WeakReference<Class<?>> ref = new WeakReference<Class<?>>(pluginClass);
+                    WeakReference<Class<?>> ref = new WeakReference<>(pluginClass);
                     classRefs.add(ref);
                 } catch (ClassNotFoundException ex) {
                     throw new RuntimeException(ex);
