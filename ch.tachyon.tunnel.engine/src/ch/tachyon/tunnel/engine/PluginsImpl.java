@@ -505,6 +505,7 @@ public class PluginsImpl {
     /**
      * Bridge the given plugin from the plugin interface 'targetType' to the host interface 'converterType'
      */
+    @SuppressWarnings("resource")
     private static <H extends IEffect, P extends IPlugin> H newConverter(Class<H> converterType, Class<P> targetType, IPlugin target, Properties properties, MultiThreading mtSpecs, MtContext mtContext,
             boolean isMultiThreadingWorth) {
         IPlugin processingTarget = target;
