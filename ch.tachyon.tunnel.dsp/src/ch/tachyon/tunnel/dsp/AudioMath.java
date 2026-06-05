@@ -124,4 +124,20 @@ public class AudioMath {
         return value;
     }
 
+    /**
+     * Convert a frequency to a bin number given the FFT size and the sample rate
+     * @param rounding -1 to round down, 0 to round to most accurate value, 1 to round up
+     */
+    public static int freq2bin(int fftSize, double freq, double sampleRate, int rounding) {
+        double normalizedFreq = freq / sampleRate;
+        int nbBins = fftSize / 2 + 1;
+        double offset = (rounding + 1) * 0.4999;
+        int result = (int) (normalizedFreq * (double) fftSize + offset);
+        if (result < 0)
+            result = 0;
+        else if (result >= nbBins)
+            result = nbBins - 1;
+        return result;
+    }
+
 }
