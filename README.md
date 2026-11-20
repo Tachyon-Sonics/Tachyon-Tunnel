@@ -46,7 +46,7 @@ The engine can convert any plugin interface to either a pull or a push interface
 
 The push and pull interfaces allow for time varying effects like time-stretching or resampling.
 
-Interfaces for each approach exists separately for the plugins and for the host. In general, the host interfaces default to multi-channel, and have a special "mono" version, and it's the other way around for plugins.
+Interfaces for each approach exist separately for the plugins and for the host. In general, the host interfaces default to multi-channel, and have a special "mono" version, and it's the other way around for plugins.
 
 In case it wasn't clear yet, the plugin system is 100% written in Java. It is supposed to be used by hosts and plugins written in Java. It is *not* supposed to work for hosts or plugins written in C or any other language.
 
@@ -63,7 +63,10 @@ Limitations:
 - The plugin's GUI is rendered by the Tachyon Tunnel's engine, not by the plugin or by the host. The plugin can provide hints in how to display each parameter using Java annotations
 - The GUI is always rendered in a separate dialog
 - A "random access" interface was started but never really implemented
+- Over-engineering at various places, especially `IProcessingInfo` stuff
+- Multi-core support exist but is quite limited and not fully stable
 - Probably many many other things... this project was stopped as soon as I had what I needed for other projects that I was more motivated to do... As such this project is no longer active.
+
 
 
 ## Side projects
@@ -90,3 +93,22 @@ It is based on:
 - https://github.com/Gagravarr/VorbisJava (container format)
 - https://github.com/lostromb/concentus (packet decoding)
 
+
+### Misc audio utilities
+
+Project `ch.tachyon.tunnel.audio` contains utilities to read and write audio files, and to process them block by block as `float[][]` arrays corresponding to sample frames in each channel.
+
+Project `ch.tachyon.tunnel.resampler` implements small command-line utilities to apply:
+- The "resample" demo plugin to an audio file, class `Resampler`
+- The "time strecthing" demo plugin to an audio file, class `TimeStretcher` (using the Tachyon Tunnel plugin system) and `TimeStretcherAlt` (using the time stretcher class directly)
+
+These classes give a good overview of the utilities in `ch.tachyon.tunnel.audio` and in how to use the Tachyon Tunnel plugin system.
+
+Project `ch.tachyon.tunnel.dsp` contains some DSP stuff, 100% in Java. Mostly FFT-related:
+- `Cmplx.java`: mutable complex numbers. Because it is mutable it is tricky to use, see its javadoc!
+- `BooFFT.java`: a relatively fast FFT implementation based on a split-radix 2/4 algorithm
+- `Windows.java`: typical windows for short-time Fourier transforms: Hann, Hamming, Blackmann, etc. Even ultraspherical windows (!)
+
+In project `ch.tachyon.tunnel.demo.plugin` you find a few plugins that are far from trivial and could be used as DSP utilities alone:
+- Resampling using sinc + linear interpolation. See `IResampler` and `ResamplerFactory` for usage as a library rather than as a plugin
+- Time stretching implementation, based on the paper "Phase Vocoder Done Right" by Zdeněk Průša and Nicki Holighaus, 25<sup>th</sup> European Signal Processing Conference (EUSIPCO), 2017. See `GradientTimeStretch`, or `TimeStretcherAlt` in `ch.tachyon.tunnel.resampler` for usage.

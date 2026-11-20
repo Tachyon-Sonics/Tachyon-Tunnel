@@ -1,6 +1,6 @@
 package ch.tachyon.tunnel.dsp.fft;
 
-import java.util.*;
+import java.util.Arrays;
 
 
 public class Windows {
@@ -193,10 +193,10 @@ public class Windows {
     public static void fillGaussianWindow(float[] window, int size, float sigma) {
         if (sigma <= 0.0f || sigma > 0.5f)
             throw new IllegalArgumentException("'sigma' must be between 0 and 0.5");
-        float half = (float)(size - 1) / 2.0f;
+        float half = (float) (size - 1) / 2.0f;
         for (int i = 0; i < size; i++) {
-            double x = ((double)i - half) / (sigma * half);
-            window[i] = (float)Math.exp(-0.5 * x * x);
+            double x = ((double) i - half) / (sigma * half);
+            window[i] = (float) Math.exp(-0.5 * x * x);
         }
     }
 
@@ -390,8 +390,8 @@ public class Windows {
     }
 
     public static float getStdEnergy(int length) {
-        float result = 0.25f * (float)length;
-        return (float)Math.sqrt(result);
+        float result = 0.25f * (float) length;
+        return (float) Math.sqrt(result);
     }
 
     public static float getPostEnergy(float[] preWindow, float[] postWindow) {
@@ -401,7 +401,7 @@ public class Windows {
             float prod = preWindow[i] * postWindow[i];
             result += prod * prod;
         }
-        return (float)Math.sqrt(result);
+        return (float) Math.sqrt(result);
     }
 
     public static boolean fillInverseWindow(float[][] preWindows, int preIndex,
@@ -419,7 +419,7 @@ public class Windows {
                 j = j + overlapShift;
                 winNum = winNum - 1;
                 if (winNum < 0)
-                    winNum+= preWindows.length;
+                    winNum += preWindows.length;
             }
             if (sum > 0.05f) {
                 inverse[i] = 1.0f / sum;
@@ -507,12 +507,12 @@ public class Windows {
     public static void main(String[] args) {
         final int Size = 32;
         float[] window = new float[Size];
-        BooFFT fft = new BooFFT(Size);
+        BooFFT fft = new BooFFT(Size / 2);
         for (int db = 20; db <= 200; db += 10) {
             System.out.println();
             System.out.println("*** sidelobe level (db): -" + db);
             Windows.fillChebyshevWindow(window, (float) db, fft);
-            for (int i = 0; i < Size; i+= Size / 32) {
+            for (int i = 0; i < Size; i += Size / 32) {
                 int c = (int) (window[i] * 64.0f + 0.5f);
                 for (int j = 0; j < c; j++)
                     System.out.print("H");
